@@ -19,7 +19,7 @@
 #' @return A list object of class `exvadec` with several matrices
 #' plus metadata.
 make_exvadec_bm_src <- function(wio_object, exporter = "all",
-                                output = "standard") {
+                                output = "standard", quiet = FALSE) {
 
   # Requires functions: bkd, bkoffd, bkt, bktt, hmult,
   # meld, bkdiag, sumnrow, sumgcol
@@ -94,7 +94,7 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
   }
 
   # DVA auxiliary matrices----
-  cli::cli_alert_info("Preparing DVA auxiliary matrices...")
+  if (!quiet) {cli::cli_alert_info("Preparing DVA auxiliary matrices...")}
 
   # Vs
   Vs <- wio$W
@@ -232,7 +232,7 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
   }
 
   # FVA auxiliary matrices----
-  cli::cli_alert_info("Preparing FVA auxiliary matrices...")
+  if (!quiet) {cli::cli_alert_info("Preparing FVA auxiliary matrices...")}
 
   if (is_all){
     Bnots <- make_global_Bnots(wio)
@@ -270,7 +270,7 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
   # DVA terms----
 
 
-  cli::cli_alert_info("Calculating DVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating DVA terms...")}
 
   VAX1 <- check_meld_group(dmult(Vs_Lss, Ysr))
 
@@ -298,7 +298,7 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
   sum_Vt_Btsnots_Asr_Lrr <- dmult(sum_Vt_Btsnots, Asr %*% Lrr)
 
   # FVA terms----
-  cli::cli_alert_info("Calculating FVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating FVA terms...")}
 
   FVA1 <- check_meld_group(dmult(sum_Vt_Btsnots, Ysr))
 
@@ -334,7 +334,7 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
   GVCB <- GVC - GVCF
 
   # Output----
-  cli::cli_alert_info("Preparing output ...")
+  if (!quiet) {cli::cli_alert_info("Preparing output ...")}
 
   if(output == "standard") {
 
@@ -380,13 +380,15 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
   }
   class(exvadec) <- "exvadec"
 
-  # cli::cli_alert_success("Done!")
+  if (!quiet) {cli::cli_alert_success("Done!")}
 
   # Print result summary
-  if (exporter == "all") {
-    get_exvadec_bkdown(exvadec)
-  } else{
-    get_exvadec_bkdown(exvadec, exporter)
+  if (!quiet) {
+    if (exporter == "all") {
+      get_exvadec_bkdown(exvadec)
+    } else{
+      get_exvadec_bkdown(exvadec, exporter)
+    }
   }
 
   return(exvadec)

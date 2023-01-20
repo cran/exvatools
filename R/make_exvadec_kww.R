@@ -19,7 +19,7 @@
 #' @return A list object of class `exvadec` with several matrices
 #' plus metadata.
 make_exvadec_kww <- function(wio_object, exporter = "all",
-                             output = "standard") {
+                             output = "standard", quiet = FALSE) {
 
   # Check class----
   wio <- check_object(wio_object, "wio")
@@ -91,10 +91,12 @@ make_exvadec_kww <- function(wio_object, exporter = "all",
   class(exvadec) <- "exvadec"
 
   # Print result summary
-  if (is_all) {
-    get_exvadec_bkdown(exvadec)
-  } else{
-    get_exvadec_bkdown(exvadec, exporter)
+  if (!quiet) {
+    if (is_all) {
+      get_exvadec_bkdown(exvadec)
+    } else{
+      get_exvadec_bkdown(exvadec, exporter)
+    }
   }
 
   return(exvadec)

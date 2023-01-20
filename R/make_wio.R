@@ -3,7 +3,9 @@
 #' Creates a list object of class `wio` containing the typical
 #'   international input-output matrices in a standardized format, as well as a
 #'   list of code names (countries, sectors and demand components) and a list
-#'   of dimensions (number of countries, sectors and demand components).
+#'   of dimensions (number of countries, sectors and demand components). It
+#'   can use source files from well-known databases or internal data (test
+#'   data).
 #' @param wiotype String specifying the name and edition of the
 #'   input-output tables to be used:
 #'     * `"icio2021"` for the 2021 edition of the OECD ICIO tables
@@ -44,9 +46,9 @@
 #' or in the University of Groningen's
 #' [WIOD web page](https://www.rug.nl/ggdc/valuechain/wiod/).
 #'
-#' For `make_wio()` to work properly, source files must be downloaded and
+#' If source files are used, they must be previously downloaded and
 #'   placed in an accessible folder in disk, without renaming them. The
-#'   following name pattern is expected for source files:
+#'   following name pattern is expected:
 #'   * `ICIO_XXXX-XXXX.zip` for `"icio2021"` (`.csv` files)
 #'   * `ICIO2018_XXXX.zip` for `"icio2018"` (`.csv` files)
 #'   * `ICIO2016_XXXX.zip` for `"icio2018"` (`.csv` files)
@@ -55,7 +57,7 @@
 #'     package `openxlsx`..
 #'   * `lr_wiod_wiot_final_filled.csv` for `"lrwiod2022"`. Requires
 #'     packages `data.table` and `reshape2`.
-#' The input-output framework followed is the traditional demand model of
+#' The input-output framework follows the traditional demand model of
 #'   Leontief (1936), which makes assumptions about the stability of inputs
 #'   (and therefore value-added) as a proportion of production. This allows
 #'   production and value-added to be expressed as the result of variations
@@ -63,10 +65,10 @@
 #' Details about the content of the world input-output object (`wio`)
 #'   produced by `make_wio()` can be obtained with the command
 #'   `summary(wio_object)`.
+#' @seealso [make_custom_wio()]
 #'
 #' @return A list object of class `wio` including input-output
 #'   matrices, dimensions, and names.
-#' @author Enrique Feas
 #' @export
 #' @examples
 #' wio <- make_wio("iciotest")

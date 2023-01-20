@@ -7,7 +7,7 @@
 get_va_exgr(
   wio_object,
   va_type = "FC",
-  geo_orig = "all",
+  geo_orig = "WLD",
   sec_orig = "TOTAL",
   geo_export,
   sec_export = "TOTAL",

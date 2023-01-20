@@ -16,11 +16,10 @@
 #'   `original`: Original denomination of terms.
 #' @keywords internal
 #' @noRd
-#' @author Enrique Feas
 #' @return A list object of class `exvadec` with several matrices
 #' plus metadata.
 make_exvadec_oecd <- function(wio_object, exporter = "all",
-                              output = "standard") {
+                              output = "standard", quiet = FALSE) {
 
   # exporter <- "EU27"
   # output <- "standard"
@@ -71,7 +70,7 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   # Simple auxiliary matrices----
 
-  cli::cli_alert_info("Preparing simple auxiliary matrices...")
+  if (!quiet) {cli::cli_alert_info("Preparing simple auxiliary matrices...")}
 
   # Vs
   Vs <- Vt <- wio$W
@@ -126,7 +125,7 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   # Complex auxiliary matrices----
 
-  cli::cli_alert_info("Preparing complex auxiliary matrices...")
+  if (!quiet) {cli::cli_alert_info("Preparing complex auxiliary matrices...")}
 
   Vs_Bss <- diagcs(dmult(Vs, Bss))
   Vs_Lss <- diagcs(dmult(Vs, Lss))
@@ -159,7 +158,7 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   # DVA terms----
 
-  cli::cli_alert_info("Calculating DVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating DVA terms...")}
 
   if (is_all) {
     VAX <- meld(bkoffd(Vs_Bsj_Yjk))
@@ -187,7 +186,7 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   # FVA terms----
 
-  cli::cli_alert_info("Calculating FVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating FVA terms...")}
 
   # FC
   Vt_Bts <- diagcs(dmult(wio$W, Bts))
@@ -243,7 +242,7 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   if (output == "tiva") {
 
-    cli::cli_alert_info("Calculating extra TiVA terms...")
+    if (!quiet) {cli::cli_alert_info("Calculating extra TiVA terms...")}
 
     if (is_all) {
       IMGR <- bkt(EXGR)
@@ -344,7 +343,7 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   # Output----
 
-  cli::cli_alert_info("Preparing output ...")
+  if (!quiet) {cli::cli_alert_info("Preparing output ...")}
 
   if (output == "standard") {
     exvadec <- list(EXGR, DC, DVA, VAX, REF, DDC,
@@ -396,15 +395,16 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
   }
   class(exvadec) <- "exvadec"
 
-  # cli::cli_alert_success("Done!")
+  if (!quiet) {cli::cli_alert_success("Done!")}
 
   # Print result summary
-  if (exporter == "all") {
-    get_exvadec_bkdown(exvadec)
-  } else {
-    get_exvadec_bkdown(exvadec, exporter)
+  if (!quiet) {
+    if (exporter == "all") {
+      get_exvadec_bkdown(exvadec)
+    } else {
+      get_exvadec_bkdown(exvadec, exporter)
+    }
   }
-
 
   return(exvadec)
 

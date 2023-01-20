@@ -14,8 +14,11 @@ library(exvatools)
 #  wio <- make_wio("icio2021", year = 2018,
 #                  src_dir = "C:/Users/Username/Documents/R")
 
-## ----make_wio_test------------------------------------------------------------
+## ----make_wio_test, message=FALSE---------------------------------------------
 wio <- make_wio("iciotest")
+
+## ----make_custom_wio, eval=FALSE----------------------------------------------
+#  wio <- make_custom_wio(df, g_names = c("C01", "C02", "C03"))
 
 ## ----summary_wio--------------------------------------------------------------
 summary(wio)

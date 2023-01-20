@@ -61,7 +61,7 @@ make_exvadir <- function(wio_object, exporter,
   is_group <- ifelse(length(pg_exp) > 1, TRUE, FALSE)
 
   # Codes and position for country of origin of VA----
-  if(!orig_geo=="all" & !orig_geo=="sum"){
+  if(!orig_geo=="all" & !orig_geo=="WLD"){
     # Position of exporter, groups
     pgn_orig <- grep(get_geo_codes(orig_geo, wio_type, TRUE), gxn_names)
     pg_orig <- grep(get_geo_codes(orig_geo, wio_type), g_names)
@@ -115,7 +115,7 @@ make_exvadir <- function(wio_object, exporter,
 
   # Specific country of origin of VA----
   # We make the rows of countries not origin as 0 (for all sectors)
-  if(!orig_geo=="all" & !orig_geo=="sum"){
+  if(!orig_geo=="all" & !orig_geo=="WLD"){
     Vt_Bts[-pgn_orig, ] <- 0
   }
 
@@ -139,7 +139,7 @@ make_exvadir <- function(wio_object, exporter,
   # Ws (GXN x GXN) x Bts(GXN x N) = GXN x N
   # All: we take the column of the exporter of matrix B
   # Vs_Bts <- wio$W %*% Bts[,pgn_exp] #dim GXN x N
-  Vt_Bts <- Vt_Bts[, pgn_exp]
+  Vt_Bts <- Vt_Bts[, pgn_exp, drop = FALSE]
 
   # Destination and intermediate importing country----
   # We define the matrix EXGRY depending on the
@@ -153,7 +153,7 @@ make_exvadir <- function(wio_object, exporter,
     Ym[pgn_exp, pg_exp] <- 0
     Am[pgn_exp, pgn_exp] <- 0
   }
-  sumEXGR <- sum(wio$EXGR[pgn_exp,])
+  sumEXGR <- sum(wio$EXGR[pgn_exp, ])
 
 
   if(via=="any"){
@@ -162,24 +162,24 @@ make_exvadir <- function(wio_object, exporter,
 
     if(flow_type == "EXGR"){
       # Normal EXGR
-      EXGRY <- wio$EXGR[pgn_exp,]
-      if(is_group==TRUE && intra==FALSE){
+      EXGRY <- wio$EXGR[pgn_exp, , drop = FALSE]
+      if (is_group == TRUE && intra == FALSE){
         EXGRY[, pg_exp] <- 0
       }
       #
     } else if(flow_type=="EXGRY"){
       B_Y <- wio$B %*% wio$Y
-      EXGRY <- (Ym + Am %*% B_Y)[pgn_exp,]
+      EXGRY <- (Ym + Am %*% B_Y)[pgn_exp, , drop = FALSE]
       #
     } else if(flow_type=="EXGRY_FIN"){
-      EXGRY <- Ym[pgn_exp,]
+      EXGRY <- Ym[pgn_exp, , drop = FALSE]
       #
     } else if(flow_type=="EXGRY_INT"){
       B_Y <- wio$B %*% wio$Y
-      EXGRY <- (Am %*% B_Y)[pgn_exp,]
+      EXGRY <- (Am %*% B_Y)[pgn_exp, , drop = FALSE]
       #
     } else if(flow_type=="FD"){
-      EXGRY <- (wio$Y)[pgn_exp,]
+      EXGRY <- (wio$Y)[pgn_exp, , drop = FALSE]
     }
 
   } else if(!via=="any"){
@@ -190,7 +190,7 @@ make_exvadir <- function(wio_object, exporter,
     # i.e. we use importer as exporter for BY
     # E.g.. Y12 + A12*BY[2,]
 
-    Ysr <- Ym[pgn_exp, ]
+    Ysr <- Ym[pgn_exp, , drop = FALSE]
     Ysr[, -pg_imp] <- 0
 
     if(flow_type=="EXGR"){
@@ -201,7 +201,7 @@ make_exvadir <- function(wio_object, exporter,
 
     if(flow_type=="EXGRY"){
       B_Y <- wio$B %*% wio$Y
-      EXGRY <- Ysr + Am[pgn_exp, pgn_imp] %*% B_Y[pgn_imp,]
+      EXGRY <- Ysr + Am[pgn_exp, pgn_imp] %*% B_Y[pgn_imp, , drop = FALSE]
       #
     } else if(flow_type=="EXGRY_FIN"){
       EXGRY <- Ysr
@@ -209,7 +209,7 @@ make_exvadir <- function(wio_object, exporter,
     } else if(flow_type=="EXGRY_INT"){
       #
       B_Y <- wio$B %*% wio$Y
-      EXGRY <- Am[pgn_exp, pgn_imp] %*% B_Y[pgn_imp,]
+      EXGRY <- Am[pgn_exp, pgn_imp] %*% B_Y[pgn_imp, , drop = FALSE]
     }
 
   }

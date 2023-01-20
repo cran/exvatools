@@ -22,7 +22,7 @@ get_exvadec_bkdown(
 \item{importer}{Character code of importer}
 }
 \value{
-Print result and copy to clipboard
+Print result to console
 }
 \description{
 Detail from an \code{exvadec} decomposition of a country by sector and
@@ -32,7 +32,4 @@ by destination
 wio <- make_wio("wiodtest", quiet = TRUE)
 exvadec <- make_exvadec(wio, quiet = TRUE)
 get_exvadec_bkdown(exvadec, "ESP", "MANUF")
-}
-\author{
-Enrique Feas
 }

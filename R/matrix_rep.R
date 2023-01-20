@@ -10,7 +10,6 @@
 #' @keywords internal
 #' @noRd
 #' @return Extended matrix df with columns repeated
-#' @author Enrique Feas
 repmat <- function(matrix, times, bycols = TRUE){
   arr <- NULL
   for (i in 1:times){
@@ -32,7 +31,6 @@ repmat <- function(matrix, times, bycols = TRUE){
 #' @keywords internal
 #' @noRd
 #' @return Extended matrix df with columns repeated
-#' @author Enrique Feas
 repeach <- function(df, times){
   # Repeats each column of a matrix df
   # a number specified by times

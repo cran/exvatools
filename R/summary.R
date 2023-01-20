@@ -37,6 +37,11 @@ summary.wio <- function(object, ...) {
                     Description = dbwio$txt_en,
                     Dimensions = dimensions)
 
+  # tbl_txt <- utils::capture.output(print(tbl, row.names = FALSE,
+  #                                        quote = FALSE, right = FALSE))
+  # tbl_txt <- paste0(tbl_txt, collapse = cr)
+
+
   # Start printing
   cat(cr)
   cat(hline(), cr)
@@ -72,6 +77,7 @@ summary.wio <- function(object, ...) {
   # Demand components
   cat("Demand components (FD):", FD, cr)
   cat(wio$names$fd_names)
+  cat(cr, cr)
 
 }
 

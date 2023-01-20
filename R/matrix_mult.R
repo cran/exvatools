@@ -159,7 +159,8 @@ hmult <- function(df1, df2){
       }
     }
     # cs_cs by cs_cs
-  } else if (all(dims_df2 == "cs_cs", dims_df2 == "cs_cs")) {
+    # cambiado a sugerencia de JSS
+  } else if (all(dims_df1 == "cs_cs", dims_df2 == "cs_cs")) {
     arr <- matrix(0, c1 * s1, c2 * s2)
     dimnames(arr) <- list(rownames(df2), colnames(df2))
     for(s in 1:c1){

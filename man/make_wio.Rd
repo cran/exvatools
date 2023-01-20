@@ -47,7 +47,9 @@ matrices, dimensions, and names.
 Creates a list object of class \code{wio} containing the typical
 international input-output matrices in a standardized format, as well as a
 list of code names (countries, sectors and demand components) and a list
-of dimensions (number of countries, sectors and demand components).
+of dimensions (number of countries, sectors and demand components). It
+can use source files from well-known databases or internal data (test
+data).
 }
 \details{
 \code{make_wio()} directly unzips and processes the original source files
@@ -61,9 +63,9 @@ Original source files can be obtained in the OECD's
 or in the University of Groningen's
 \href{https://www.rug.nl/ggdc/valuechain/wiod/}{WIOD web page}.
 
-For \code{make_wio()} to work properly, source files must be downloaded and
+If source files are used, they must be previously downloaded and
 placed in an accessible folder in disk, without renaming them. The
-following name pattern is expected for source files:
+following name pattern is expected:
 \itemize{
 \item \code{ICIO_XXXX-XXXX.zip} for \code{"icio2021"} (\code{.csv} files)
 \item \code{ICIO2018_XXXX.zip} for \code{"icio2018"} (\code{.csv} files)
@@ -73,7 +75,7 @@ following name pattern is expected for source files:
 package \code{openxlsx}..
 \item \code{lr_wiod_wiot_final_filled.csv} for \code{"lrwiod2022"}. Requires
 packages \code{data.table} and \code{reshape2}.
-The input-output framework followed is the traditional demand model of
+The input-output framework follows the traditional demand model of
 Leontief (1936), which makes assumptions about the stability of inputs
 (and therefore value-added) as a proportion of production. This allows
 production and value-added to be expressed as the result of variations
@@ -94,6 +96,6 @@ wio <- make_wio("wiod2016", 2014)
 wio <- make_wio("wiod2021", 2018, src_dir = "C:/Users/John/R/")
 }
 }
-\author{
-Enrique Feas
+\seealso{
+\code{\link[=make_custom_wio]{make_custom_wio()}}
 }

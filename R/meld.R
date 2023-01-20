@@ -7,7 +7,6 @@
 #' @param meld_rows Boolean, true to meld rows.
 #' @param meld_cols Boolean, true to meld cols.
 #' @return Melded version of `ICIO` matrix.
-#' @author Enrique Feas
 #' @export
 meld <- function(df, meld_rows=TRUE, meld_cols=TRUE){
 
@@ -31,7 +30,7 @@ meld <- function(df, meld_rows=TRUE, meld_cols=TRUE){
     # MEX
     if (all(length(prMEX) > 0, length(prMXall) > 0)) {
       if (!sum(df[prMEX, ]) == 0) {
-        print("Row MEX is not empty")
+        warning("Row MEX is not empty")
       }
       if (length(prMEX) == 1) {
         df[prMEX, ] <- csums(df[prMXall, , drop = FALSE])
@@ -46,7 +45,7 @@ meld <- function(df, meld_rows=TRUE, meld_cols=TRUE){
     # CHN
     if (all(length(prCHN) > 0, length(prCNall) > 0)) {
       if (!sum(df[prCHN, ]) == 0) {
-        print("Row CHN is not empty")
+        warning("Row CHN is not empty")
       }
       if (length(prCHN) == 1) {
         df[prCHN, ] <- csums(df[prCNall, , drop = FALSE])
@@ -79,7 +78,7 @@ meld <- function(df, meld_rows=TRUE, meld_cols=TRUE){
     # MEX
     if (all(length(pcMEX) > 0, length(pcMXall) > 0)) {
       if (!sum(df[, pcMEX]) == 0) {
-        print("Row MEX is not empty")
+        warning("Row MEX is not empty")
       }
       if (length(pcMEX) == 1) {
         df[, pcMEX] <- rsums(df[, pcMXall, drop = FALSE])
@@ -94,7 +93,7 @@ meld <- function(df, meld_rows=TRUE, meld_cols=TRUE){
     # CHN
     if (all(length(pcCHN) > 0, length(pcCNall) > 0)) {
       if (!sum(df[, pcCHN]) == 0) {
-        print("Row CHN is not empty")
+        warning("Row CHN is not empty")
       }
       if (length(pcCHN) == 1) {
         df[, pcCHN] <- rsums(df[, pcCNall, drop = FALSE])

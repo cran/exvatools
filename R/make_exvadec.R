@@ -97,48 +97,25 @@ make_exvadec <- function(wio_object, exporter = "all",
   # Returns TRUE if ok
   checked_args <- check_exvadec_args(list_args, my_args)
 
-
   # Select method, exporter and output----
-  if (quiet == FALSE) {
-    if (method == "bm_src") {
-      exvadec <- make_exvadec_bm_src(wio, exporter = exporter,
-                                     output = output)
-    } else if (method == "bm_snk") {
-      exvadec <- make_exvadec_bm_snk(wio, exporter = exporter,
-                                     output = output)
-    } else if (method == "wwz") {
-      exvadec <- make_exvadec_wwz(wio, exporter = exporter,
-                                  output = output)
-    } else if (method == "kww") {
-      exvadec <- make_exvadec_kww(wio, exporter = exporter,
-                                  output = output)
-    } else if (method == "my") {
-      exvadec <- make_exvadec_my(wio, exporter = exporter,
-                                  output = output, ...)
-    } else if (method == "oecd") {
-      exvadec <- make_exvadec_oecd(wio, exporter = exporter,
-                                   output = output)
-    }
-  } else if (quiet == TRUE) {
-    if (method == "bm_src") {
-      exvadec <- suppressMessages(make_exvadec_bm_src(wio, exporter = exporter,
-                                     output = output))
-    } else if (method == "bm_snk") {
-      exvadec <- suppressMessages(make_exvadec_bm_snk(wio, exporter = exporter,
-                                     output = output))
-    } else if (method == "wwz") {
-      exvadec <- suppressMessages(make_exvadec_wwz(wio, exporter = exporter,
-                                  output = output))
-    } else if (method == "kww") {
-      exvadec <- suppressMessages(make_exvadec_kww(wio, exporter = exporter,
-                                                   output = output))
-    } else if (method == "my") {
-      exvadec <- suppressMessages(make_exvadec_my(wio, exporter = exporter,
-                                                   output = output, ...))
-    } else if (method == "oecd") {
-      exvadec <- suppressMessages(make_exvadec_oecd(wio, exporter = exporter,
-                                   output = output))
-    }
+  if (method == "bm_src") {
+    exvadec <- make_exvadec_bm_src(wio, exporter = exporter,
+                                   output = output, quiet = quiet)
+  } else if (method == "bm_snk") {
+    exvadec <- make_exvadec_bm_snk(wio, exporter = exporter,
+                                   output = output, quiet = quiet)
+  } else if (method == "wwz") {
+    exvadec <- make_exvadec_wwz(wio, exporter = exporter,
+                                output = output, quiet = quiet)
+  } else if (method == "kww") {
+    exvadec <- make_exvadec_kww(wio, exporter = exporter,
+                                output = output, quiet = quiet)
+  } else if (method == "my") {
+    exvadec <- make_exvadec_my(wio, exporter = exporter,
+                               output = output, quiet = quiet, ...)
+  } else if (method == "oecd") {
+    exvadec <- make_exvadec_oecd(wio, exporter = exporter,
+                                 output = output, quiet = quiet)
   }
 
   # Output----

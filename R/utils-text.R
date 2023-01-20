@@ -9,9 +9,9 @@
 #' @noRd
 #'
 #' @return Text string (1 string only)
-vecwrap <- function(txt, nchars = 80) {
+vecwrap <- function(txt, nchars = 70) {
 
-  txt <- paste(strwrap(paste0(txt, collapse=", "), 80),
+  txt <- paste(strwrap(paste0(txt, collapse=", "), nchars),
                collapse = "\n")
   return(txt)
 
@@ -52,12 +52,12 @@ formatnumber <- function(value, num_decimals){
 #' hline
 #' Inserts horizontal line (of equal sign)
 #'
-#' @param num_chars Integer number of symbols (default = 80)
+#' @param num_chars Integer number of symbols (default = 70)
 #'
 #' @return String line
 #' @keywords internal
 #' @noRd
-hline <- function(num_chars = 80){
+hline <- function(num_chars = 70){
   return(strrep("=", num_chars))
 }
 
@@ -70,7 +70,7 @@ hline <- function(num_chars = 80){
 #' @return Character string
 #' @keywords internal
 #' @noRd
-center <- function(txt, limchars = 80) {
+center <- function(txt, limchars = 70) {
   num_spc <- round((limchars - nchar(txt))/2, 0)
   new_txt <- paste0(strrep(" ", num_spc), txt)
   return(new_txt)

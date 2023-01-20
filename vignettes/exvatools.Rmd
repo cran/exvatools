@@ -1,7 +1,9 @@
 ---
 title: "Introduction to exvatools"
-author: Enrique Feás
-date: December, 2022
+author: 
+  - name: Enrique Feás
+    affiliation: University of Alcalá and Elcano Royal Institute
+date: January, 2023
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to exvatools}
@@ -16,51 +18,22 @@ knitr::opts_chunk$set(
 )
 ```
 
-International input-output tables are useful statistical tools: they show us
-how different sectors in  different countries interact with each other. This
-is particularly relevant when analyzing international trade, given that half of
-today's trade is composed of intermediate goods and gross flows become less and
-less representative of reality. Moreover, international input-output tables 
-show the increasing relations between services and goods.
-
-The problem is that handling big input-output tables is complicated. This is
-where **exvatools** comes to the rescue. Its purpose is double:
+Half of today's international trade is composed of intermediate goods, so 
+statistics of gross exports do not reflect the complexity of globalization.
+Trade flows should be expressed in terms of value added, taking advantage of
+modern international input-output tables, which show how different sectors in
+different countries interact with each other. The problem is that handling 
+big input-output tables is complicated and many indicators are not available.
+This is where **exvatools** comes to the rescue. Its purpose is double:
 
 * To facilitate the extraction and processing of the most relevant 
-  international input tables available today, through easy commands.
-* To provide tools to decompose the value added in exports
-  according to different methodologies in the literature.
+  international input tables available today, or the use of custom databases,
+  with user-friendly commands.
+* To provide tools to analyze value added in exports, including the 
+  calculation of decompositions according to different methodologies 
+  in the literature.
 
 ## International input-output analysis tools
-
-### Getting raw data
-
-There are a few international input-output tables available. Two of the most
-renowned in economic literature are:
-
-* The OECD's Trade in Value Added database (TiVA), based on the Inter-Country
-  Input-Output Tables (ICIO)
-* The University of Groningen's World Input Output Database (WIOD), based on
-  the World Input Output Tables.
-
-The advantage of these databases is twofold: they are quite rich in terms of
-countries and sectors, and they are directly downloadable from the web page of
-their supporting institutions.
-
-Source data is normally provided in zipped files containing comma-delimited 
-files (`.csv`), Excel files (`.xlsx`) or R data files (`.rData`), which
-**exvatools** can handle with the support of other CRAN packages.
-
-In order to use **exvatools** with official data, we must first download the
-source files to our computer. For instance, if we want to use the last 
-edition of the OECD (2021) with data up to 2018, we should download the
-file "ICIO_2015-2018.zip" (96 MB) from the
-[ICIO web page](https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm) 
-containing the required `.csv` files.
-
-From here, **exvatools** will take care of the rest: it will extract the raw 
-data from the zip file and create the basic input-output matrices, embedded
-in objects that will be the basis for further analysis.
 
 ### Installing exvatools
 
@@ -72,34 +45,76 @@ install.packages("exvatools")
 ```
 
 To make **exvatools** available:
+
 ```{r library}
 library(exvatools)
 ```
 
-### Importing data and creating basic input-output matrices
+### Using data
 
-Once we have downloaded the raw data, we can obtain the basic input-output
-matrices in an object `wio` (for 'world input-output') with the command 
-`make_wio()`. We just need the input-output edition we want to use (the one
-we have downloaded), the year and the folder where we saved our zip file 
-(just the directory). For instance, if we had downloaded it in
-`C:\Users\Username\Documents\R`, we would just need to type the following
-command (mind the direction of the slashes in **R**):
+**exvatools** produces basic input-output tables from three types of data:
+
+1. Raw data of standard international input-output databases
+
+Raw data can be directly downloaded from the web pages of their respective
+institutions. Two sources are currently supported:
+  
+  * OECD Inter-Country Input-Output (ICIO) tables, on which the OECD's
+    Trade in Value Added database (TiVA) is based.
+  * World Input Output Database (WIOD) tables
+
+The advantage of these databases is threefold: they are widely used in the 
+economic literature, they are quite rich in terms of countries and sectors, 
+and they are directly downloadable from the web page of their supporting 
+institutions, normally as zipped files containing comma-delimited 
+files (`.csv`), Excel files (`.xlsx`) or R data files (`.rData`).
+
+For instance, if we want to use **exvatools** with the latest edition of 
+the OECD ICIO tables (2021, with data up to 2018), we must first download to
+our computer the source file "ICIO_2015-2018.zip" (96 MB) from the
+[ICIO web page](https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm).
+Then we will use the command `make_wio()`, specifying the edition, 
+the year and the folder where the source zip file is saved (just the directory).
+For instance, if we had downloaded it in `C:\Users\Username\Documents\R` and
+we wanted the year 2018, we would just need to type:
 
 ```{r make_wio, eval=FALSE, echo=TRUE}
 wio <- make_wio("icio2021", year = 2018, 
                 src_dir = "C:/Users/Username/Documents/R")
 ```
 
-As the dimension of these input-output matrices is big, for didactic purposes
-we will use a test input-output database, with non-real data. **exvatools**
-includes two test tables, `"iciotest"` (which follows a ICIO-type structure)
-and `"wiodtest"` (which follows a WIOD-type structure).
-```{r make_wio_test}
+and **exvatools** will take care of the rest: it will extract the `.csv` files
+from the zip file and produce the basic input-output matrices.
+
+2. Test datasets included in the package
+
+If we just want to check the features of **exvatools**, there is no need to
+download any data. The package includes two sets of fictitious data, one 
+replicating an ICIO-type database (`wiotype = "iciotest"`, with Mexico and 
+China disaggregated) and another one replicating a WIOD-type database 
+(`wiotype = "wiodtest"`).
+
+```{r make_wio_test, message=FALSE}
 wio <- make_wio("iciotest")
 ```
 
-We can easily check the contents of the created `wio` object with `summary()`:
+3. Custom data
+
+Alternatively, **exvatools** can use custom data to create basic input-output 
+matrices. In this case, we just need as input a numeric matrix (or data frame)
+with the intermediate inputs `Z` and the final demand `Yfd`, and a vector with
+the names of the countries (names of sectors and final demand components are
+optional). The command `make_custom_wio()` will be used in this case.   
+
+```{r make_custom_wio, eval=FALSE}
+wio <- make_custom_wio(df, g_names = c("C01", "C02", "C03"))
+```
+
+For didactic purposes, we will use here ICIO-type fictitious data made with
+`make_wio("iciotest")`.
+
+The contents of the created `wio` object can be checked with `summary()`:
+
 ```{r summary_wio}
 summary(wio)
 ```
@@ -124,34 +139,37 @@ nth column, `sumgrows()` to sum groups of rows of a particular size,
 
 For instance, let us check that the production `X` is equivalent to the product
 of the global Leontief inverse matrix `B` and the final demand `Y`:
+
 ```{r BY}
 BY <- wio$B %*% wio$Y
 ```
 
 We can sum the rows and check that it coincides with the production vector:
+
 ```{r sum_WBY}
 BY <- rsums(BY, "BY")
 print(cbind(head(BY, 10), head(wio$X, 10)))
 ```
 
-The OECD ICIO tables have a particular feature: two big industrial countries,
-China and Mexico, are disaggregated in two for calculation purposes. This
-requires a tool to consolidate data once all calculations are done. The 
-command `meld()` takes care of that.
+In OECD ICIO tables two big industrial countries, China and Mexico, 
+are disaggregated into two. Calculations must be done with disaggregated
+data, but countries must be later consolidated (e.g., `CN1` and `CN2` must
+be converted into `CHN`). This can be done with the command `meld()`.
 
-For instance, to calculate the value added absorbed abroad we need to 
+For instance, to calculate the value added absorbed abroad (`VAX`) we need to 
 multiply the value added coefficients matrix `V`-hat (represented here
 with `W`) by the global inverse matrix `B` by the final demand matrix `Y`, 
 and then exclude the value added absorbed domestically. This can be easily done
 with a few commands.
+
 ```{r WBY}
 # To calculate all value added induced by demand:
 VBY <- dmult(wio$W, wio$B) %*% wio$Y
 VBY
 ```
 
-We can see that rows for Mexico and China are disaggregated. We can now
-meld them:
+We can see that rows for Mexico and China are disaggregated. We can meld them
+with `meld()`:
 
 ```{r meld}
 VBY <- meld(VBY)
@@ -168,17 +186,20 @@ bkoffd(VBY)
 
 ## Value added in exports
 
-The model we have used allows us to express value added induced by demand. This
-is the idea behind the calculation of value added in exports, i.e., induced by
-the demand of exports. In this case, we need not only to obtain the value 
-added, but to estimate the effect of the multiple times that intermediate 
-products cross the international borders.
+The model we have used allows us to express value added induced by final 
+demand, but we can also study how gross exports induce value added, not
+only from final exports but also from exports of intermediates. In this case,
+we need to consider the effect of the multiple times that intermediate 
+products cross international borders, to avoid double counting.
 
 This is why several methods have appeared to calculate full decomposition of
 value added in exports, distinguishing what part of value added is *pure*
 value added and which one is double counting, and also, within the *pure*
 double counting, what part is really exported and what part eventually
 returns back to the exporting country ('false' exports).
+
+**exvatools** can then produce key value added indicators (like bilateral value 
+added exports or `VAX`) that are not currently available in public databases.
 
 ### Alternative decompositions of value added in exports
 
@@ -205,8 +226,8 @@ get_exvadec_bkdown(exvabm, exporter = "ESP",
                    sector = "SRVWC", importer = "USA")
 ```
 
-An alternative (although methodologically inferior) decomposition would be
-the Wang et al. (2013) decomposition. In this case, instead of the normal 
+An alternative (although methodologically inferior) decomposition would be that
+of Wang et al. (2013). In this case, instead of the normal 
 decomposition, we will use the `"terms"` output. (that shows the 16 terms that
 compose the value added in exports):
 
@@ -231,9 +252,10 @@ get_exvadec_bkdown(exvawwz, exporter = "USA",
 ### Direction of value added in exports: origin and destination
 
 We have seen that the foreign content in Spanish exports amounts to USD 2501.78
-million. Where does it come from? If we can pass without the detailed breakdown,
-but are interested in knowing the specific geographical and sector origin of 
-the value added in exports, we van use the command `make_exvadir`: 
+million. Where does it come from? If we do not need a detailed breakdown of
+the value added, but we are interested in knowing the specific geographical and
+sector origin of the value added content in exports, we can use the command
+`make_exvadir()`: 
 
 ```{r make_exvadir, results='hide'}
 exvadir <- make_exvadir(wio, exporter = "ESP", va_type = "FC", 
@@ -276,10 +298,10 @@ in the current environment.
 LATAM <- c("ESP", "MEX")
 ```
 
-And now we can use it as a normal variable, just introducing it as `"LATAM"` (do 
-not forget the double quotes). We will use the `wwz` decomposition and
+And now we can use it as a normal variable, just introducing it as `"LATAM"` 
+(with double quotes). We will use the `wwz` decomposition and
 extract the domestic value added in intermediates (`DVA_INT`) from `LATAM` to
-`USA`. Mind that, if we use custom groups, we need to select the 
+`USA`. Note that, if we use custom groups, we need to select the 
 option `custom = TRUE` in `get_data()`.
 
 ```{r get_data_vax_latam}
@@ -304,9 +326,11 @@ get_data(exvawwz, "EXGR", exporter = "NAFTA",
 The flexibility of the commands `make_exvadir()` and `get_data()` allows for
 the creation of several ready-made commands in **exvatools**. One is
 `get_va_exgr()`, to get a detailed sector and geographical origin and 
-destination of value added. For instance, if we want the value added in
-services of the US incorporated in the Spanish exports of 
-manufactures, we just have to type:
+destination of value added, i.e., how the inputs of specific sectors in 
+specific countries contribute to the value added in exports of a particular 
+sector of a particular country. For instance, if we want to check the value 
+added in US services incorporated in Spanish exports of manufactures, we
+just have to type:
 
 ```{r get_va_exgr}
 get_va_exgr(wio,geo_orig = "USA", sec_orig = "SRVWC",
@@ -316,7 +340,7 @@ get_va_exgr(wio,geo_orig = "USA", sec_orig = "SRVWC",
 Sometimes we are not only interested in the origin, but also in the country
 of final absorption. For that we have `get_va_exgry()`. For instance, if we 
 want to know what part of the US value added incorporated in China's exports
-of manufactures end up absorbed back in the US, we can type:
+of manufactures ends up absorbed back in the US, we can type:
 
 ```{r get_va_exgry}
 get_va_exgry(wio, geo_orig = "USA", geo_export = "CHN",
@@ -345,6 +369,7 @@ exvativa <- make_exvadec(wio, exporter = "all", method = "oecd",
 ```
 
 And then get the decomposition for Spain:
+
 ```{r tiva_esp}
 get_exvadec_bkdown(exvativa, exporter = "ESP")
 ```
@@ -352,11 +377,13 @@ get_exvadec_bkdown(exvativa, exporter = "ESP")
 ## Available sectors and countries in each input-output edition
 
 To check the information about sectors, it suffices to print `info_sec()`:
+
 ```{r info_sec}
 info_sec("iciotest")
 ```
 
 To check the information about available countries, the command is `info_geo()`:
+
 ```{r info_geo}
 info_geo("iciotest")
 ```
@@ -371,11 +398,14 @@ Additionally, the commands `get_geo_codes()` and `get_sec_codes` provide details
 about the components of the different groups. These commands are also directly
 applicable for any available input-output table. For instance, for `"wiod2016"`
 we would have the following components of EU27:
+
 ```{r get_geo_codes_wiod2016}
 get_geo_codes("EU27", wiotype = "wiod2016")
 ```
+
 And for `"icio2021"` we have the following components of the business services
 sector:
+
 ```{r get_sec_codes_icio2021}
 get_sec_codes("BIZSV", wiotype = "icio2021")
 ```

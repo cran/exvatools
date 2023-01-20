@@ -22,7 +22,7 @@
 #' @return A list object of class `exvadec` with several matrices
 #' plus metadata.
 make_exvadec_wwz <- function(wio_object, exporter = "all",
-                             output = "standard"){
+                             output = "standard", quiet = FALSE){
 
   # Check class----
   wio <- check_object(wio_object, "wio")
@@ -69,7 +69,7 @@ make_exvadec_wwz <- function(wio_object, exporter = "all",
 
   # DVA auxiliary matrices----
 
-  cli::cli_alert_info("Preparing DVA auxiliary matrices...")
+  if (!quiet) {cli::cli_alert_info("Preparing DVA auxiliary matrices...")}
 
   # Vs
   Vs <- wio$W
@@ -233,7 +233,7 @@ make_exvadec_wwz <- function(wio_object, exporter = "all",
   }
 
   # FVA auxiliary matrices----
-  cli::cli_alert_info("Preparing FVA auxiliary matrices...")
+  if (!quiet) {cli::cli_alert_info("Preparing FVA auxiliary matrices...")}
 
   # FVA matrices
   Vt_Bts <- dmult(wio$W, Bts)
@@ -279,7 +279,7 @@ make_exvadec_wwz <- function(wio_object, exporter = "all",
 
   # DVA terms----
 
-  cli::cli_alert_info("Calculating DVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating DVA terms...")}
 
   VAX1 <- check_meld_group(dmult(Vs_Bss, Ysr))
 
@@ -308,7 +308,7 @@ make_exvadec_wwz <- function(wio_object, exporter = "all",
 
   # FVA terms----
 
-  cli::cli_alert_info("Calculating FVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating FVA terms...")}
 
   FVA1 <- check_meld_group(hmult(Vr_Brs, Ysr))
 
@@ -342,7 +342,7 @@ make_exvadec_wwz <- function(wio_object, exporter = "all",
 
 
   # Output----
-  cli::cli_alert_info("Preparing output ...")
+  if (!quiet) {cli::cli_alert_info("Preparing output ...")}
 
   if (output == "standard"){
 
@@ -449,13 +449,15 @@ make_exvadec_wwz <- function(wio_object, exporter = "all",
   class(exvadec) <- "exvadec"
 
 
-  # cli::cli_alert_success("Done!")
+  if (!quiet) {cli::cli_alert_success("Done!")}
 
   # Print result summary
-  if (is_all) {
-    get_exvadec_bkdown(exvadec)
-  } else{
-    get_exvadec_bkdown(exvadec, exporter)
+  if (!quiet) {
+    if (is_all) {
+      get_exvadec_bkdown(exvadec)
+    } else{
+      get_exvadec_bkdown(exvadec, exporter)
+    }
   }
 
   return(exvadec)

@@ -31,7 +31,6 @@
 #'   [get_data()]).
 #'
 #' @return A matrix, vector or data frame with data of exports
-#' @author Enrique Feas
 #' @export
 #' @examples
 #' # What part of French value added exported as US final intermediate

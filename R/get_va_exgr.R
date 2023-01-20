@@ -32,7 +32,7 @@
 #' wio <- make_wio("iciotest")
 #' # Exports of manufactures of Spain using foreign VA from France
 #' get_va_exgr(wio, "FC", "FRA", "TOTAL", "ESP", "MANUF")
-get_va_exgr <- function(wio_object, va_type = "FC", geo_orig = "all",
+get_va_exgr <- function(wio_object, va_type = "FC", geo_orig = "WLD",
                          sec_orig = "TOTAL", geo_export,
                          sec_export = "TOTAL", as_numeric = TRUE) {
 

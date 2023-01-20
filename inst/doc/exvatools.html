@@ -10,7 +10,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta name="author" content="Enrique Feás" />
 
 
 <title>Introduction to exvatools</title>
@@ -120,13 +119,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -332,56 +338,31 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to exvatools</h1>
 <h4 class="author">Enrique Feás</h4>
-<h4 class="date">December, 2022</h4>
+<address class="author_afil">
+University of Alcalá and Elcano Royal
+Institute<br><h4 class="date">January, 2023</h4>
 
 
 
-<p>International input-output tables are useful statistical tools: they
-show us how different sectors in different countries interact with each
-other. This is particularly relevant when analyzing international trade,
-given that half of today’s trade is composed of intermediate goods and
-gross flows become less and less representative of reality. Moreover,
-international input-output tables show the increasing relations between
-services and goods.</p>
-<p>The problem is that handling big input-output tables is complicated.
-This is where <strong>exvatools</strong> comes to the rescue. Its
-purpose is double:</p>
+<p>Half of today’s international trade is composed of intermediate
+goods, so statistics of gross exports do not reflect the complexity of
+globalization. Trade flows should be expressed in terms of value added,
+taking advantage of modern international input-output tables, which show
+how different sectors in different countries interact with each other.
+The problem is that handling big input-output tables is complicated and
+many indicators are not available. This is where
+<strong>exvatools</strong> comes to the rescue. Its purpose is
+double:</p>
 <ul>
 <li>To facilitate the extraction and processing of the most relevant
-international input tables available today, through easy commands.</li>
-<li>To provide tools to decompose the value added in exports according
-to different methodologies in the literature.</li>
+international input tables available today, or the use of custom
+databases, with user-friendly commands.</li>
+<li>To provide tools to analyze value added in exports, including the
+calculation of decompositions according to different methodologies in
+the literature.</li>
 </ul>
 <div id="international-input-output-analysis-tools" class="section level2">
 <h2>International input-output analysis tools</h2>
-<div id="getting-raw-data" class="section level3">
-<h3>Getting raw data</h3>
-<p>There are a few international input-output tables available. Two of
-the most renowned in economic literature are:</p>
-<ul>
-<li>The OECD’s Trade in Value Added database (TiVA), based on the
-Inter-Country Input-Output Tables (ICIO)</li>
-<li>The University of Groningen’s World Input Output Database (WIOD),
-based on the World Input Output Tables.</li>
-</ul>
-<p>The advantage of these databases is twofold: they are quite rich in
-terms of countries and sectors, and they are directly downloadable from
-the web page of their supporting institutions.</p>
-<p>Source data is normally provided in zipped files containing
-comma-delimited files (<code>.csv</code>), Excel files
-(<code>.xlsx</code>) or R data files (<code>.rData</code>), which
-<strong>exvatools</strong> can handle with the support of other CRAN
-packages.</p>
-<p>In order to use <strong>exvatools</strong> with official data, we
-must first download the source files to our computer. For instance, if
-we want to use the last edition of the OECD (2021) with data up to 2018,
-we should download the file “ICIO_2015-2018.zip” (96 MB) from the <a href="https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm">ICIO
-web page</a> containing the required <code>.csv</code> files.</p>
-<p>From here, <strong>exvatools</strong> will take care of the rest: it
-will extract the raw data from the zip file and create the basic
-input-output matrices, embedded in objects that will be the basis for
-further analysis.</p>
-</div>
 <div id="installing-exvatools" class="section level3">
 <h3>Installing exvatools</h3>
 <p>Installing <strong>exvatools</strong> from the CRAN repository
@@ -390,81 +371,113 @@ follows the usual procedure:</p>
 <p>To make <strong>exvatools</strong> available:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(exvatools)</span></code></pre></div>
 </div>
-<div id="importing-data-and-creating-basic-input-output-matrices" class="section level3">
-<h3>Importing data and creating basic input-output matrices</h3>
-<p>Once we have downloaded the raw data, we can obtain the basic
-input-output matrices in an object <code>wio</code> (for ‘world
-input-output’) with the command <code>make_wio()</code>. We just need
-the input-output edition we want to use (the one we have downloaded),
-the year and the folder where we saved our zip file (just the
-directory). For instance, if we had downloaded it in
-<code>C:\Users\Username\Documents\R</code>, we would just need to type
-the following command (mind the direction of the slashes in
-<strong>R</strong>):</p>
+<div id="using-data" class="section level3">
+<h3>Using data</h3>
+<p><strong>exvatools</strong> produces basic input-output tables from
+three types of data:</p>
+<ol style="list-style-type: decimal">
+<li>Raw data of standard international input-output databases</li>
+</ol>
+<p>Raw data can be directly downloaded from the web pages of their
+respective institutions. Two sources are currently supported:</p>
+<ul>
+<li>OECD Inter-Country Input-Output (ICIO) tables, on which the OECD’s
+Trade in Value Added database (TiVA) is based.</li>
+<li>World Input Output Database (WIOD) tables</li>
+</ul>
+<p>The advantage of these databases is threefold: they are widely used
+in the economic literature, they are quite rich in terms of countries
+and sectors, and they are directly downloadable from the web page of
+their supporting institutions, normally as zipped files containing
+comma-delimited files (<code>.csv</code>), Excel files
+(<code>.xlsx</code>) or R data files (<code>.rData</code>).</p>
+<p>For instance, if we want to use <strong>exvatools</strong> with the
+latest edition of the OECD ICIO tables (2021, with data up to 2018), we
+must first download to our computer the source file “ICIO_2015-2018.zip”
+(96 MB) from the <a href="https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm">ICIO
+web page</a>. Then we will use the command <code>make_wio()</code>,
+specifying the edition, the year and the folder where the source zip
+file is saved (just the directory). For instance, if we had downloaded
+it in <code>C:\Users\Username\Documents\R</code> and we wanted the year
+2018, we would just need to type:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>wio <span class="ot">&lt;-</span> <span class="fu">make_wio</span>(<span class="st">&quot;icio2021&quot;</span>, <span class="at">year =</span> <span class="dv">2018</span>, </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">src_dir =</span> <span class="st">&quot;C:/Users/Username/Documents/R&quot;</span>)</span></code></pre></div>
-<p>As the dimension of these input-output matrices is big, for didactic
-purposes we will use a test input-output database, with non-real data.
-<strong>exvatools</strong> includes two test tables,
-<code>&quot;iciotest&quot;</code> (which follows a ICIO-type structure) and
-<code>&quot;wiodtest&quot;</code> (which follows a WIOD-type structure).</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>wio <span class="ot">&lt;-</span> <span class="fu">make_wio</span>(<span class="st">&quot;iciotest&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Getting matrices Z, Y, X</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating matrices A, B, V</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating submatrices of Z, A, B and Y</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating local Leontief matrix Ld</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating export matrices EXGR and E</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Preparing output...</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ Done!</span></span></code></pre></div>
-<p>We can easily check the contents of the created <code>wio</code>
-object with <code>summary()</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wio)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================ </span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 </span><span class="al">TEST</span><span class="co"> INPUT OUTPUT TABLE, ICIO-TYPE, 2022 EDITION </span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                               Data for year: 2022 </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================ </span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Element Description                                       Dimensions</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Z       Intermediate inputs                               30 x 30   </span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Zd      Domestic intermediate inputs                      30 x 30   </span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Zm      Foreign intermediate inputs                       30 x 30   </span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  A       Coefficient matrix                                30 x 30   </span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Ad      Domestic coefficient matrix                       30 x 30   </span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Am      Foreign coefficient matrix                        30 x 30   </span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  B       Global Leontief inverse                           30 x 30   </span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Bd      Domestic global Leontief inverse                  30 x 30   </span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Bm      Foreign global Leontief inverse                   30 x 30   </span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Ld      Local Leontief inverse matrices                   30 x 30   </span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Yfd     Final demand, with components                     30 x 12   </span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Y       Final demand                                      30 x 6    </span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Yd      Domestic final demand                             30 x 6    </span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Ym      Foreign final demand                              30 x 6    </span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA      Value added                                       30 x 1    </span></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  V       Value added coefficients                          30 x 1    </span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  W       Diagonalized VA coefficients (V-hat)              30 x 30   </span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  X       Production                                        30 x 1    </span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  EXGR    Gross bilateral exports                           30 x 6    </span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  E       Diagonalized total gross exports (E-hat)          30 x 30   </span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  dims    Dimensions                                                  </span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  names   Names of countries, sectors and demand components           </span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  type    Type of input-output table                                  </span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  year    Year                                                        </span></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available countries, including rest of the world (G): 6 </span></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP, FRA, MEX, USA, CHN, ROW </span></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Extra disaggregated countries: 4 </span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX : MX1 MX2 </span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN : CN1 CN2 </span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Total countries, including disaggregations (GX): 10 </span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available sectors (N): 3 </span></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D01T09, D10T39, D41T98 </span></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Demand components (FD): 2 </span></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CONS INVST</span></span></code></pre></div>
+<p>and <strong>exvatools</strong> will take care of the rest: it will
+extract the <code>.csv</code> files from the zip file and produce the
+basic input-output matrices.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Test datasets included in the package</li>
+</ol>
+<p>If we just want to check the features of <strong>exvatools</strong>,
+there is no need to download any data. The package includes two sets of
+fictitious data, one replicating an ICIO-type database
+(<code>wiotype = &quot;iciotest&quot;</code>, with Mexico and China disaggregated)
+and another one replicating a WIOD-type database
+(<code>wiotype = &quot;wiodtest&quot;</code>).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>wio <span class="ot">&lt;-</span> <span class="fu">make_wio</span>(<span class="st">&quot;iciotest&quot;</span>)</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Custom data</li>
+</ol>
+<p>Alternatively, <strong>exvatools</strong> can use custom data to
+create basic input-output matrices. In this case, we just need as input
+a numeric matrix (or data frame) with the intermediate inputs
+<code>Z</code> and the final demand <code>Yfd</code>, and a vector with
+the names of the countries (names of sectors and final demand components
+are optional). The command <code>make_custom_wio()</code> will be used
+in this case.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>wio <span class="ot">&lt;-</span> <span class="fu">make_custom_wio</span>(df, <span class="at">g_names =</span> <span class="fu">c</span>(<span class="st">&quot;C01&quot;</span>, <span class="st">&quot;C02&quot;</span>, <span class="st">&quot;C03&quot;</span>))</span></code></pre></div>
+<p>For didactic purposes, we will use here ICIO-type fictitious data
+made with <code>make_wio(&quot;iciotest&quot;)</code>.</p>
+<p>The contents of the created <code>wio</code> object can be checked
+with <code>summary()</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wio)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ====================================================================== </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            </span><span class="al">TEST</span><span class="co"> INPUT OUTPUT TABLE, ICIO-TYPE, 2022 EDITION </span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                           Data for year: 2022 </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ====================================================================== </span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Element Description                                       Dimensions</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Z       Intermediate inputs                               30 x 30   </span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Zd      Domestic intermediate inputs                      30 x 30   </span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Zm      Foreign intermediate inputs                       30 x 30   </span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  A       Coefficient matrix                                30 x 30   </span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Ad      Domestic coefficient matrix                       30 x 30   </span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Am      Foreign coefficient matrix                        30 x 30   </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  B       Global Leontief inverse                           30 x 30   </span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Bd      Domestic global Leontief inverse                  30 x 30   </span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Bm      Foreign global Leontief inverse                   30 x 30   </span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Ld      Local Leontief inverse matrices                   30 x 30   </span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Yfd     Final demand, with components                     30 x 12   </span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Y       Final demand                                      30 x 6    </span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Yd      Domestic final demand                             30 x 6    </span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Ym      Foreign final demand                              30 x 6    </span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA      Value added                                       30 x 1    </span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  V       Value added coefficients                          30 x 1    </span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  W       Diagonalized VA coefficients (V-hat)              30 x 30   </span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  X       Production                                        30 x 1    </span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  EXGR    Gross bilateral exports                           30 x 6    </span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  E       Diagonalized total gross exports (E-hat)          30 x 30   </span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  dims    Dimensions                                                  </span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  names   Names of countries, sectors and demand components           </span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  type    Type of input-output table                                  </span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  year    Year                                                        </span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available countries, including rest of the world (G): 6 </span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP, FRA, MEX, USA, CHN, ROW </span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Extra disaggregated countries: 4 </span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX : MX1 MX2 </span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN : CN1 CN2 </span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Total countries, including disaggregations (GX): 10 </span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available sectors (N): 3 </span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D01T09, D10T39, D41T98 </span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Demand components (FD): 2 </span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CONS INVST</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
 </div>
 <div id="operating-with-input-output-matrices" class="section level3">
 <h3>Operating with input-output matrices</h3>
@@ -488,128 +501,132 @@ size, <code>sumncols()</code> to do the same with columns, etc.</p>
 <p>For instance, let us check that the production <code>X</code> is
 equivalent to the product of the global Leontief inverse matrix
 <code>B</code> and the final demand <code>Y</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>BY <span class="ot">&lt;-</span> wio<span class="sc">$</span>B <span class="sc">%*%</span> wio<span class="sc">$</span>Y</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>BY <span class="ot">&lt;-</span> wio<span class="sc">$</span>B <span class="sc">%*%</span> wio<span class="sc">$</span>Y</span></code></pre></div>
 <p>We can sum the rows and check that it coincides with the production
 vector:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>BY <span class="ot">&lt;-</span> <span class="fu">rsums</span>(BY, <span class="st">&quot;BY&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">cbind</span>(<span class="fu">head</span>(BY, <span class="dv">10</span>), <span class="fu">head</span>(wio<span class="sc">$</span>X, <span class="dv">10</span>)))</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 BY        X</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09 1378.568 1378.568</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39 1914.607 1914.607</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98 2113.699 2113.699</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09 1848.173 1848.173</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 1799.486 1799.486</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 1608.004 1608.004</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09    0.000    0.000</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39    0.000    0.000</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98    0.000    0.000</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 1895.742 1895.742</span></span></code></pre></div>
-<p>The OECD ICIO tables have a particular feature: two big industrial
-countries, China and Mexico, are disaggregated in two for calculation
-purposes. This requires a tool to consolidate data once all calculations
-are done. The command <code>meld()</code> takes care of that.</p>
-<p>For instance, to calculate the value added absorbed abroad we need to
-multiply the value added coefficients matrix <code>V</code>-hat
-(represented here with <code>W</code>) by the global inverse matrix
-<code>B</code> by the final demand matrix <code>Y</code>, and then
-exclude the value added absorbed domestically. This can be easily done
-with a few commands.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate all value added induced by demand:</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>VBY <span class="ot">&lt;-</span> <span class="fu">dmult</span>(wio<span class="sc">$</span>W, wio<span class="sc">$</span>B) <span class="sc">%*%</span> wio<span class="sc">$</span>Y</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>VBY</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 ESP       FRA       MEX       USA       CHN       ROW</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09  33.25239  33.04328  29.13415  39.26315  44.36171  40.26254</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39 105.86567  99.40932 118.73322 139.90848 115.91495 126.97831</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98 221.93642 191.16663 158.37563 173.76610 145.22181 168.64254</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09  48.48628  66.62310  51.62458  49.45643  47.66424  70.97642</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 120.80031 104.64030 128.78920 102.79096  97.91708  99.78527</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 134.74749 129.14500  99.99938  88.70168  86.75694 101.79354</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 175.01545 130.46673 128.74728 107.71747 102.20179 117.94400</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_10T39 102.29790  84.03672  79.60012 121.89497  66.60450 100.75615</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_41T98 115.50508 118.18725 129.51719 122.16680  95.86500 111.98916</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_01T09   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_10T39   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_41T98   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_01T09  82.22487  42.82585  45.01008  60.06683  46.78138  51.62906</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_10T39  90.44372  97.64510  80.63597  95.00232  91.33130  91.05473</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_41T98  62.56171  51.01318  42.64560  58.70599  41.40437  50.09897</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX1_01T09 173.85507 180.14952 154.43342 149.69601 164.13090 149.43125</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX1_10T39 119.84480  74.11099 117.78742  97.93871 142.64384 121.97803</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX1_41T98  49.45281  29.23090  35.52473  39.69653  36.67997  31.42076</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX2_01T09  96.85254  83.89485  70.55941  97.36493  80.35587  66.40230</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX2_10T39 138.50490  86.35272  92.84516 108.88726  99.24637 102.95958</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX2_41T98  82.91973  67.68778  62.14849  77.03372  65.06803  75.12146</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN1_01T09 109.94070 114.47837  91.18810 152.37369 127.84703 118.37641</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN1_10T39 119.64017 127.22095 126.45021 165.70116 164.43470 128.00251</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN1_41T98 109.34845  93.91197 106.67385 115.50129 111.77386 119.86482</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN2_01T09  84.74417  83.13258  69.33664  86.84078  80.88526  72.00972</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN2_10T39  73.17244  54.76049  43.08188  56.11525  70.19744  78.67920</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN2_41T98 158.98841 103.45062 108.60598 136.04997 128.63627 109.93866</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>BY <span class="ot">&lt;-</span> <span class="fu">rsums</span>(BY, <span class="st">&quot;BY&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">cbind</span>(<span class="fu">head</span>(BY, <span class="dv">10</span>), <span class="fu">head</span>(wio<span class="sc">$</span>X, <span class="dv">10</span>)))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 BY        X</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09 1378.568 1378.568</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39 1914.607 1914.607</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98 2113.699 2113.699</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09 1848.173 1848.173</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 1799.486 1799.486</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 1608.004 1608.004</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09    0.000    0.000</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39    0.000    0.000</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98    0.000    0.000</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 1895.742 1895.742</span></span></code></pre></div>
+<p>In OECD ICIO tables two big industrial countries, China and Mexico,
+are disaggregated into two. Calculations must be done with disaggregated
+data, but countries must be later consolidated (e.g., <code>CN1</code>
+and <code>CN2</code> must be converted into <code>CHN</code>). This can
+be done with the command <code>meld()</code>.</p>
+<p>For instance, to calculate the value added absorbed abroad
+(<code>VAX</code>) we need to multiply the value added coefficients
+matrix <code>V</code>-hat (represented here with <code>W</code>) by the
+global inverse matrix <code>B</code> by the final demand matrix
+<code>Y</code>, and then exclude the value added absorbed domestically.
+This can be easily done with a few commands.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate all value added induced by demand:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>VBY <span class="ot">&lt;-</span> <span class="fu">dmult</span>(wio<span class="sc">$</span>W, wio<span class="sc">$</span>B) <span class="sc">%*%</span> wio<span class="sc">$</span>Y</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>VBY</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 ESP       FRA       MEX       USA       CHN       ROW</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09  33.25239  33.04328  29.13415  39.26315  44.36171  40.26254</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39 105.86567  99.40932 118.73322 139.90848 115.91495 126.97831</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98 221.93642 191.16663 158.37563 173.76610 145.22181 168.64254</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09  48.48628  66.62310  51.62458  49.45643  47.66424  70.97642</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 120.80031 104.64030 128.78920 102.79096  97.91708  99.78527</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 134.74749 129.14500  99.99938  88.70168  86.75694 101.79354</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 175.01545 130.46673 128.74728 107.71747 102.20179 117.94400</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_10T39 102.29790  84.03672  79.60012 121.89497  66.60450 100.75615</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_41T98 115.50508 118.18725 129.51719 122.16680  95.86500 111.98916</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_01T09   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_10T39   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_41T98   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_01T09  82.22487  42.82585  45.01008  60.06683  46.78138  51.62906</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_10T39  90.44372  97.64510  80.63597  95.00232  91.33130  91.05473</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_41T98  62.56171  51.01318  42.64560  58.70599  41.40437  50.09897</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX1_01T09 173.85507 180.14952 154.43342 149.69601 164.13090 149.43125</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX1_10T39 119.84480  74.11099 117.78742  97.93871 142.64384 121.97803</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX1_41T98  49.45281  29.23090  35.52473  39.69653  36.67997  31.42076</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX2_01T09  96.85254  83.89485  70.55941  97.36493  80.35587  66.40230</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX2_10T39 138.50490  86.35272  92.84516 108.88726  99.24637 102.95958</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MX2_41T98  82.91973  67.68778  62.14849  77.03372  65.06803  75.12146</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN1_01T09 109.94070 114.47837  91.18810 152.37369 127.84703 118.37641</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN1_10T39 119.64017 127.22095 126.45021 165.70116 164.43470 128.00251</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN1_41T98 109.34845  93.91197 106.67385 115.50129 111.77386 119.86482</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN2_01T09  84.74417  83.13258  69.33664  86.84078  80.88526  72.00972</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN2_10T39  73.17244  54.76049  43.08188  56.11525  70.19744  78.67920</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CN2_41T98 158.98841 103.45062 108.60598 136.04997 128.63627 109.93866</span></span></code></pre></div>
 <p>We can see that rows for Mexico and China are disaggregated. We can
-now meld them:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>VBY <span class="ot">&lt;-</span> <span class="fu">meld</span>(VBY)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>VBY</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 ESP       FRA       MEX       USA       CHN       ROW</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09  33.25239  33.04328  29.13415  39.26315  44.36171  40.26254</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39 105.86567  99.40932 118.73322 139.90848 115.91495 126.97831</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98 221.93642 191.16663 158.37563 173.76610 145.22181 168.64254</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09  48.48628  66.62310  51.62458  49.45643  47.66424  70.97642</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 120.80031 104.64030 128.78920 102.79096  97.91708  99.78527</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 134.74749 129.14500  99.99938  88.70168  86.75694 101.79354</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09 270.70761 264.04436 224.99283 247.06094 244.48677 215.83355</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39 258.34970 160.46370 210.63258 206.82598 241.89021 224.93762</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98 132.37254  96.91869  97.67322 116.73025 101.74800 106.54222</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 175.01545 130.46673 128.74728 107.71747 102.20179 117.94400</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_10T39 102.29790  84.03672  79.60012 121.89497  66.60450 100.75615</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_41T98 115.50508 118.18725 129.51719 122.16680  95.86500 111.98916</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_01T09 194.68487 197.61095 160.52474 239.21447 208.73229 190.38614</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_10T39 192.81261 181.98144 169.53209 221.81640 234.63214 206.68171</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_41T98 268.33686 197.36260 215.27984 251.55127 240.41013 229.80349</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_01T09  82.22487  42.82585  45.01008  60.06683  46.78138  51.62906</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_10T39  90.44372  97.64510  80.63597  95.00232  91.33130  91.05473</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_41T98  62.56171  51.01318  42.64560  58.70599  41.40437  50.09897</span></span></code></pre></div>
+meld them with <code>meld()</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>VBY <span class="ot">&lt;-</span> <span class="fu">meld</span>(VBY)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>VBY</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 ESP       FRA       MEX       USA       CHN       ROW</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09  33.25239  33.04328  29.13415  39.26315  44.36171  40.26254</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39 105.86567  99.40932 118.73322 139.90848 115.91495 126.97831</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98 221.93642 191.16663 158.37563 173.76610 145.22181 168.64254</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09  48.48628  66.62310  51.62458  49.45643  47.66424  70.97642</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 120.80031 104.64030 128.78920 102.79096  97.91708  99.78527</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 134.74749 129.14500  99.99938  88.70168  86.75694 101.79354</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09 270.70761 264.04436 224.99283 247.06094 244.48677 215.83355</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39 258.34970 160.46370 210.63258 206.82598 241.89021 224.93762</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98 132.37254  96.91869  97.67322 116.73025 101.74800 106.54222</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 175.01545 130.46673 128.74728 107.71747 102.20179 117.94400</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_10T39 102.29790  84.03672  79.60012 121.89497  66.60450 100.75615</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_41T98 115.50508 118.18725 129.51719 122.16680  95.86500 111.98916</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_01T09 194.68487 197.61095 160.52474 239.21447 208.73229 190.38614</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_10T39 192.81261 181.98144 169.53209 221.81640 234.63214 206.68171</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_41T98 268.33686 197.36260 215.27984 251.55127 240.41013 229.80349</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_01T09  82.22487  42.82585  45.01008  60.06683  46.78138  51.62906</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_10T39  90.44372  97.64510  80.63597  95.00232  91.33130  91.05473</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_41T98  62.56171  51.01318  42.64560  58.70599  41.40437  50.09897</span></span></code></pre></div>
 <p>We just want the value added absorbed abroad (sometimes referred to
 as value added exported). For that we need the block off-diagonal matrix
 of <code>VBY</code>, that we can produce with <code>bkoffd()</code>:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bkoffd</span>(VBY)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 ESP       FRA       MEX       USA       CHN       ROW</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09   0.00000  33.04328  29.13415  39.26315  44.36171  40.26254</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39   0.00000  99.40932 118.73322 139.90848 115.91495 126.97831</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98   0.00000 191.16663 158.37563 173.76610 145.22181 168.64254</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09  48.48628   0.00000  51.62458  49.45643  47.66424  70.97642</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 120.80031   0.00000 128.78920 102.79096  97.91708  99.78527</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 134.74749   0.00000  99.99938  88.70168  86.75694 101.79354</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09 270.70761 264.04436   0.00000 247.06094 244.48677 215.83355</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39 258.34970 160.46370   0.00000 206.82598 241.89021 224.93762</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98 132.37254  96.91869   0.00000 116.73025 101.74800 106.54222</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 175.01545 130.46673 128.74728   0.00000 102.20179 117.94400</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_10T39 102.29790  84.03672  79.60012   0.00000  66.60450 100.75615</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_41T98 115.50508 118.18725 129.51719   0.00000  95.86500 111.98916</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_01T09 194.68487 197.61095 160.52474 239.21447   0.00000 190.38614</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_10T39 192.81261 181.98144 169.53209 221.81640   0.00000 206.68171</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_41T98 268.33686 197.36260 215.27984 251.55127   0.00000 229.80349</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_01T09  82.22487  42.82585  45.01008  60.06683  46.78138   0.00000</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_10T39  90.44372  97.64510  80.63597  95.00232  91.33130   0.00000</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_41T98  62.56171  51.01318  42.64560  58.70599  41.40437   0.00000</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bkoffd</span>(VBY)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 ESP       FRA       MEX       USA       CHN       ROW</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_01T09   0.00000  33.04328  29.13415  39.26315  44.36171  40.26254</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_10T39   0.00000  99.40932 118.73322 139.90848 115.91495 126.97831</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP_41T98   0.00000 191.16663 158.37563 173.76610 145.22181 168.64254</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_01T09  48.48628   0.00000  51.62458  49.45643  47.66424  70.97642</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_10T39 120.80031   0.00000 128.78920 102.79096  97.91708  99.78527</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_41T98 134.74749   0.00000  99.99938  88.70168  86.75694 101.79354</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_01T09 270.70761 264.04436   0.00000 247.06094 244.48677 215.83355</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_10T39 258.34970 160.46370   0.00000 206.82598 241.89021 224.93762</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MEX_41T98 132.37254  96.91869   0.00000 116.73025 101.74800 106.54222</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_01T09 175.01545 130.46673 128.74728   0.00000 102.20179 117.94400</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_10T39 102.29790  84.03672  79.60012   0.00000  66.60450 100.75615</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_41T98 115.50508 118.18725 129.51719   0.00000  95.86500 111.98916</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_01T09 194.68487 197.61095 160.52474 239.21447   0.00000 190.38614</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_10T39 192.81261 181.98144 169.53209 221.81640   0.00000 206.68171</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_41T98 268.33686 197.36260 215.27984 251.55127   0.00000 229.80349</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_01T09  82.22487  42.82585  45.01008  60.06683  46.78138   0.00000</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_10T39  90.44372  97.64510  80.63597  95.00232  91.33130   0.00000</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ROW_41T98  62.56171  51.01318  42.64560  58.70599  41.40437   0.00000</span></span></code></pre></div>
 </div>
 </div>
 <div id="value-added-in-exports" class="section level2">
 <h2>Value added in exports</h2>
 <p>The model we have used allows us to express value added induced by
-demand. This is the idea behind the calculation of value added in
-exports, i.e., induced by the demand of exports. In this case, we need
-not only to obtain the value added, but to estimate the effect of the
-multiple times that intermediate products cross the international
-borders.</p>
+final demand, but we can also study how gross exports induce value
+added, not only from final exports but also from exports of
+intermediates. In this case, we need to consider the effect of the
+multiple times that intermediate products cross international borders,
+to avoid double counting.</p>
 <p>This is why several methods have appeared to calculate full
 decomposition of value added in exports, distinguishing what part of
 value added is <em>pure</em> value added and which one is double
 counting, and also, within the <em>pure</em> double counting, what part
 is really exported and what part eventually returns back to the
 exporting country (‘false’ exports).</p>
+<p><strong>exvatools</strong> can then produce key value added
+indicators (like bilateral value added exports or <code>VAX</code>) that
+are not currently available in public databases.</p>
 <div id="alternative-decompositions-of-value-added-in-exports" class="section level3">
 <h3>Alternative decompositions of value added in exports</h3>
 <p>There are several methodologies in the economic literature, and
@@ -619,69 +636,68 @@ and Ye (2021).</p>
 <p>For instance, to create create a full decomposition of value added in
 exports of Spain using the method of Borin and Mancini (2019), using a
 source-based approach, we would type::</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>exvabm <span class="ot">&lt;-</span> <span class="fu">make_exvadec</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>, <span class="at">method =</span> <span class="st">&quot;bm_src&quot;</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Preparing DVA auxiliary matrices...</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Preparing FVA auxiliary matrices...</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating DVA terms...</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating FVA terms...</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Preparing output ...</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ Done!</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             DECOMPOSITION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: All sectors</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: All countries</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                              USD_MM  Percent</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Gross exports of goods and services (EXGR) 4666.96 100.00 </span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic Content in VA (DC)              2165.17  46.39 </span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Value Added (DVA)             1880.60  40.30 </span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Value Added Exported (VAX)           1624.18  34.80 </span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Reflection (REF)                      256.41   5.49 </span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Double Counting (DDC)          284.58   6.10 </span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Foreign Content in VA (FC)               2501.78  53.61 </span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Value Added (FVA)              2176.21  46.63 </span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Double Counting (FDC)           325.58   6.98 </span></span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Global Value Chain-related trade (GVC)     4034.25  86.44 </span></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, backward (GVCB)         2786.36  59.70 </span></span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, forward (GVCF)          1247.89  26.74 </span></span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: Borin and Mancini (2019), source-based, standard output</span></span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>exvabm <span class="ot">&lt;-</span> <span class="fu">make_exvadec</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>, <span class="at">method =</span> <span class="st">&quot;bm_src&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Preparing DVA auxiliary matrices...</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Preparing FVA auxiliary matrices...</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating DVA terms...</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Calculating FVA terms...</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Preparing output ...</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ Done!</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        DECOMPOSITION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: All sectors</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: All countries</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                              USD_MM  Percent</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Gross exports of goods and services (EXGR) 4666.96 100.00 </span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic Content in VA (DC)              2165.17  46.39 </span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Value Added (DVA)             1880.60  40.30 </span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Value Added Exported (VAX)           1624.18  34.80 </span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Reflection (REF)                      256.41   5.49 </span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Double Counting (DDC)          284.58   6.10 </span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Foreign Content in VA (FC)               2501.78  53.61 </span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Value Added (FVA)              2176.21  46.63 </span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Double Counting (FDC)           325.58   6.98 </span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Global Value Chain-related trade (GVC)     4034.25  86.44 </span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, backward (GVCB)         2786.36  59.70 </span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, forward (GVCF)          1247.89  26.74 </span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: Borin and Mancini (2019), source-based, standard output</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
 <p>The advantage is that, once we have obtained a decomposition, we can
 play with the results in terms of sectors and countries of destination
 just using the command <code>get_exvadec_bkdown()</code>. For instance,
 to select the value added in Spanish exports of services (including
 construction) to the United States, we just have to type:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_exvadec_bkdown</span>(exvabm, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>, </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">sector =</span> <span class="st">&quot;SRVWC&quot;</span>, <span class="at">importer =</span> <span class="st">&quot;USA&quot;</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ Done!</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             DECOMPOSITION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: Services, including construction (SRVWC)</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: United States (USA)</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                              USD_MM Percent</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Gross exports of goods and services (EXGR) 276.71 100.00 </span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic Content in VA (DC)              159.63  57.69 </span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Value Added (DVA)             145.95  52.74 </span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Value Added Exported (VAX)           127.28  46.00 </span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Reflection (REF)                      18.67   6.75 </span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Double Counting (DDC)          13.68   4.94 </span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Foreign Content in VA (FC)               117.08  42.31 </span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Value Added (FVA)              101.53  36.69 </span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Double Counting (FDC)           15.55   5.62 </span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Global Value Chain-related trade (GVC)     221.62  80.09 </span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, backward (GVCB)         130.76  47.26 </span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, forward (GVCF)           90.86  32.84 </span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: Borin and Mancini (2019), source-based, standard output</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_exvadec_bkdown</span>(exvabm, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>, </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">sector =</span> <span class="st">&quot;SRVWC&quot;</span>, <span class="at">importer =</span> <span class="st">&quot;USA&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        DECOMPOSITION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: Services, including construction (SRVWC)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: United States (USA)</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                              USD_MM Percent</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Gross exports of goods and services (EXGR) 276.71 100.00 </span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic Content in VA (DC)              159.63  57.69 </span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Value Added (DVA)             145.95  52.74 </span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Value Added Exported (VAX)           127.28  46.00 </span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Reflection (REF)                      18.67   6.75 </span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Domestic Double Counting (DDC)          13.68   4.94 </span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Foreign Content in VA (FC)               117.08  42.31 </span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Value Added (FVA)              101.53  36.69 </span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      Foreign Double Counting (FDC)           15.55   5.62 </span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Global Value Chain-related trade (GVC)     221.62  80.09 </span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, backward (GVCB)         130.76  47.26 </span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, forward (GVCF)           90.86  32.84 </span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: Borin and Mancini (2019), source-based, standard output</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
 <p>An alternative (although methodologically inferior) decomposition
-would be the Wang et al. (2013) decomposition. In this case, instead of
-the normal decomposition, we will use the <code>&quot;terms&quot;</code> output.
-(that shows the 16 terms that compose the value added in exports):</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>exvawwz <span class="ot">&lt;-</span> <span class="fu">make_exvadec</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;all&quot;</span>, <span class="at">method =</span> <span class="st">&quot;wwz&quot;</span>,</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">output =</span> <span class="st">&quot;terms&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+would be that of Wang et al. (2013). In this case, instead of the normal
+decomposition, we will use the <code>&quot;terms&quot;</code> output. (that shows
+the 16 terms that compose the value added in exports):</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>exvawwz <span class="ot">&lt;-</span> <span class="fu">make_exvadec</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;all&quot;</span>, <span class="at">method =</span> <span class="st">&quot;wwz&quot;</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">output =</span> <span class="st">&quot;terms&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Note that here we have selected <code>export = all</code>, that
 produces decompositions for all countries (not only a specific one), and
 we have also used the option <code>quiet = TRUE</code>, that produces a
@@ -689,45 +705,44 @@ silent output.</p>
 <p>We can check any exporting country, any sector, and any destination
 country. For instance, we can produce the decomposition of the value
 added in US exports to China for the manufacturing sector:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_exvadec_bkdown</span>(exvawwz, <span class="at">exporter =</span> <span class="st">&quot;USA&quot;</span>, </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">sector =</span> <span class="st">&quot;MANUF&quot;</span>, <span class="at">importer =</span> <span class="st">&quot;CHN&quot;</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ Done!</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         DECOMPOSITION OF VALUE ADDED IN EXPORTS OF UNITED STATES IN 2022</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: Manufacturing (MANUF)</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: China (CHN)</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                                       USD_MM Percent</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  EXGR (Gross exports of goods and services)          400.89 100.00 </span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T01 DVA_FIN (DVA, finals)                          12.79   3.19 </span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T02 DVA_INT (DVA, interm. for absorption)          13.95   3.48 </span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T03 DVA_INTrex1 (DVA, int. reexp. for finals 3rd)   8.81   2.20 </span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T04 DVA_INTrex2 (DVA, interm. for finals reexp.)   36.55   9.12 </span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T05 DVA_INTrex3 (DVA, interm. for reexp. interm.)  35.08   8.75 </span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T06 RDV_FIN1 (Reflection, finals from partner)     13.25   3.31 </span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T07 RDV_FIN2 (Reflection, finals from 3rd cou)      8.62   2.15 </span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T08 RDV_INT (Reflection, intermediates)             2.19   0.55 </span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T09 DDC_FIN (Domestic Double Counting, finals)      9.13   2.28 </span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T10 DDC_INT (Domestic Double Counting, interm.)    23.82   5.94 </span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T11 FVA_FIN1 (FVA from partner, finals)             6.11   1.52 </span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T12 FVA_FIN2 (FVA from 3rd countries, finals)      12.33   3.08 </span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T13 FVA_INT1 (FVA from partner, intermediates)      6.22   1.55 </span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T14 FVA_INT2 (FVA from 3rd countries, interm.)     12.56   3.13 </span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T15 MDC (Double Counting, partner)                 66.07  16.48 </span></span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T16 ODC (Double Counting, 3rd countries)          133.42  33.28 </span></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: Wang et al. (2013), terms output</span></span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Mix of country and world perspective, mix of source and sink approach</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_exvadec_bkdown</span>(exvawwz, <span class="at">exporter =</span> <span class="st">&quot;USA&quot;</span>, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">sector =</span> <span class="st">&quot;MANUF&quot;</span>, <span class="at">importer =</span> <span class="st">&quot;CHN&quot;</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    DECOMPOSITION OF VALUE ADDED IN EXPORTS OF UNITED STATES IN 2022</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: Manufacturing (MANUF)</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: China (CHN)</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                                       USD_MM Percent</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  EXGR (Gross exports of goods and services)          400.89 100.00 </span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T01 DVA_FIN (DVA, finals)                          12.79   3.19 </span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T02 DVA_INT (DVA, interm. for absorption)          13.95   3.48 </span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T03 DVA_INTrex1 (DVA, int. reexp. for finals 3rd)   8.81   2.20 </span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T04 DVA_INTrex2 (DVA, interm. for finals reexp.)   36.55   9.12 </span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T05 DVA_INTrex3 (DVA, interm. for reexp. interm.)  35.08   8.75 </span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T06 RDV_FIN1 (Reflection, finals from partner)     13.25   3.31 </span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T07 RDV_FIN2 (Reflection, finals from 3rd cou)      8.62   2.15 </span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T08 RDV_INT (Reflection, intermediates)             2.19   0.55 </span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T09 DDC_FIN (Domestic Double Counting, finals)      9.13   2.28 </span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T10 DDC_INT (Domestic Double Counting, interm.)    23.82   5.94 </span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T11 FVA_FIN1 (FVA from partner, finals)             6.11   1.52 </span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T12 FVA_FIN2 (FVA from 3rd countries, finals)      12.33   3.08 </span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T13 FVA_INT1 (FVA from partner, intermediates)      6.22   1.55 </span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T14 FVA_INT2 (FVA from 3rd countries, interm.)     12.56   3.13 </span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T15 MDC (Double Counting, partner)                 66.07  16.48 </span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    T16 ODC (Double Counting, 3rd countries)          133.42  33.28 </span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: Wang et al. (2013), terms output</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Mix of country and world perspective, mix of source and sink approach</span></span></code></pre></div>
 </div>
 <div id="direction-of-value-added-in-exports-origin-and-destination" class="section level3">
 <h3>Direction of value added in exports: origin and destination</h3>
 <p>We have seen that the foreign content in Spanish exports amounts to
-USD 2501.78 million. Where does it come from? If we can pass without the
-detailed breakdown, but are interested in knowing the specific
-geographical and sector origin of the value added in exports, we van use
-the command <code>make_exvadir</code>:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>exvadir <span class="ot">&lt;-</span> <span class="fu">make_exvadir</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>, <span class="at">va_type =</span> <span class="st">&quot;FC&quot;</span>, </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">flow_type =</span> <span class="st">&quot;EXGR&quot;</span>)</span></code></pre></div>
+USD 2501.78 million. Where does it come from? If we do not need a
+detailed breakdown of the value added, but we are interested in knowing
+the specific geographical and sector origin of the value added content
+in exports, we can use the command <code>make_exvadir()</code>:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>exvadir <span class="ot">&lt;-</span> <span class="fu">make_exvadir</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>, <span class="at">va_type =</span> <span class="st">&quot;FC&quot;</span>, </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">flow_type =</span> <span class="st">&quot;EXGR&quot;</span>)</span></code></pre></div>
 <p>Please note that the <code>exvadir</code> object that we have
 obtained is different from the <code>exvadec</code> object, in the sense
 that <em>‘exporters’</em> in an <code>exvadir</code> object are the
@@ -735,28 +750,28 @@ different countries and sectors of origin of the value added included in
 the exports of the country specified with <code>make_exvadir()</code>(in
 this case, Spain). We can better understand this by typing
 <code>summary(exvadir)</code>:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(exvadir)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================ </span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         ORIGIN AND DESTINATION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022 </span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================ </span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Value added type: Foreign VA content (FC) </span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; In type of flow: Total gross exports (EXGR) </span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; That goes via country: any </span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Using inputs from sector: all sectors </span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Of country: all countries </span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; With sector perspective: exporter </span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================ </span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available countries of origin of VA (G): 6 </span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP, FRA, MEX, USA, CHN, ROW </span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available sectors of origin of VA (N): 3 </span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D01T09, D10T39, D41T98 </span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available destinations of VA (G): 6 </span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP, FRA, MEX, USA, CHN, ROW </span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(exvadir)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ====================================================================== </span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   ORIGIN AND DESTINATION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022 </span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ====================================================================== </span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Value added type: Foreign VA content (FC) </span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; In type of flow: Total gross exports (EXGR) </span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; That goes via country: any </span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Using inputs from sector: all sectors </span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Of country: all countries </span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; With sector perspective: exporter </span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ====================================================================== </span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available countries of origin of VA (G): 6 </span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP, FRA, MEX, USA, CHN, ROW </span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available sectors of origin of VA (N): 3 </span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D01T09, D10T39, D41T98 </span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  </span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Available destinations of VA (G): 6 </span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ESP, FRA, MEX, USA, CHN, ROW </span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
 </div>
 <div id="get-specific-data-with-custom-groups" class="section level3">
 <h3>Get specific data with custom groups</h3>
@@ -765,57 +780,57 @@ of Spanish exports, with a breakdown between EU and Non-EU origin
 (specifying a few countries) and also distinguishing between goods (with
 utilities) and services. We can also break down the destination of those
 exports between EU and non-EU:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_data</span>(exvadir, <span class="at">exporter =</span> <span class="fu">c</span>(<span class="st">&quot;WLD&quot;</span>, <span class="st">&quot;EU27&quot;</span>, <span class="st">&quot;FRA&quot;</span>,</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;NONEU27&quot;</span>, <span class="st">&quot;USA&quot;</span>),</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">sector =</span> <span class="fu">c</span>(<span class="st">&quot;TOTAL&quot;</span>, <span class="st">&quot;GOODSWU&quot;</span>, <span class="st">&quot;SRVWC&quot;</span>),</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">importer =</span> <span class="fu">c</span>(<span class="st">&quot;WLD&quot;</span>, <span class="st">&quot;EU27&quot;</span>, <span class="st">&quot;NONEU27&quot;</span>))</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        WLD      EU27    NONEU27</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD_TOTAL       2501.78421 367.55781 2134.22640</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD_GOODSWU     1772.66226 236.16941 1536.49285</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD_SRVWC        729.12195 131.38840  597.73355</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; EU27_TOTAL       340.74928  49.39794  291.35134</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; EU27_GOODSWU     252.80996  33.55120  219.25877</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; EU27_SRVWC        87.93932  15.84674   72.09258</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_TOTAL        340.74928  49.39794  291.35134</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_GOODSWU      252.80996  33.55120  219.25877</span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_SRVWC         87.93932  15.84674   72.09258</span></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NONEU27_TOTAL   2161.03493 318.15987 1842.87505</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NONEU27_GOODSWU 1519.85229 202.61821 1317.23408</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NONEU27_SRVWC    641.18263 115.54166  525.64097</span></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_TOTAL        433.65389  64.94868  368.70521</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_GOODSWU      286.90179  38.50383  248.39796</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_SRVWC        146.75210  26.44485  120.30725</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_data</span>(exvadir, <span class="at">exporter =</span> <span class="fu">c</span>(<span class="st">&quot;WLD&quot;</span>, <span class="st">&quot;EU27&quot;</span>, <span class="st">&quot;FRA&quot;</span>,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                               <span class="st">&quot;NONEU27&quot;</span>, <span class="st">&quot;USA&quot;</span>),</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">sector =</span> <span class="fu">c</span>(<span class="st">&quot;TOTAL&quot;</span>, <span class="st">&quot;GOODSWU&quot;</span>, <span class="st">&quot;SRVWC&quot;</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">importer =</span> <span class="fu">c</span>(<span class="st">&quot;WLD&quot;</span>, <span class="st">&quot;EU27&quot;</span>, <span class="st">&quot;NONEU27&quot;</span>))</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        WLD      EU27    NONEU27</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD_TOTAL       2501.78421 367.55781 2134.22640</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD_GOODSWU     1772.66226 236.16941 1536.49285</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD_SRVWC        729.12195 131.38840  597.73355</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; EU27_TOTAL       340.74928  49.39794  291.35134</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; EU27_GOODSWU     252.80996  33.55120  219.25877</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; EU27_SRVWC        87.93932  15.84674   72.09258</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_TOTAL        340.74928  49.39794  291.35134</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_GOODSWU      252.80996  33.55120  219.25877</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA_SRVWC         87.93932  15.84674   72.09258</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NONEU27_TOTAL   2161.03493 318.15987 1842.87505</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NONEU27_GOODSWU 1519.85229 202.61821 1317.23408</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NONEU27_SRVWC    641.18263 115.54166  525.64097</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_TOTAL        433.65389  64.94868  368.70521</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_GOODSWU      286.90179  38.50383  248.39796</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; USA_SRVWC        146.75210  26.44485  120.30725</span></span></code></pre></div>
 <p>On the other hand, the flexibility of <code>get_data()</code> allows
 for the creation of custom-made groups of countries and/or sectors.</p>
 <p>For instance, let’s create a group of countries called
 <code>LATAM</code>, with Spain and Mexico. We would just have to define
 the variable in the current environment.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>LATAM <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ESP&quot;</span>, <span class="st">&quot;MEX&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>LATAM <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ESP&quot;</span>, <span class="st">&quot;MEX&quot;</span>)</span></code></pre></div>
 <p>And now we can use it as a normal variable, just introducing it as
-<code>&quot;LATAM&quot;</code> (do not forget the double quotes). We will use the
+<code>&quot;LATAM&quot;</code> (with double quotes). We will use the
 <code>wwz</code> decomposition and extract the domestic value added in
 intermediates (<code>DVA_INT</code>) from <code>LATAM</code> to
-<code>USA</code>. Mind that, if we use custom groups, we need to select
+<code>USA</code>. Note that, if we use custom groups, we need to select
 the option <code>custom = TRUE</code> in <code>get_data()</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_data</span>(exvawwz, <span class="st">&quot;DVA_INT&quot;</span>, <span class="at">exporter =</span> <span class="st">&quot;LATAM&quot;</span>, </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">sector =</span> <span class="fu">c</span>(<span class="st">&quot;TOTAL&quot;</span>, <span class="st">&quot;MANUF&quot;</span>, <span class="st">&quot;SRVWC&quot;</span>), </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">importer =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">custom =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  USA</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; LATAM_TOTAL 39.85574</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; LATAM_MANUF 11.80574</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; LATAM_SRVWC 14.75979</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_data</span>(exvawwz, <span class="st">&quot;DVA_INT&quot;</span>, <span class="at">exporter =</span> <span class="st">&quot;LATAM&quot;</span>, </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">sector =</span> <span class="fu">c</span>(<span class="st">&quot;TOTAL&quot;</span>, <span class="st">&quot;MANUF&quot;</span>, <span class="st">&quot;SRVWC&quot;</span>), </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">importer =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">custom =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                  USA</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; LATAM_TOTAL 39.85574</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; LATAM_MANUF 11.80574</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; LATAM_SRVWC 14.75979</span></span></code></pre></div>
 <p>Let us now see an example of the exception marker <code>&quot;x&quot;</code>,
 that allows to define exceptions for countries and for sectors. We can,
 for instance, calculate the NAFTA exports, both intra-regional and
 extra-regional, employing just two sectors: non-services and
 services.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_data</span>(exvawwz, <span class="st">&quot;EXGR&quot;</span>, <span class="at">exporter =</span> <span class="st">&quot;NAFTA&quot;</span>, </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">sector =</span> <span class="fu">c</span>(<span class="st">&quot;TOTAL&quot;</span>, <span class="st">&quot;TOTALxSRVWC&quot;</span>, <span class="st">&quot;SRVWC&quot;</span>), </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">importer =</span> <span class="fu">c</span>(<span class="st">&quot;WLD&quot;</span>, <span class="st">&quot;NAFTA&quot;</span>, <span class="st">&quot;WLDxNAFTA&quot;</span>), <span class="at">custom =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                         WLD    NAFTA WLDxNAFTA</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NAFTA_TOTAL       13087.740 2602.338 10485.402</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NAFTA_TOTALxSRVWC  8736.552 1502.340  7234.212</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NAFTA_SRVWC        4351.188 1099.998  3251.189</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_data</span>(exvawwz, <span class="st">&quot;EXGR&quot;</span>, <span class="at">exporter =</span> <span class="st">&quot;NAFTA&quot;</span>, </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">sector =</span> <span class="fu">c</span>(<span class="st">&quot;TOTAL&quot;</span>, <span class="st">&quot;TOTALxSRVWC&quot;</span>, <span class="st">&quot;SRVWC&quot;</span>), </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">importer =</span> <span class="fu">c</span>(<span class="st">&quot;WLD&quot;</span>, <span class="st">&quot;NAFTA&quot;</span>, <span class="st">&quot;WLDxNAFTA&quot;</span>), <span class="at">custom =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                         WLD    NAFTA WLDxNAFTA</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NAFTA_TOTAL       13087.740 2602.338 10485.402</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NAFTA_TOTALxSRVWC  8736.552 1502.340  7234.212</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NAFTA_SRVWC        4351.188 1099.998  3251.189</span></span></code></pre></div>
 </div>
 <div id="other-useful-commands" class="section level3">
 <h3>Other useful commands</h3>
@@ -823,29 +838,31 @@ services.</p>
 <code>get_data()</code> allows for the creation of several ready-made
 commands in <strong>exvatools</strong>. One is
 <code>get_va_exgr()</code>, to get a detailed sector and geographical
-origin and destination of value added. For instance, if we want the
-value added in services of the US incorporated in the Spanish exports of
-manufactures, we just have to type:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_va_exgr</span>(wio,<span class="at">geo_orig =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">sec_orig =</span> <span class="st">&quot;SRVWC&quot;</span>,</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">geo_export =</span> <span class="st">&quot;ESP&quot;</span>, <span class="at">sec_export =</span> <span class="st">&quot;MANUF&quot;</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 51.31605</span></span></code></pre></div>
+origin and destination of value added, i.e., how the inputs of specific
+sectors in specific countries contribute to the value added in exports
+of a particular sector of a particular country. For instance, if we want
+to check the value added in US services incorporated in Spanish exports
+of manufactures, we just have to type:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_va_exgr</span>(wio,<span class="at">geo_orig =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">sec_orig =</span> <span class="st">&quot;SRVWC&quot;</span>,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">geo_export =</span> <span class="st">&quot;ESP&quot;</span>, <span class="at">sec_export =</span> <span class="st">&quot;MANUF&quot;</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 51.31605</span></span></code></pre></div>
 <p>Sometimes we are not only interested in the origin, but also in the
 country of final absorption. For that we have
 <code>get_va_exgry()</code>. For instance, if we want to know what part
 of the US value added incorporated in China’s exports of manufactures
-end up absorbed back in the US, we can type:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_va_exgry</span>(wio, <span class="at">geo_orig =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">geo_export =</span> <span class="st">&quot;CHN&quot;</span>,</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">sec_export =</span> <span class="st">&quot;MANUF&quot;</span>, <span class="at">geo_fd =</span> <span class="st">&quot;USA&quot;</span>)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 53.81984</span></span></code></pre></div>
+ends up absorbed back in the US, we can type:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_va_exgry</span>(wio, <span class="at">geo_orig =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">geo_export =</span> <span class="st">&quot;CHN&quot;</span>,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">sec_export =</span> <span class="st">&quot;MANUF&quot;</span>, <span class="at">geo_fd =</span> <span class="st">&quot;USA&quot;</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 53.81984</span></span></code></pre></div>
 <p>At the beginning we manually calculated the value added induced by
 final demand. There is also a specific command for that in
 <strong>exvatools</strong> called <code>get_va_fd()</code>. This allows,
 for instance, the calculation of the Chinese total value added (or GDP)
 induced by US final demand for manufactures:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_va_fd</span>(wio, <span class="at">geo_orig =</span> <span class="st">&quot;CHN&quot;</span>, <span class="at">sec_orig =</span> <span class="st">&quot;TOTAL&quot;</span>,</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">geo_fd =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">sec_fd =</span> <span class="st">&quot;MANUF&quot;</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;               WLD</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_TOTAL 229.385</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_va_fd</span>(wio, <span class="at">geo_orig =</span> <span class="st">&quot;CHN&quot;</span>, <span class="at">sec_orig =</span> <span class="st">&quot;TOTAL&quot;</span>,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">geo_fd =</span> <span class="st">&quot;USA&quot;</span>, <span class="at">sec_fd =</span> <span class="st">&quot;MANUF&quot;</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;               WLD</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; CHN_TOTAL 229.385</span></span></code></pre></div>
 </div>
 <div id="tiva-useful-indicators" class="section level3">
 <h3>TiVA useful indicators</h3>
@@ -853,143 +870,148 @@ induced by US final demand for manufactures:</p>
 (exports, imports, value added, production) similar to those of the TiVA
 database, we could just use <code>make_exvadec()</code> with the method
 <code>&quot;oecd&quot;</code> and <code>output = &quot;tiva&quot;</code>.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>exvativa <span class="ot">&lt;-</span> <span class="fu">make_exvadec</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;all&quot;</span>, <span class="at">method =</span> <span class="st">&quot;oecd&quot;</span>,</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">output =</span> <span class="st">&quot;tiva&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>exvativa <span class="ot">&lt;-</span> <span class="fu">make_exvadec</span>(wio, <span class="at">exporter =</span> <span class="st">&quot;all&quot;</span>, <span class="at">method =</span> <span class="st">&quot;oecd&quot;</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">output =</span> <span class="st">&quot;tiva&quot;</span>, <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>And then get the decomposition for Spain:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_exvadec_bkdown</span>(exvativa, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ Done!</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             DECOMPOSITION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: All sectors</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: All countries</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                               USD_MM  Percent</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Gross exports of goods and services (EXGR)  4666.96 100.00 </span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross exports, finals (EXGR_FNL)          1343.03  28.78 </span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross exports, intermediates (EXGR_INT)   3323.92  71.22 </span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross imports (IMGR)                      5292.12 113.40 </span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross imports, finals (IMGR_FNL)          2386.14  51.13 </span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross imports, intermediates (IMGR_INT)   2905.98  62.27 </span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic absorption (DOM)                  739.92  15.85 </span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic absorption, finals (DOM_FNL)      224.26   4.81 </span></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic absorption, interm. (DOM_INT)     515.66  11.05 </span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross balance (BALGR)                     -625.17 -13.40 </span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic Content in VA (EXGR_DVA)         2165.17  46.39 </span></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Direct domestic VA content (EXGR_DDC)     1757.25  37.65 </span></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Indirect domestic VA content (EXGR_IDC)    123.34   2.64 </span></span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Reimported domestic VA content (EXGR_RIM)  284.58   6.10 </span></span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Value Added in final demand (FD_VA)       1985.24  42.54 </span></span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    DVA in dom. final dem. (VAD) (DXD_DVA)     361.05   7.74 </span></span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    DVA in foreign final dem. (VAX) (FFD_DVA) 1624.18  34.80 </span></span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    FVA in dom. final dem. (VAM) (DFD_FVA)    2249.35  48.20 </span></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Balance of VA (VAX - VAM) (BALVAFD)       -625.17 -13.40 </span></span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Foreign VA Content (EXGR_FVA)             2501.78  53.61 </span></span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Backward participation in GVC (DEXFVAP)   2501.78  53.61 </span></span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Forward participation in GVC (FEXDVAP)    3047.87  65.31 </span></span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Value added (VA)                          1985.24  42.54 </span></span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Production (PROD)                         5406.87 115.85 </span></span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ================================================================================</span></span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: OECD (2021), TiVA output</span></span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_exvadec_bkdown</span>(exvativa, <span class="at">exporter =</span> <span class="st">&quot;ESP&quot;</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        DECOMPOSITION OF VALUE ADDED IN EXPORTS OF SPAIN IN 2022</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Sector: All sectors</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                     Destination: All countries</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  VA_components                               USD_MM  Percent</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Gross exports of goods and services (EXGR)  4666.96 100.00 </span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross exports, finals (EXGR_FNL)          1343.03  28.78 </span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross exports, intermediates (EXGR_INT)   3323.92  71.22 </span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross imports (IMGR)                      5292.12 113.40 </span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross imports, finals (IMGR_FNL)          2386.14  51.13 </span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross imports, intermediates (IMGR_INT)   2905.98  62.27 </span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic absorption (DOM)                  739.92  15.85 </span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic absorption, finals (DOM_FNL)      224.26   4.81 </span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic absorption, interm. (DOM_INT)     515.66  11.05 </span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Gross balance (BALGR)                     -625.17 -13.40 </span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Domestic Content in VA (EXGR_DVA)         2165.17  46.39 </span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Direct domestic VA content (EXGR_DDC)     1757.25  37.65 </span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Indirect domestic VA content (EXGR_IDC)    123.34   2.64 </span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Reimported domestic VA content (EXGR_RIM)  284.58   6.10 </span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Value Added in final demand (FD_VA)       1985.24  42.54 </span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    DVA in dom. final dem. (VAD) (DXD_DVA)     361.05   7.74 </span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    DVA in foreign final dem. (VAX) (FFD_DVA) 1624.18  34.80 </span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    FVA in dom. final dem. (VAM) (DFD_FVA)    2249.35  48.20 </span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Balance of VA (VAX - VAM) (BALVAFD)       -625.17 -13.40 </span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Foreign VA Content (EXGR_FVA)             2501.78  53.61 </span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Backward participation in GVC (DEXFVAP)   2501.78  53.61 </span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Forward participation in GVC (FEXDVAP)    3047.87  65.31 </span></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Value added (VA)                          1985.24  42.54 </span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Production (PROD)                         5406.87 115.85 </span></span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Method: OECD (2021), TiVA output</span></span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
 </div>
 </div>
 <div id="available-sectors-and-countries-in-each-input-output-edition" class="section level2">
 <h2>Available sectors and countries in each input-output edition</h2>
 <p>To check the information about sectors, it suffices to print
 <code>info_sec()</code>:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info_sec</span>(<span class="st">&quot;iciotest&quot;</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ===========================================================================</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Test Input Output Table, ICIO-type, 2022 edition</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ===========================================================================</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Individual sectors:</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PRIMARY: D01T09 (Primary sector), MANUF: D10T39 (Manufacturing), SRVWC: D41T98</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Services, including construction)</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sector groups:</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TOTAL: D01T98 (Total goods and services), GOODSWU: D01T39 (Goods, total, incl.</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; utilities)</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info_sec</span>(<span class="st">&quot;iciotest&quot;</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Test Input Output Table, ICIO-type, 2022 edition</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Individual sectors:</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PRIMARY: D01T09 (Primary sector), MANUF: D10T39 (Manufacturing),</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; SRVWC: D41T98 (Services, including construction)</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sector groups:</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TOTAL: D01T98 (Total goods and services), GOODSWU: D01T39 (Goods,</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; total, incl. utilities)</span></span></code></pre></div>
 <p>To check the information about available countries, the command is
 <code>info_geo()</code>:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info_geo</span>(<span class="st">&quot;iciotest&quot;</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ===========================================================================</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Test Input Output Table, ICIO-type, 2022 edition</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ===========================================================================</span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Individual countries:</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA (France), MEX (Mexico), ESP (Spain), USA (United States), CHN (China), ROW</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Rest of the world)</span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Groups of countries:</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD (World), EU27 (EU-27), NONEU27 (Non-EU27), NAFTA (NAFTA)</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info_geo</span>(<span class="st">&quot;iciotest&quot;</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Test Input Output Table, ICIO-type, 2022 edition</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Individual countries:</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; FRA (France), MEX (Mexico), ESP (Spain), USA (United States), CHN</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (China), ROW (Rest of the world)</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Groups of countries:</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WLD (World), EU27 (EU-27), NONEU27 (Non-EU27), NAFTA (NAFTA)</span></span></code></pre></div>
 <p>This commands do not require to have a <code>wio</code> in the
 environment, so we can just check what sectors are available in the
 OECD’s ICIO tables, 2021 edition.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info_sec</span>(<span class="st">&quot;icio2021&quot;</span>)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ===========================================================================</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  OECD&#39;s Inter-Country Input-Output Table (ICIO), 2021 edition</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ===========================================================================</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Individual sectors:</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; AGR: D01T02 (Agriculture), FSH: D03 (Fishing), MN1: D05T06 (Mining, energy</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; products), MN2: D07T08 (Mining, non-energy products), MN3: D09 (Mining, support</span></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; activities), FOD: D10T12 (Food and beverages), TEX: D13T15 (Textiles and</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; clothing), WOD: D16 (Wood products), PPR: D17T18 (Paper products and printing),</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PET: D19 (Petroleum products), CHM: D20 (Chemical products), PHR: D21</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Pharmaceutical products), RBP: D22 (Rubber and plastic products), NMM: D23</span></span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Other non-metalic mineral products), MET: D24 (Basic metals), FMP: D25</span></span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Fabricated metal products), CEO: D26 (Computer, electronic and optical</span></span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; products), ELQ: D27 (Electrical equipment), OMQ: D28 (Other machinery and</span></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; equipment), VEH: D29 (Motor vehicles), OTQ: D30 (Other transport equipment),</span></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; OMF: D31T33 (Other manufacturing equipment), EGS: D35 (Electricity and gas),</span></span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; WTR: D36T39 (Water and water treatment), CON: D41T43 (Construction), WRT:</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D45T47 (Wholesale and retail trade), LTP: D49 (Land transport), WTP: D50 (Water</span></span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; transport), ATP: D51 (Air transport), STO: D52 (Warehousing and support</span></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; activities), POS: D53 (Post and courier), HTR: D55T56 (Accommodation and food</span></span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; services), PAV: D58T60 (Publishing, audiovisual activities), TEL: D61</span></span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Telecommunications), CIS: D62T63 (Computer prog. &amp; information services), FIN:</span></span>
-<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D64T66 (Financial and insurance services), REA: D68 (Real estate activities),</span></span>
-<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PRS: D69T75 (Professional activities), ADM: D77T82 (Administrative and</span></span>
-<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; support), GOV: D84 (Public admin., defence and social security), EDU: D85</span></span>
-<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Education services), HHS: D86T88 (Human health and social services), AER:</span></span>
-<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D90T93 (Arts, entertainment services), OSA: D94T96 (Other services), PVH:</span></span>
-<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D97T98 (Private household services)</span></span>
-<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sector groups:</span></span>
-<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TOTAL: D01T98 (Total goods and services), GOODSWU: D01T39 (Goods, total, incl.</span></span>
-<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; utilities), GOODS: D01T33 (Goods, total), PRIMARY: D01T09 (Primary sector),</span></span>
-<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; AGF: D01T03 (Agriculture and fishing), MINWU: D05T09pD35T39 (Mining and</span></span>
-<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; utilities), MIN: D05T09 (Mining and quarrying), MANUF: D10T33 (Manufacturing),</span></span>
-<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MNFXPET: D10T33x19 (Manufacturing, except coke and petroleum), WPPR: D16T18</span></span>
-<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Wood, paper and printing), CHNMP: D20T23 (Chemical, pharma, plastic and</span></span>
-<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; non-metallic products), CHPH: D20T21 (Chemical and pharma products), BMMP:</span></span>
-<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D24T25 (Basic metals and metal products), CEOE: D26T27 (Computer, electronic,</span></span>
-<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; optical and electrical equipment), TREQ: D29T30 (Transport equipment), EGWT:</span></span>
-<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D35T39 (Electricity, gas, water supply), SRVWC: D41T98 (Services, including</span></span>
-<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; construction), SERVS: D45T98 (Services), BIZSV: D45T82 (Business services),</span></span>
-<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TPST: D49T53 (Transportation and storage), PTL: D53T61 (Post and</span></span>
-<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; telecommunications), INFO: D58T63 (Information industries), ITCS: D61T63 (ITC</span></span>
-<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Services), OBZS: D69T82 (Other business services), NONBIZSV: D84T98</span></span>
-<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Non-business services), OSPS: D90T98 (Other social and personal services),</span></span>
-<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; AEO: D90T96 (Arts, entertainment and other), RDIHI: D21, D28 (R&amp;D Intensity</span></span>
-<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; High), RDIMH: D20, D27T30, D62T65 (R&amp;D Intensity Medium-High), RDIME: D22T24,</span></span>
-<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D31T33, D69T77 (R&amp;D Intensity Medium), RDIML: D05T09, D10T19, D25, D58T63 (R&amp;D</span></span>
-<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Intensity Medium-Low), RDILO: D01T03, D35T56, D64T68, D77T82, D90T100 (R&amp;D</span></span>
-<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Intensity Low), RDINM: D84T90 (Non-Market Activities)</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">info_sec</span>(<span class="st">&quot;icio2021&quot;</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  OECD&#39;s Inter-Country Input-Output Table (ICIO), 2021 edition</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Individual sectors:</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; AGR: D01T02 (Agriculture), FSH: D03 (Fishing), MN1: D05T06 (Mining,</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; energy products), MN2: D07T08 (Mining, non-energy products), MN3: D09</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Mining, support activities), FOD: D10T12 (Food and beverages), TEX:</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D13T15 (Textiles and clothing), WOD: D16 (Wood products), PPR: D17T18</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Paper products and printing), PET: D19 (Petroleum products), CHM:</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D20 (Chemical products), PHR: D21 (Pharmaceutical products), RBP: D22</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Rubber and plastic products), NMM: D23 (Other non-metalic mineral</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; products), MET: D24 (Basic metals), FMP: D25 (Fabricated metal</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; products), CEO: D26 (Computer, electronic and optical products), ELQ:</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D27 (Electrical equipment), OMQ: D28 (Other machinery and equipment),</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; VEH: D29 (Motor vehicles), OTQ: D30 (Other transport equipment), OMF:</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D31T33 (Other manufacturing equipment), EGS: D35 (Electricity and</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; gas), WTR: D36T39 (Water and water treatment), CON: D41T43</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Construction), WRT: D45T47 (Wholesale and retail trade), LTP: D49</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Land transport), WTP: D50 (Water transport), ATP: D51 (Air</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; transport), STO: D52 (Warehousing and support activities), POS: D53</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Post and courier), HTR: D55T56 (Accommodation and food services),</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PAV: D58T60 (Publishing, audiovisual activities), TEL: D61</span></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Telecommunications), CIS: D62T63 (Computer prog. &amp; information</span></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; services), FIN: D64T66 (Financial and insurance services), REA: D68</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Real estate activities), PRS: D69T75 (Professional activities), ADM:</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D77T82 (Administrative and support), GOV: D84 (Public admin., defence</span></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; and social security), EDU: D85 (Education services), HHS: D86T88</span></span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Human health and social services), AER: D90T93 (Arts, entertainment</span></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; services), OSA: D94T96 (Other services), PVH: D97T98 (Private</span></span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; household services)</span></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sector groups:</span></span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; TOTAL: D01T98 (Total goods and services), GOODSWU: D01T39 (Goods,</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; total, incl. utilities), GOODS: D01T33 (Goods, total), PRIMARY:</span></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D01T09 (Primary sector), AGF: D01T03 (Agriculture and fishing),</span></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; MINWU: D05T09pD35T39 (Mining and utilities), MIN: D05T09 (Mining and</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; quarrying), MANUF: D10T33 (Manufacturing), MNFXPET: D10T33x19</span></span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Manufacturing, except coke and petroleum), WPPR: D16T18 (Wood, paper</span></span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; and printing), CHNMP: D20T23 (Chemical, pharma, plastic and</span></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; non-metallic products), CHPH: D20T21 (Chemical and pharma products),</span></span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; BMMP: D24T25 (Basic metals and metal products), CEOE: D26T27</span></span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Computer, electronic, optical and electrical equipment), TREQ:</span></span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D29T30 (Transport equipment), EGWT: D35T39 (Electricity, gas, water</span></span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; supply), SRVWC: D41T98 (Services, including construction), SERVS:</span></span>
+<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D45T98 (Services), BIZSV: D45T82 (Business services), TPST: D49T53</span></span>
+<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Transportation and storage), PTL: D53T61 (Post and</span></span>
+<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; telecommunications), INFO: D58T63 (Information industries), ITCS:</span></span>
+<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; D61T63 (ITC Services), OBZS: D69T82 (Other business services),</span></span>
+<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NONBIZSV: D84T98 (Non-business services), OSPS: D90T98 (Other social</span></span>
+<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; and personal services), AEO: D90T96 (Arts, entertainment and other),</span></span>
+<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; RDIHI: D21, D28 (R&amp;D Intensity High), RDIMH: D20, D27T30, D62T65 (R&amp;D</span></span>
+<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Intensity Medium-High), RDIME: D22T24, D31T33, D69T77 (R&amp;D Intensity</span></span>
+<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Medium), RDIML: D05T09, D10T19, D25, D58T63 (R&amp;D Intensity</span></span>
+<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Medium-Low), RDILO: D01T03, D35T56, D64T68, D77T82, D90T100 (R&amp;D</span></span>
+<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Intensity Low), RDINM: D84T90 (Non-Market Activities)</span></span></code></pre></div>
 <p>Additionally, the commands <code>get_geo_codes()</code> and
 <code>get_sec_codes</code> provide details about the components of the
 different groups. These commands are also directly applicable for any
 available input-output table. For instance, for <code>&quot;wiod2016&quot;</code>
 we would have the following components of EU27:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_geo_codes</span>(<span class="st">&quot;EU27&quot;</span>, <span class="at">wiotype =</span> <span class="st">&quot;wiod2016&quot;</span>)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AUT|BEL|CZE|DNK|EST|FIN|FRA|DEU|GRC|HUN|IRL|ITA|LVA|LTU|LUX|NLD|POL|PRT|SVK|SVN|ESP|SWE|BGR|HRV|CYP|MLT|ROU&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_geo_codes</span>(<span class="st">&quot;EU27&quot;</span>, <span class="at">wiotype =</span> <span class="st">&quot;wiod2016&quot;</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AUT|BEL|CZE|DNK|EST|FIN|FRA|DEU|GRC|HUN|IRL|ITA|LVA|LTU|LUX|NLD|POL|PRT|SVK|SVN|ESP|SWE|BGR|HRV|CYP|MLT|ROU&quot;</span></span></code></pre></div>
 <p>And for <code>&quot;icio2021&quot;</code> we have the following components of
 the business services sector:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_sec_codes</span>(<span class="st">&quot;BIZSV&quot;</span>, <span class="at">wiotype =</span> <span class="st">&quot;icio2021&quot;</span>)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;D45T47|D49|D50|D51|D52|D53|D55T56|D58T60|D61|D62T63|D64T66|D68|D69T75|D77T82&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_sec_codes</span>(<span class="st">&quot;BIZSV&quot;</span>, <span class="at">wiotype =</span> <span class="st">&quot;icio2021&quot;</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;D45T47|D49|D50|D51|D52|D53|D55T56|D58T60|D61|D62T63|D64T66|D68|D69T75|D77T82&quot;</span></span></code></pre></div>
 </div>
 
 

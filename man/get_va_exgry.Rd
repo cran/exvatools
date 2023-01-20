@@ -65,6 +65,3 @@ wio <- make_wio("iciotest")
 get_va_exgry(wio, flow_type = "EXGRY_INT", geo_orig = "FRA",
              geo_export = "USA", sec_export = "MANUF", geo_fd = "ESP")
 }
-\author{
-Enrique Feas
-}

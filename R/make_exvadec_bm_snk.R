@@ -19,7 +19,7 @@
 #' @return A list object of class `exvadec` with several matrices
 #' plus metadata.
 make_exvadec_bm_snk <- function(wio_object, exporter,
-                                output = "standard"){
+                                output = "standard", quiet = FALSE){
 
   # Check class----
   wio <- check_object(wio_object, "wio")
@@ -63,7 +63,7 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
     Yrj <- Ysr <- wio$Ym
     Yrs <- bkt(wio$Ym)
 
-    cli::cli_alert_info("Initializing matrices...")
+    if (!quiet) {cli::cli_alert_info("Initializing matrices...")}
     # Initialization of matrices for iteration
 
     sum_Arj_sum_Bnotsjk_Ynotskl <-
@@ -75,7 +75,7 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
       name(matrix(0, GN, G), gn_names, g_names)
 
 
-    cli::cli_alert_info("Starting iteration, please wait...")
+    if (!quiet) {cli::cli_alert_info("Starting iteration, please wait...")}
 
     cli::cli_progress_bar("Please wait...",
                           type = "iterator",
@@ -134,7 +134,7 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
 
     }  # End iteration matrix fill
 
-    cli::cli_progress_done(result = "{G} inverse matrices computed")
+    if (!quiet) {cli::cli_progress_done(result = "{G} inverse matrices computed")}
 
 
     # Compound matrices
@@ -180,7 +180,8 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
     ggn_names <- gn_names
 
     # Compound names with groups EU27_01T03
-    expn_names <- paste0(exporter, gsub("[CD]", "_", n_names))
+    # expn_names <- paste0(exporter, gsub("[CD]", "_", n_names))
+    expn_names <- paste0(exporter, "_", gsub("[CD]", "", n_names))
     if (is_group) {
       ggn_names <- paste0(exporter, "_", gsub("[CD]", "", n_names))
     }
@@ -207,7 +208,7 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
     Brs <- Bts <- Brs[, pgn_exp, drop = FALSE]
 
     # Bnots
-    cli::cli_alert_info("Solving inverse matrix Bnots...")
+    if (!quiet) {cli::cli_alert_info("Solving inverse matrix Bnots...")}
 
     Bnots <- make_Bnots(wio, exporter)
 
@@ -315,7 +316,7 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
 
   # DVA terms----
 
-  cli::cli_alert_info("Calculating DVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating DVA terms...")}
 
   VAX1 <- check_meld_group(dmult(Vs_Bss, Ysr))
 
@@ -343,7 +344,7 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
 
   # FVA terms----
 
-  cli::cli_alert_info("Calculating FVA terms...")
+  if (!quiet) {cli::cli_alert_info("Calculating FVA terms...")}
 
   FVA1 <- check_meld_group(dmult(Vt_Bts, Ysr))
 
@@ -369,7 +370,7 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
   FVA <- FVA1 + FVA2 + FVA3 + FVA4
   FC <- FVA + FDC
 
-  cli::cli_alert_info("Preparing output ...")
+  if (!quiet) {cli::cli_alert_info("Preparing output ...")}
 
   # Output----
 
@@ -416,13 +417,15 @@ make_exvadec_bm_snk <- function(wio_object, exporter,
   }
   class(exvadec) <- "exvadec"
 
-  # cli::cli_alert_success("Done!")
+  if (!quiet) {cli::cli_alert_success("Done!")}
 
   # Print result summary
-  if (exporter == "all") {
-    get_exvadec_bkdown(exvadec)
-  } else{
-    get_exvadec_bkdown(exvadec, exporter)
+  if (!quiet) {
+    if (exporter == "all") {
+      get_exvadec_bkdown(exvadec)
+    } else{
+      get_exvadec_bkdown(exvadec, exporter)
+    }
   }
 
   return(exvadec)

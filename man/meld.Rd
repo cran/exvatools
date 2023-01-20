@@ -21,6 +21,3 @@ Meld \code{ICIO} matrix with extended countries.
 Melds countries \code{CHN} and \code{MEX} from their extended versions
 e.g., \code{CN1} and \code{CN2} are melded into \code{CHN}.
 }
-\author{
-Enrique Feas
-}

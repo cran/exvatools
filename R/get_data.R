@@ -218,8 +218,16 @@ get_data <- function(exvatools_object, var, exporter,
         # get_data, as we are really selecting the EU27 origin of VA for
         # the ultimate exporter NAFTA
         if (is_exvadir) {
-          # We look for the codes
-          exp_codes <- get_geo_codes(exporter[i], wio_type)
+          # This added 17/01
+          # If is a custom wio and exporter is "WLD", we need to calculate it
+          # as the sum of all countries (we have no database for that)
+          if (wio_type == "custom" && exporter[i] == "WLD") {
+            exp_codes <- paste0(exvatools_object$names$g_names, collapse = "|")
+            # If not, use get_geo_codes (which will also return the same value
+            # if wio_type is "custom")
+          } else {
+            exp_codes <- get_geo_codes(exporter[i], wio_type)
+          }
         } else {
           # If it is a country-exvadec object, just take the name
           # (if is NAFTA, rows will be NAFTA_01T02, etc)

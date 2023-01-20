@@ -168,7 +168,6 @@ make_Bnots <- function(wio, exporter, ...) {
 #' @param ... Rest of parameters from make_Bnots
 #' @keywords internal
 #' @noRd
-#' @author Enrique Feas
 #' @return A Bnots matrix
 make_global_Bnots <- function(wio, ...) {
 

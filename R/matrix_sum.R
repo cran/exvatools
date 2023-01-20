@@ -257,7 +257,6 @@ sumgcols <- function(df, n, col_names = NULL) {
 #' @keywords internal
 #' @noRd
 #' @return Aggregated matrix of/with grouped columns
-#' @author Enrique Feas
 #' @examples
 #' \dontrun{
 #' group_cols(df, "EU27", "replace")
@@ -393,7 +392,6 @@ sum_every_nth_row <- function(df, n){
 #' @keywords internal
 #' @noRd
 #' @return Aggregated matrix by columns
-#' @author Enrique Feas
 sum_every_nth_col <- function(df, n){
 
   # sum_every:nth_col: Takes an array df
@@ -443,7 +441,6 @@ sum_every_nth_col <- function(df, n){
 #' @keywords internal
 #' @noRd
 #' @return Aggregated matrix by rows
-#' @author Enrique Feas
 sum_by_groups_of <- function(df, n, bycols=FALSE){
   # Takes an array df and sums its rows for each column
   # so the first row is 1:n, the secons n+1:2n... etc

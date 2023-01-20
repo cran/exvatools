@@ -29,12 +29,11 @@
 #'   will be considered double counting.
 #' @keywords internal
 #' @noRd
-#' @author Enrique Feas
 #' @return A list object of class `exvadec` with several matrices
 #' plus metadata.
 make_exvadec_my <- function(wio_object, exporter = "all",
                             output = "standard", perim = "country",
-                            partner = "WLD", sector = "TOTAL") {
+                            partner = "WLD", sector = "TOTAL", quiet = FALSE) {
 
   # Requires functions: bkd, bkoffd, bkt, bktt, hmult,
   # meld, bkdiag, sum_every_nth_row, sum_by_groups_of
@@ -96,7 +95,7 @@ make_exvadec_my <- function(wio_object, exporter = "all",
     }
 
     # DVA auxiliary matrices----
-    cli::cli_alert_info("Preparing auxiliary matrices...")
+    if (!quiet) {cli::cli_alert_info("Preparing auxiliary matrices...")}
 
     # Vs
     Vs <- wio$W[pgn_exp, pgn_exp, drop = FALSE]
@@ -127,7 +126,7 @@ make_exvadec_my <- function(wio_object, exporter = "all",
     Bss <- wio$B[pgn_exp, pgn_exp, drop = FALSE]
 
 
-    cli::cli_alert_info("Calculating terms ...")
+    if (!quiet) {cli::cli_alert_info("Calculating terms ...")}
 
     # Auxiliary function: if is_icio, melds (sometimes specifying)
     # and then, if it is_group, consolidates and names rows
@@ -232,7 +231,9 @@ make_exvadec_my <- function(wio_object, exporter = "all",
                         type = "iterator",
                         total = G)
   for (exp in exporter) {
-    if (is_all) {cli::cli_alert_info("Country {exp}")}
+    if (is_all) {
+      if (!quiet) {cli::cli_alert_info("Country {exp}")}
+    }
     exvadec_exp <- make_my(exp)
     cli::cli_progress_update()
     exvadec_names <- names(exvadec_exp)
@@ -247,7 +248,7 @@ make_exvadec_my <- function(wio_object, exporter = "all",
   }
 
   # Output----
-  cli::cli_alert_info("Preparing output ...")
+  if (!quiet) {cli::cli_alert_info("Preparing output ...")}
 
 
   # Metadata
@@ -266,13 +267,15 @@ make_exvadec_my <- function(wio_object, exporter = "all",
 
   class(exvadec) <- "exvadec"
 
-  # cli::cli_alert_success("Done!")
+  if (!quiet) {cli::cli_alert_success("Done!")}
 
   # Print result summary
-  if (is_all) {
-    get_exvadec_bkdown(exvadec)
-  } else{
-    get_exvadec_bkdown(exvadec, exporter)
+  if (!quiet) {
+    if (is_all) {
+      get_exvadec_bkdown(exvadec)
+    } else{
+      get_exvadec_bkdown(exvadec, exporter)
+    }
   }
 
   return(exvadec)

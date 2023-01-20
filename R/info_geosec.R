@@ -10,6 +10,11 @@
 #' info_geo("icio2021")
 info_geo <- function(wiotype = "icio2021", lang = "en"){
 
+  if (wiotype == "custom") {
+    stop("info_geo() only works with standard input-output tables.\n",
+         "Use summary(wio) to check available countries in custom wio.")
+  }
+
   # Select column with included elements
   # (basic_icio2021, basic_wiod2016, etc)
   # Elements will have 1 (individual) or 0 (group).
@@ -28,7 +33,7 @@ info_geo <- function(wiotype = "icio2021", lang = "en"){
 
   # List of individual countries
   # It will appear as ESP (Spain) USA (United States), etc
-  # altghough depending of language
+  # although depending of language
 
   # Select language description
   txt_lang <- paste0("txt", "_", lang)
@@ -46,9 +51,9 @@ info_geo <- function(wiotype = "icio2021", lang = "en"){
   # Start printing
   cr <- "\n"
   txt <- cr
-  txt <- paste0(txt, hline(75), cr)
+  txt <- paste0(txt, hline(), cr)
   txt <- paste0(txt, " ", txt_wio, cr)
-  txt <- paste0(txt, hline(75), cr, cr)
+  txt <- paste0(txt, hline(), cr, cr)
   txt <- paste0(txt, "Individual countries:", cr)
   txt <- paste0(txt, vecwrap(list_indiv), cr, cr)
   txt <- paste0(txt, "Groups of countries:", cr)
@@ -72,6 +77,12 @@ info_geo <- function(wiotype = "icio2021", lang = "en"){
 #' @examples
 #' info_sec("icio2021")
 info_sec <- function(wiotype = "icio2021", lang = "en"){
+
+  if (wiotype == "custom") {
+    stop("info_sec() only works with standard input-output tables.\n",
+         "Use summary(wio) to check available sectors in custom wio.")
+  }
+
 
   # Select column with included elements
   # (basic_icio2021, basic_wiod2016, etc)
@@ -120,9 +131,9 @@ info_sec <- function(wiotype = "icio2021", lang = "en"){
   # Start printing
   cr <- "\n"
   txt <- cr
-  txt <- paste0(txt, hline(75), cr)
+  txt <- paste0(txt, hline(), cr)
   txt <- paste0(txt, " ", txt_wio, cr)
-  txt <- paste0(txt, hline(75), cr, cr)
+  txt <- paste0(txt, hline(), cr, cr)
   txt <- paste0(txt, "Individual sectors:", cr)
   txt <- paste0(txt, vecwrap(list_indiv), cr, cr)
   txt <- paste0(txt, "Sector groups:", cr)

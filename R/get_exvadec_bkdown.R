@@ -9,8 +9,7 @@
 #' @param sector Character code of sector
 #' @param importer Character code of importer
 #'
-#' @return Print result and copy to clipboard
-#' @author Enrique Feas
+#' @return Print result to console
 #' @export
 #' @examples
 #' wio <- make_wio("wiodtest", quiet = TRUE)
@@ -198,8 +197,8 @@ get_exvadec_bkdown <- function(exvadec_object, exporter = "WLD",
   cr <- "\n"
 
   # Start header
-  txt <- paste0("Done!", cr)
-  txt <- paste0(txt, hline(), cr)
+  # txt <- paste0("Done!", cr)
+  txt <- paste0(hline(), cr)
 
   title <- center(paste0("DECOMPOSITION OF VALUE ADDED IN EXPORTS OF ",
                   toupper(txt_exporter), " IN ", exvadec$year))
@@ -222,8 +221,8 @@ get_exvadec_bkdown <- function(exvadec_object, exporter = "WLD",
   # End of text
 
   # Print text to console
-  cli::cli_alert_success(txt)
-  # cat(txt)
+  # cli::cli_alert_success(txt)
+  cat(txt)
 
   # Return tbl (without printing to console)
   return(invisible(tbl))
