@@ -1,28 +1,20 @@
 #' Make OECD (2019) decomposition
 #'
-#'#' Calculates the decomposition of value added in exports of a country
-#' or a group of countries according to the OECD methodology.
-#'
-#' @param wio_object An object of class `wio` (standardized world
-#' input-output table) obtained using [make_wio()].
+#' Creates OECD decomposition
+#' @param wio_object A class `wio` object
 #' @param exporter A string character with the code of a country
-#' (e.g., `USA`) or a country group (e.g., `EU27`,
-#' `NAFTA`, etc.). The default `all` produces the export VA
-#' decomposition for all individual countries.
-#' @param output String character specifying the type of matrices
-#'   in output:
-#'   `standard`: `DC`, `DVA`, `VAX`...
-#'   `terms`: `T01`, `T02`, `T02`... (12).
-#'   `original`: Original denomination of terms.
+#' @param output String, type of output
+#' @param quiet Boolean
 #' @keywords internal
 #' @noRd
-#' @return A list object of class `exvadec` with several matrices
-#' plus metadata.
+#' @return A list with matrices
 make_exvadec_oecd <- function(wio_object, exporter = "all",
                               output = "standard", quiet = FALSE) {
 
-  # exporter <- "EU27"
-  # output <- "standard"
+  # exporter <- "ESP"
+  # output <- "tiva"
+  # quiet <- FALSE
+
 
   # Check class----
   wio <- check_object(wio_object, "wio")
@@ -47,25 +39,72 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   is_all <- ifelse(exporter == "all", TRUE, FALSE)
   is_exporter <- !is_all
+  is_group <- FALSE
 
-  # Countries with groups (initially as G)
-  GG <- G
-  # Country names with groups (initially as g_names)
+  # Initialize names and number of countries in case exporter is group
   gg_names <- g_names
-  ggn_names <- gn_names
+  GG <- G
 
-  # # Position of exporter, groups
   if (is_exporter) {
+    # Row names with sectors for exporter (valid also if group)
+    expn_names <- paste0(exporter, "_", gsub("^[CD]", "", n_names))
+
+    # Position of exporter
     pgn_exp <- grep(get_geo_codes(exporter, wio_type, TRUE), gxn_names)
     pg_exp <- grep(get_geo_codes(exporter, wio_type), g_names)
+    pgn_exp_melt <- grep(get_geo_codes(exporter, wio_type), gn_names)
+
+    # Check if exporter is group
     is_group <- ifelse(length(pg_exp) > 1, TRUE, FALSE)
-    expn_names <- paste0(exporter, "_", gsub("[CD]", "", n_names))
-    # If is exporter group, ggn_names will be EU27_01T02...EU27_90T98
     if (is_group) {
-      ggn_names <- paste0(exporter, "_", gsub("[CD]", "", n_names))
+      group_names <-
+        strsplit(get_geo_codes(exporter, wio$type, TRUE), "[|]")[[1]]
+      gg_names <- c(g_names[!g_names %in% group_names], exporter)
+      GG <- length(gg_names)
     }
-  } else {
-    is_group <- FALSE
+  }
+
+  # Auxiliary functions to improve code readability
+  get_block_exp <- function(df) df[pgn_exp, pgn_exp, drop = FALSE]
+  get_cols_exp <- function(df) df[, pgn_exp, drop = FALSE]
+  get_rows_exp <- function(df) df[pgn_exp, , drop = FALSE]
+  get_rows_exp_melt <- function(df) df[pgn_exp_melt, , drop = FALSE]
+  group_cols_exp <- function(df) group_cols(df, pg_exp, "replace", exporter, wio_type)
+  # sum_X <- function(df) name(repmat(rsums(df), GG), gxn_names, gg_names)
+  # sum_Xxs <- function(df) name(repmat(rsums(df), GG) - df, gxn_names, gg_names)
+  bkt_bkoffd <- function(df) {
+    df <- bkoffd(df)
+    df <- bkt(df)
+  }
+  bkt_col_bkoffd <- function(df) {
+    df <- bkoffdx(df, gg_names)
+    df <- df[, exporter, drop = FALSE]
+    df <- bkt(df)
+  }
+  bkt_col <- function(df) bkt(df[, exporter, drop = FALSE])
+  sumnrow_meld <- function(df, meld_rows = TRUE, meld_cols = TRUE) {
+    if (is_icio) {
+      df <- meld(df, meld_rows = meld_rows, meld_cols = meld_cols)
+    }
+    if (is_group) {
+      col_names <- colnames(df)
+      df <- name(sumnrow(df, N), expn_names, col_names)
+    }
+    return(df)
+  }
+  sumnrow_rows_exp_melt <- function(df) {
+    df <- df[pgn_exp_melt, , drop = FALSE]
+    if (is_group) {
+      df <- sumnrow(df, N, expn_names)
+    }
+    return(df)
+  }
+  set_zero_exp <- function(df) {
+    if (nrow(df) == ncol(df)) {
+      return(set_zero(df, pgn_exp, pgn_exp))
+    } else {
+      return(set_zero(df, pgn_exp, pg_exp))
+    }
   }
 
   # Simple auxiliary matrices----
@@ -73,55 +112,31 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
   if (!quiet) {cli::cli_alert_info("Preparing simple auxiliary matrices...")}
 
   # Vs
-  Vs <- Vt <- wio$W
-  if (is_exporter) {
-    Vs <- Vs[pgn_exp, pgn_exp, drop = FALSE]
-  }
+  Vs <- if (is_exporter) get_block_exp(wio$W) else wio$W
 
-  # B
-  Bjk <- wio$B
-  Bss <- Brr <- wio$Bd
-  Bsr <- Brs <- Brj <- Bts <- wio$Bm
-  if (is_exporter) {
-    Bsr <- Brs <- Brj <- Bts <- set_zero(Bsr, pgn_exp, pgn_exp)
-    Bss <- (wio$B - Bsr)[pgn_exp, pgn_exp, drop = FALSE]
-    Bsr <- Bsr[pgn_exp, , drop = FALSE]
-    Brs <- Brs[, pgn_exp, drop = FALSE]
-    Bts <- Bts[, pgn_exp, drop = FALSE]
-  }
+  # Preparation
+  Bm <- if (is_exporter) set_zero_exp(wio$Bm) else wio$Bm
+  Bd <- wio$B - Bm
+  Am <- if (is_exporter) set_zero_exp(wio$Am) else wio$Am
+  Ad <- wio$A - Am
+  Ym <- if (is_exporter) set_zero_exp(wio$Ym) else wio$Ym
+  Yd <- wio$Y - Ym
 
-  # Y grouped
-  Ykl <- wio$Y
-  if (is_group) {
-    Ykl <- group_cols(Ykl, pg_exp, "replace", exporter, wio_type)
-  }
+  Brr <- Bd
+  Brj <- Bm
+  Bss <- if (is_exporter) get_block_exp(Bd) else Bd
+  Bsr <- if (is_exporter) get_rows_exp(Bm) else Bm
+  Bts <- if (is_exporter) get_cols_exp(Bm) else Bm
+  Asr <- if (is_exporter) get_rows_exp(Am) else Am
+  Lrr <- if (is_group) solve(diag(GXN) - Ad) else wio$Ld
+  Lss <- if (is_exporter) get_block_exp(Lrr) else Lrr
 
-  # A
-  Asr <- wio$Am
-  if (is_exporter) {
-    Asr <- set_zero(Asr, pgn_exp, pgn_exp)[pgn_exp, , drop = FALSE]
-  }
-  Arj <- wio$Am
-  if (is_exporter) {
-    Arj <- set_zero(Arj, pgn_exp, pgn_exp)
-  }
-  Ass <- wio$A - Arj
+  Yrr <- Yd
+  Yjj <- Yss <- if (is_group) group_cols_exp(Yd) else Yd
+  Yrj <- Yjk <- if (is_group) group_cols_exp(Ym) else Ym
+  Ykl <- if (is_group) group_cols_exp(wio$Y) else wio$Y
 
-  # EXGR
-  EXGR <- wio$EXGR
-  if (is_exporter) {
-    EXGR <- set_zero(EXGR, pgn_exp, pg_exp)[pgn_exp, , drop = FALSE]
-  }
-
-  # Lss, Lrr
-  Lss <- Lrr <- wio$Ld
-  if (is_exporter) {
-    if (is_group) {
-      Lss <- name(solve(diag(GXN) - Ass), gxn_names, gxn_names)
-    }
-    Lrr <- Lss
-    Lss <- Lss[pgn_exp, pgn_exp, drop = FALSE]
-  }
+  EXGR <- if (is_exporter) get_rows_exp(set_zero_exp(wio$EXGR)) else wio$EXGR
 
   # Complex auxiliary matrices----
 
@@ -130,7 +145,6 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
   Vs_Bss <- diagcs(dmult(Vs, Bss))
   Vs_Lss <- diagcs(dmult(Vs, Lss))
   Vs_Bss_minus_Lss <- diagcs(dmult(Vs, Bss - Lss))
-
 
   K <- nrow(Lss) # Normally GXN
 
@@ -141,48 +155,32 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
   Vs_Bsj_Yjk <- dmult(wio$W, (wio$B %*% wio$Y))
 
 
-
-  # Auxiliary function: if is_icio, melds (sometimes rows only)
-  # and then, if it is_group, consolidates the rows and names the matrix
-  # with ggn_names
-  check_meld_group <- function(df, meld_rows = TRUE, meld_cols = TRUE) {
-    if (is_icio) {
-      df <- meld(df, meld_rows = meld_rows, meld_cols = meld_cols)
-    }
-    if (is_group) {
-      col_names <- colnames(df)
-      df <- name(sum_every_nth_row(df, N), ggn_names, col_names)
-    }
-    return(df)
-  }
-
   # DVA terms----
 
   if (!quiet) {cli::cli_alert_info("Calculating DVA terms...")}
 
-  if (is_all) {
+  if (is_exporter) {
+    VAX <- set_zero_exp(bkoffd(Vs_Bsj_Yjk))
+    VAD <- sumnrow_meld(get_rows_exp(Vs_Bsj_Yjk - VAX))
+    VAX <- sumnrow_meld(get_rows_exp(VAX))
+  } else {
     VAX <- meld(bkoffd(Vs_Bsj_Yjk))
     VAD <- meld(bkd(Vs_Bsj_Yjk))
-  } else if (is_exporter) {
-    VAX <- set_zero(bkoffd(Vs_Bsj_Yjk), pgn_exp, pg_exp)
-    VAD <- check_meld_group((Vs_Bsj_Yjk - VAX)[pgn_exp, , drop = FALSE])
-    VAX <- check_meld_group((VAX)[pgn_exp, , drop = FALSE])
   }
 
   # Total VA of Fnal Demand
   FDVA <- VAD + VAX
 
-  DC <- check_meld_group(dmult(Vs_Bss, EXGR))
+  DC <- sumnrow_meld(dmult(Vs_Bss, EXGR))
 
   # DVA direct
-  DVA1 <- check_meld_group(dmult(Vs_diag_Lss, EXGR))
+  DVA1 <- sumnrow_meld(dmult(Vs_diag_Lss, EXGR))
 
   # DVA indirect
-  DVA2 <- check_meld_group(dmult(Vs_offdiag_Lss, EXGR))
+  DVA2 <- sumnrow_meld(dmult(Vs_offdiag_Lss, EXGR))
 
   # DVA reimported
-  DDC <- check_meld_group(dmult(Vs_Bss_minus_Lss, EXGR))
-
+  DDC <- sumnrow_meld(dmult(Vs_Bss_minus_Lss, EXGR))
 
   # FVA terms----
 
@@ -191,18 +189,16 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
   # FC
   Vt_Bts <- diagcs(dmult(wio$W, Bts))
 
-  FC <- check_meld_group(dmult(Vt_Bts, EXGR))
+  FC <- sumnrow_meld(dmult(Vt_Bts, EXGR))
 
   # Export matrices for GVC indicators
-  Esr <- wio$EXGR
-  if (is_exporter) {
-    Esr <- set_zero(Esr, pgn_exp, pg_exp)
-  }
+
+  Esr <- if (is_exporter) set_zero_exp(wio$EXGR) else wio$EXGR
   Esr <- bkdiag(bkoffd(name(repmat(rowSums(Esr), GX), gxn_names, gx_names)))
   Ers <- bkt(Esr)
   if (is_exporter) {
-    Esr <- Esr[pgn_exp, , drop = FALSE]
-    Ers <- Ers[pgn_exp, , drop = FALSE]
+    Esr <- get_rows_exp(Esr)
+    Ers <- get_rows_exp(Ers)
   }
 
   # GVCB (backwards)
@@ -215,9 +211,9 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
   Vt_Bts <- bkt(dmult(wio$W, Bts))
 
   GVCB <- bktt(hmult(Vt_Bts, Esr))
-  GVCB <- check_meld_group(sumgcols(GVCB, N, gx_names))
+  GVCB <- sumnrow_meld(sumgcols(GVCB, N, gx_names))
 
-  # GVCB <- check_meld_group(name(sum_by_groups_of(GVCB, N, bycols = TRUE),
+  # GVCB <- sumnrow_meld(name(sum_by_groups_of(GVCB, N, bycols = TRUE),
   #                               rownames(Esr), gx_names))
 
   # GVCF (forward)
@@ -229,9 +225,9 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
   Vs_Bsr <- dmult(Vs, Bsr)
 
   GVCF <- bktt(hmult(Vs_Bsr, Ers))
-  GVCF <- check_meld_group(sumgcols(GVCF, N, gx_names))
+  GVCF <- sumnrow_meld(sumgcols(GVCF, N, gx_names))
 
-  EXGR <- check_meld_group(EXGR)
+  EXGR <- sumnrow_meld(EXGR)
 
 
   DVA <- DVA1 + DVA2
@@ -244,79 +240,35 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
     if (!quiet) {cli::cli_alert_info("Calculating extra TiVA terms...")}
 
-    if (is_all) {
-      IMGR <- bkt(EXGR)
-    } else if (is_exporter) {
-      pgn_exp_melt <- grep(get_geo_codes(exporter, wio_type), gn_names)
-      IMGR <- bkt(meld(set_zero(wio$EXGR, pgn_exp, pg_exp)))[pgn_exp_melt,
-                                                             , drop = FALSE]
-      if (is_group) {
-        IMGR <- sumnrow(IMGR, N, ggn_names)
+    IMGR <-
+      if (is_exporter) {
+        sumnrow_rows_exp_melt(bkt(meld(set_zero_exp(wio$EXGR))))
+      } else {
+        bkt(EXGR)
       }
-    }
 
-    if (is_all) {
-      VAM <- bkt(meld(bkoffd(Vs_Bsj_Yjk)))
-    } else if (is_exporter) {
-      VAM <- bkt(meld(set_zero(bkoffd(Vs_Bsj_Yjk), pgn_exp, pg_exp)))
-      VAM <- VAM[pgn_exp_melt, , drop = FALSE]
-      if (is_group) {
-        VAM <- sumnrow(VAM, N, ggn_names)
+    VAM <-
+      if (is_exporter) {
+        sumnrow_rows_exp_melt(bkt(meld(set_zero_exp(bkoffd(Vs_Bsj_Yjk)))))
+      } else {
+        VAM <- bkt(meld(bkoffd(Vs_Bsj_Yjk)))
       }
-    }
 
-    Z <- wio$Z
-    if (is_all) {
-      Zd <- wio$Zd
-      Zm <- wio$Zm
-    } else if (is_exporter) {
-      Zm <- set_zero(wio$Zm, pgn_exp, pgn_exp)
-      Zd <- wio$Z - Zm
-    }
+    Zm <- if (is_exporter) set_zero_exp(wio$Zm) else wio$Zm
+    Zd <- wio$Z - Zm
 
-    EXGR_INT <- meld(sumgcols(Zm, N, gx_names))
+    Zm_melt <- meld(sumgcols(Zm, N, gx_names))
+    Zd_melt <- meld(sumgcols(Zd, N, gx_names))
 
-    IMGR_INT <- bkt(EXGR_INT)
+    EXGR_INT <- if (is_exporter) sumnrow_rows_exp_melt(Zm_melt) else Zm_melt
+    IMGR_INT <- if (is_exporter) sumnrow_rows_exp_melt(bkt(Zm_melt)) else bkt(Zm_melt)
+    DOM_INT <- if (is_exporter) sumnrow_rows_exp_melt(Zd_melt) else Zd_melt
 
-    DOM_INT <- meld(sumgcols(Zd, N, gx_names))
-
-    # DOM_INT <- meld(name(sum_by_groups_of(Zd, N, bycols = TRUE),
-    #                      gxn_names, gx_names))
-    if (is_exporter) {
-      EXGR_INT <- EXGR_INT[pgn_exp_melt, , drop = FALSE]
-      IMGR_INT <- IMGR_INT[pgn_exp_melt, , drop = FALSE]
-      DOM_INT <- DOM_INT[pgn_exp_melt, , drop = FALSE]
-      if (is_group) {
-        EXGR_INT <- sumnrow(EXGR_INT, N, ggn_names)
-        IMGR_INT <- sumnrow(IMGR_INT, N, ggn_names)
-        DOM_INT <- sumnrow(DOM_INT, N, ggn_names)
-      }
-    }
-
-    Ym <- wio$Ym
-    Yd <- wio$Yd
-    if (is_exporter) {
-      Ym <- set_zero(wio$Ym, pgn_exp, pg_exp)
-      Yd <- wio$Y - Ym
-    }
-
-    EXGR_FNL <- meld(Ym)
-    IMGR_FNL <- meld(bkt(Ym))
-    DOM_FNL <- meld(Yd)
-
-    if (is_exporter) {
-      EXGR_FNL <- EXGR_FNL[pgn_exp_melt, , drop = FALSE]
-      IMGR_FNL <- IMGR_FNL[pgn_exp_melt, , drop = FALSE]
-      DOM_FNL <- DOM_FNL[pgn_exp_melt, , drop = FALSE]
-      if (is_group) {
-        EXGR_FNL <- sumnrow(EXGR_FNL, N, ggn_names)
-        IMGR_FNL <- sumnrow(IMGR_FNL, N, ggn_names)
-        DOM_FNL <- sumnrow(DOM_FNL, N, ggn_names)
-      }
-    }
+    EXGR_FNL <- if (is_exporter) sumnrow_rows_exp_melt(meld(Ym)) else meld(Ym)
+    IMGR_FNL <- if (is_exporter) sumnrow_rows_exp_melt(meld(bkt(Ym))) else meld(bkt(Ym))
+    DOM_FNL <- if (is_exporter) sumnrow_rows_exp_melt(meld(Yd)) else meld(Yd)
 
     DOM <- DOM_INT + DOM_FNL
-
     BALGR <- EXGR - IMGR
     BALVA <- VAX - VAM
 
@@ -325,17 +277,8 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
     # EXGR_FNLDVAFX <- dmult(diagcs(dmult(Vs, Bss)), Ysr)
     # EXGR_INTDVAFX <- dmult(diagcs(dmult(Vs, Bss)), Asj_Bjk_Ykl)
 
-
-    X <- meld(wio$X)
-    VA <- meld(wio$VA)
-    if (is_exporter) {
-      X <- X[pgn_exp_melt, , drop = FALSE]
-      VA <- VA[pgn_exp_melt, , drop = FALSE]
-      if (is_group) {
-        X <- sumnrow(X, N, ggn_names)
-        VA <- sumnrow(VA, N, ggn_names)
-      }
-    }
+    X <- if (is_exporter) sumnrow_rows_exp_melt(meld(wio$X)) else (meld(wio$X))
+    VA <- if (is_exporter) sumnrow_rows_exp_melt(meld(wio$VA)) else (meld(wio$VA))
 
     # End extra TiVA terms
   }
@@ -347,9 +290,9 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   if (output == "standard") {
     exvadec <- list(EXGR, DC, DVA, VAX, REF, DDC,
-                 FC, GVC, GVCB, GVCF)
+                    FC, GVC, GVCB, GVCF)
     exvadec_names <- c("EXGR", "DC", "DVA", "VAX", "REF", "DDC",
-                    "FC", "GVC", "GVCB", "GVCF")
+                       "FC", "GVC", "GVCB", "GVCF")
 
   } else if (output == "terms") {
 
@@ -381,6 +324,7 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   }
 
+  # Set names
   names(exvadec) <- exvadec_names
 
   # Additional metadata
@@ -408,8 +352,4 @@ make_exvadec_oecd <- function(wio_object, exporter = "all",
 
   return(exvadec)
 
-
-  # End function
-
 }
-

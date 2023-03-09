@@ -72,7 +72,11 @@ hline <- function(num_chars = 70){
 #' @noRd
 center <- function(txt, limchars = 70) {
   num_spc <- round((limchars - nchar(txt))/2, 0)
-  new_txt <- paste0(strrep(" ", num_spc), txt)
+  if (num_spc > 0) {
+    new_txt <- paste0(strrep(" ", num_spc), txt)
+  } else {
+    new_txt <- txt
+  }
   return(new_txt)
 }
 

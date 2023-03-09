@@ -137,7 +137,6 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
   method <- list_args$method
   output <- list_args$output
 
-
   # Check that method exists
   list_methods <- unique(dbmet$id)
   if (!method %in% list_methods) {
@@ -156,11 +155,24 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
   # sector have been specified as arguments with other
   # method, my_args will have length > 0 and an error will appear
   if (length(my_args) > 0) {
-    # Method different from MY
-    if (!method == "my") {
-      cli::cli_abort(paste0("Perpectives world, bilateral or sector are ",
+    # Method different from BMsrc/MY
+    if (!method %in% c("bm_src", "my")) {
+      cli::cli_abort(paste0("Perpectives other than country ",
                             "only available for the ",
-                            "decomposition method 'my'."))
+                            "decomposition methods 'bm_src' and 'my'."))
+    # Method BM source
+    } else if (method == "bm_src") {
+      # Check that BM arguments are valid
+      for (arg in names(my_args)) {
+        # As arguments in R admit partial matching
+        # e.g. "sec" is valid for "sector", we use grepl
+        # If the is not at least a similar coincidence
+        if (!any(grepl(arg, c("partner", "sector")))) {
+          cli::cli_abort(paste0("Argument {arg} not valid.",
+                                "Method 'bm_src' is only compatible with ",
+                                "'partner' and 'sector' perimeters."))
+        }
+      }
     # Method MY
     } else if (method == "my") {
     # Check that MY arguments are valid
@@ -172,15 +184,15 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
           cli::cli_abort("Argument {arg} not valid")
         }
       }
-    # Check that MY terms
+    # Check that MY terms2 is with WLD perspective
       if (all(exists("perim", my_args), output == "terms2")) {
         if (!my_args$perim == "WLD") {
           cli::cli_abort(paste0("Output 'terms2' is only compatible ",
                                 "with world perspective (perim = 'WLD')"))
         }
       }
-    # End of method MY
     }
+
   # If my_args is NULL, at least check that "terms" 2 is not
   # sele
   } else {
@@ -189,6 +201,8 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
                             "of world perspective (perim = 'WLD')"))
     }
   }
+
+
 
   return(TRUE)
 
@@ -235,10 +249,10 @@ check_exvadec_bkdown_args <- function(list_args) {
   }
 
   # *******************
-  # Special Miroudot-Ye
+  # Special BM/MY
   # *******************
 
-  # If it is an Miroudoy-Ye exvadec and there is partner
+  # If it is an BM/MY exvadec and there is partner
   # importer can only be the partner
   if (exists("partner", exvadec)) {
     # If importer argument is missing, the default will
@@ -254,8 +268,7 @@ check_exvadec_bkdown_args <- function(list_args) {
                             "data for importer {exvadec$partner}"))
     }
   }
-
-  # If it is an Miroudoy-Ye exvadec and there is a sector
+  # If it is BM/MY exvadec and there is a sector
   # sector can only be that sector
   if (exists("sector", exvadec)) {
     # If sector argument is missing, the default will

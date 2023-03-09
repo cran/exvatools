@@ -61,20 +61,20 @@ make_exvadir <- function(wio_object, exporter,
   is_group <- ifelse(length(pg_exp) > 1, TRUE, FALSE)
 
   # Codes and position for country of origin of VA----
-  if(!orig_geo=="all" & !orig_geo=="WLD"){
+  if (all(!orig_geo=="all", !orig_geo=="WLD")) {
     # Position of exporter, groups
     pgn_orig <- grep(get_geo_codes(orig_geo, wio_type, TRUE), gxn_names)
     pg_orig <- grep(get_geo_codes(orig_geo, wio_type), g_names)
   }
 
   # Codes/position for sector of origin of VA----
-  if(!sec_orig=="all"){
+  if (!sec_orig=="all") {
     pgn_sec <- grep(get_sec_codes(sec_orig, wio_type, remove_letter = TRUE),
                     gxn_names)
   }
 
   # Codes/position of intermediate importer (via)----
-  if(!via=="any"){
+  if (!via=="any") {
     # Codes
     pgn_imp <- grep(get_geo_codes(via, wio_type, TRUE), gxn_names)
     pg_imp <- grep(get_geo_codes(via, wio_type), g_names)
@@ -82,9 +82,9 @@ make_exvadir <- function(wio_object, exporter,
 
   # Type of VA (VA o content) and matrix Bts----
   va_type = toupper(va_type)
-  if(va_type %in% c("TCX", "DCX", "FCX", "TC", "DC", "FC")){
+  if (va_type %in% c("TCX", "DCX", "FCX", "TC", "DC", "FC")){
     Bts <- wio$B
-  } else if(va_type %in% c("TVA", "DVA", "FVA")){
+  } else if(va_type %in% c("TVA", "DVA", "FVA")) {
     # Matrix Bo for exporter
     cli::cli_alert_info("Calculating inverse matrix...")
     Ao <- wio$A
@@ -95,14 +95,14 @@ make_exvadir <- function(wio_object, exporter,
 
   # Domestic or foreign VA----
   # bkd and bkoffd correct icio, if needed
-  if(va_type %in% c("DCX", "DC", "DVA")){
+  if (va_type %in% c("DCX", "DC", "DVA")) {
     Bm <- bkoffd(Bts)
     if (intra == FALSE) {
       Bm[pgn_exp, pgn_exp] <- 0
     }
     Bd <- Bts - Bm
     Bts <- Bd
-  } else if(va_type %in% c("FCX", "FC", "FVA")){
+  } else if (va_type %in% c("FCX", "FC", "FVA")) {
     Bm <- bkoffd(Bts)
     if (intra == FALSE) {
       Bm[pgn_exp, pgn_exp] <- 0
@@ -115,13 +115,13 @@ make_exvadir <- function(wio_object, exporter,
 
   # Specific country of origin of VA----
   # We make the rows of countries not origin as 0 (for all sectors)
-  if(!orig_geo=="all" & !orig_geo=="WLD"){
+  if (all(!orig_geo == "all", !orig_geo == "WLD")) {
     Vt_Bts[-pgn_orig, ] <- 0
   }
 
   # Specific sector or origin of VA----
   # We make the rows of sectors not origin as 0 (for all countries)
-  if(!sec_orig=="all"){
+  if (!sec_orig == "all") {
     Vt_Bts[-pgn_sec, ] <- 0
   }
 
@@ -131,7 +131,7 @@ make_exvadir <- function(wio_object, exporter,
   # Be careful: we are diagonalizing every submatrix ij of Vt_Bts
   # The result is not a block-diagonal matrix, but a full matrix with
   # every block diagonalized
-  if(perspective=="exporter"){
+  if (perspective == "exporter") {
     Vt_Bts <- bkdiag(Vt_Bts)
   }
 
@@ -149,40 +149,40 @@ make_exvadir <- function(wio_object, exporter,
   Ym <- wio$Ym
   Am <- wio$Am
   # make intra-flows zero if needed
-  if(is_group==TRUE && intra==FALSE){
+  if (all(is_group == TRUE, intra == FALSE)) {
     Ym[pgn_exp, pg_exp] <- 0
     Am[pgn_exp, pgn_exp] <- 0
   }
   sumEXGR <- sum(wio$EXGR[pgn_exp, ])
 
 
-  if(via=="any"){
+  if (via == "any"){
 
     #If there is no intermediate importer
 
-    if(flow_type == "EXGR"){
+    if (flow_type == "EXGR") {
       # Normal EXGR
       EXGRY <- wio$EXGR[pgn_exp, , drop = FALSE]
-      if (is_group == TRUE && intra == FALSE){
+      if (all(is_group == TRUE, intra == FALSE)) {
         EXGRY[, pg_exp] <- 0
       }
       #
-    } else if(flow_type=="EXGRY"){
+    } else if (flow_type == "EXGRY") {
       B_Y <- wio$B %*% wio$Y
       EXGRY <- (Ym + Am %*% B_Y)[pgn_exp, , drop = FALSE]
       #
-    } else if(flow_type=="EXGRY_FIN"){
+    } else if (flow_type == "EXGRY_FIN") {
       EXGRY <- Ym[pgn_exp, , drop = FALSE]
       #
-    } else if(flow_type=="EXGRY_INT"){
+    } else if (flow_type == "EXGRY_INT") {
       B_Y <- wio$B %*% wio$Y
       EXGRY <- (Am %*% B_Y)[pgn_exp, , drop = FALSE]
       #
-    } else if(flow_type=="FD"){
+    } else if(flow_type == "FD") {
       EXGRY <- (wio$Y)[pgn_exp, , drop = FALSE]
     }
 
-  } else if(!via=="any"){
+  } else if (!via == "any") {
 
     # If an importer is specified we take the Ym row of exporter
     # and make all columns of other importers except selected = 0
@@ -193,20 +193,20 @@ make_exvadir <- function(wio_object, exporter,
     Ysr <- Ym[pgn_exp, , drop = FALSE]
     Ysr[, -pg_imp] <- 0
 
-    if(flow_type=="EXGR"){
+    if (flow_type == "EXGR") {
       cli::cli_alert_info(c("EXGR is not compatible with intermediate importer",
                             "Taking EXGRY instead"))
       flow_type <- "EXGRY"
     }
 
-    if(flow_type=="EXGRY"){
+    if (flow_type=="EXGRY") {
       B_Y <- wio$B %*% wio$Y
       EXGRY <- Ysr + Am[pgn_exp, pgn_imp] %*% B_Y[pgn_imp, , drop = FALSE]
       #
-    } else if(flow_type=="EXGRY_FIN"){
+    } else if (flow_type=="EXGRY_FIN") {
       EXGRY <- Ysr
       #
-    } else if(flow_type=="EXGRY_INT"){
+    } else if(flow_type=="EXGRY_INT") {
       #
       B_Y <- wio$B %*% wio$Y
       EXGRY <- Am[pgn_exp, pgn_imp] %*% B_Y[pgn_imp, , drop = FALSE]

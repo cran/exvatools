@@ -24,7 +24,7 @@ available individual countries.}
 
 \item{method}{A string specifying the export VA decomposition method:
 \itemize{
-\item \code{"bm_src"}: Borin and Mancini, source-based (2019) (default).
+\item \code{"bm_src"}: Borin and Mancini, source-based (2023) (default).
 \item \code{"bm_snk"}: Borin and Mancini, sink-based (2019).
 \item \code{"wwz"}: Wang et al. (2013).
 \item \code{"kww"}: Koopman et al. (2014).
@@ -39,48 +39,57 @@ domestic value added (\code{DVA}), the domestic double counting
 (\code{DDC}), the foreign content (\code{FC}), the foreign value
 added (\code{FVA}) and the foreign double counting (\code{DDC}). The
 value added exported (\code{VAX}) is also produced in most cases, and
-additional indicators are provided in specific cases.
+additional indicators in some cases.
 \item \code{"terms"}: Shows the basic decomposition terms, whose sum gives
 the value of gross exports. The number and specification of terms
 follows the standard in the economic literature: 12 in the Borin and
 Mancini (2019) decompositions (source and sink), 16 in the Wang et al.
 (2013) decomposition, 9 in the Koopman et al. (2014) decomposition
 and just 4 in the Miroudot and Ye (2021) decomposition (as the latter
-does not expand value added in terms of final absorption, like the
-rest). \
-For the \code{"wwz"} (Wang et al. ,2013) decomposition there is an
+does not expand value added in terms of final absorption). \
+Additional outputs:
+\item For the \code{"bm_src"} (Borin and Mancini, 2023, source-based) method
+there is an additional \code{"basic"} output, without \code{GVC} indicators. This
+output will replace \code{"standard"} if targeted perspectives (sector,
+bilateral or sector-bilateral) are selected.
+\item For the Miroudot and Ye (2021) method there is an additional
+\code{"terms2"} output, when world perspective is selected.
+\item For the \code{"wwz"} (Wang et al. ,2013) decomposition there is an
 additional \code{"terms2"} option with an alternative arrangement of
-terms, and for the \code{"oecd"} decomposition there is an
-additional \code{"tiva"} decomposition with many TiVA basic indicators.
+the 16 terms.
+\item For the \code{"oecd"} decomposition there is an additional \code{"tiva"}
+output with several indicators of the OECD TiVA database.
 }}
 
-\item{quiet}{Boolean, if \code{TRUE} suppress all status messages. Default
+\item{quiet}{Boolean, if \code{TRUE}, suppresses all status messages. Default
 is \code{FALSE}, i.e., messages are shown.}
 
-\item{...}{Additional parameters for the Miroudot and Ye (2021)
-decomposition. These can be:
+\item{...}{Additional parameters for targeted value added perspectives.
+These are only available for the \code{"bm_src"} (Borin and Mancini, 2023,
+source-based) and the \code{"my"} (Miroudot and Ye, 2021) decomposition.
+methods. Specific perimeters can be:
 \itemize{
-\item \code{perim} String, for general perimeter of value added.
-Default is \code{"country"}, but can also be \code{"WLD"} (world). In
-this case, all flows that cross the border of \emph{any} country
+\item \code{partner} String, for bilateral perspective. Default is \code{"WLD"}, but
+any country or country group code (e.g. \code{"USA"} or \code{"EU27"}) can be
+specified. In that case, all flows that cross the bilateral geographic
+perimeter more than once will be considered as double counting.
+\item \code{sector} String, for sector perspective. Default is \code{"TOTAL"}, but
+any sector or sector group code (e.g. \code{"MANUF"}) can be specified. In
+that case, all flows that cross the sector perimeter more than
+once will be considered as double counting. \
+The bilateral and sector perspectives can be combined in a
+bilateral-sector perspective.
+\item \code{perim} Boolean (only for \code{"my"}, and incompatible with sector or partner
+specifications). String, for general perimeter of value added.
+If \code{perim = "WLD"} (world) is specified (default is exporting country),
+then all flows that cross the border of \emph{any} country
 more than once will be considered as double counting (unlike in the
 country perspective, where flows are considered as double counting
 only when they \emph{exit} the border of \emph{the exporting country}
-more than once).
-\item \code{partner} String, for bilateral perimeter of value added.
-Default is \code{"WLD"}, but it can also be any country or
-country group code (e.g. \code{"USA"} or \code{"EU27"}). In this case
-(bilateral perspective), all flows that cross the bilateral
-perimeter more than once will be considered as double counting.
-\item \code{sector} String, for sector perimeter of value added.
-Default is \code{"TOTAL"}, but it can also be any sector or
-sector group code (e.g. \code{"MANUF"}. In this case (sector
-perspective), all flows that cross the sector perimeter more than
-once will be considered as double counting. The bilateral and sector
-perspectives can be combined in a bilateral-sector perspective.
-Please note that, when using the world perspective (\code{perim = "WLD"})
-and the terms output (\code{output = "terms"}, the foreign double
-counting will be automatically divided in two elements.
+more than once). Please note that, when using the world perspective
+(\code{perim = "WLD"}) and the terms output (\code{output = "terms"}, the foreign
+double counting will be automatically divided into two
+elements (\code{"terms2"}).
 }}
 }
 \value{
@@ -94,7 +103,7 @@ or a group of countries according to different methodologies.
 \examples{
 # Create a test wio
 wio <- make_wio("iciotest")
-# Make Borin and Mancini (2019) source decomposition for Spain
+# Make Borin and Mancini (2023) source decomposition for Spain
 exvadec <- make_exvadec(wio, exporter = "ESP", method = "bm_src")
 # Make Wang et al. (2013) decomposition for all countries
 # expressed in the traditional 16 terms
@@ -102,9 +111,8 @@ exvadec <- make_exvadec(wio, method = "wwz", output = "terms")
 }
 \references{
 \itemize{
-\item Borin, A., & Mancini, M. (2019). Measuring What Matters in Global
-Value Chains and Value-Added Trade (Policy Research Working Paper
-No. 8804). World Bank.
+\item Borin, A., & Mancini, M. (2023). Measuring What Matters in Value-Added
+Trade. Economic Systems Research, 1-25.
 \item Koopman, R., Wang, Z., & Wei, S.-J. (2014). Tracing Value-Added and
 Double Counting in Gross Exports. American Economic Review, 104(2),
 459–494.

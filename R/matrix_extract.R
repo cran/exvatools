@@ -88,6 +88,9 @@ get_xmatrix <- function(wio, exporter, perim = "country",
 
       pgn_geosec <- grep(geosec_codes, wio$names$gxn_names)
 
+      # Faltaba esto
+      Anots <- set_zero(wio$A, pgn_geosec, -pgn_exp)
+
     # ********************************
     #  Bilateral-sector perspective
     # ********************************
