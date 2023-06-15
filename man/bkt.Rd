@@ -12,8 +12,6 @@ and sectors are automatically identified.}
 }
 \value{
 Block transposed version of \code{df}.
-
-A block transposed version of the original matrix.
 }
 \description{
 Transpose a matrix by blocks, so \code{block(s,r)} becomes \code{block(r,s)}, but

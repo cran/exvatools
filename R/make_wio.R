@@ -17,6 +17,10 @@
 #'       remains available for literature replication purposes.
 #'     * `"lrwiod2022"` for the 2022 edition of the long-run WIOD
 #'       (1965-2000), useful for historical analysis.
+#'     * `"figaro2022i` for the 2022 edition of the FIGARO EU Input-Output
+#'       Tables (EU IC-SUIOTs), industry-by-industry (2010-2020), and
+#'       `"figaro2022p` for the product-by-product version of the same
+#'       database.
 #'     * `"iciotest"` for an example of an ICIO-type international
 #'       input-output table (disaggregated for `MEX` into `MX1` and `MX2` and
 #'       for `CHN` into `CN1` and `CN2`) and `"wiodtest"` for an example of a
@@ -42,21 +46,25 @@
 #'   matrices `Ld` and others.
 #'
 #' Original source files can be obtained in the OECD's
-#' [ICIO web page](https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm)
+#' [ICIO web page](https://www.google.com/search?q=OECD+ICIO+tables)
 #' or in the University of Groningen's
-#' [WIOD web page](https://www.rug.nl/ggdc/valuechain/wiod/).
+#' [WIOD web page](https://www.rug.nl/ggdc/valuechain/wiod/) or in the
+#' [Eurostat web page](https://ec.europa.eu/eurostat/web/esa-supply-use-input-tables/database)
 #'
 #' If source files are used, they must be previously downloaded and
 #'   placed in an accessible folder in disk, without renaming them. The
 #'   following name pattern is expected:
 #'   * `ICIO_XXXX-XXXX.zip` for `"icio2021"` (`.csv` files)
 #'   * `ICIO2018_XXXX.zip` for `"icio2018"` (`.csv` files)
-#'   * `ICIO2016_XXXX.zip` for `"icio2018"` (`.csv` files)
+#'   * `ICIO2016_XXXX.zip` for `"icio2016"` (`.csv` files)
 #'   * `WIOTS_in_R.zip` for `"wiod2016"` (`.RData` files)
 #'   * `WIOTS_in_EXCEL.zip` for `"wiod2013"` (`.xlsx` files). Requires
 #'     package `openxlsx`..
 #'   * `lr_wiod_wiot_final_filled.csv` for `"lrwiod2022"`. Requires
 #'     packages `data.table` and `reshape2`.
+#'   * `matrix_eu-ic-io_ind-by-ind_XXXX.csv` for `"figaro2022i` and
+#'     `matrix_eu-ic-io_prod-by-prod_XXXX.csv` for `"figaro2022p`
+#'     (`.csv` files)
 #' The input-output framework follows the traditional demand model of
 #'   Leontief (1936), which makes assumptions about the stability of inputs
 #'   (and therefore value-added) as a proportion of production. This allows
@@ -103,19 +111,23 @@ make_wio <- function(wiotype ="icio2021", year = NULL,
   # Extraction of Z, Yfd, Y, X, VA----
 
   if (wiotype == "icio2021") {
-    io <- extract_icio2021(src_dir, year, quiet)
+    io <- extract_icio("icio2021", src_dir, year, quiet)
   } else if (wiotype == "icio2018") {
-    io <- extract_icio2018(src_dir, year, quiet)
+    io <- extract_icio("icio2018", src_dir, year, quiet)
   } else if (wiotype == "icio2016") {
-    io <- extract_icio2016(src_dir, year, quiet)
+    io <- extract_icio("icio2016", src_dir, year, quiet)
   } else if (wiotype == "iciotest") {
     io <- generate_test_iot(is_icio = TRUE, quiet)
   } else if (wiotype == "wiod2016") {
-    io <- extract_wiod2016(src_dir, year, quiet)
+    io <- extract_wiod("wiod2016", src_dir, year, quiet)
   } else if (wiotype == "wiod2013") {
-    io <- extract_wiod2013(src_dir, year, quiet)
+    io <- extract_wiod("wiod2013", src_dir, year, quiet)
   } else if (wiotype == "lrwiod2022") {
     io <- extract_lrwiod2022(src_dir, year, quiet)
+  } else if (wiotype == "figaro2022i") {
+    io <- extract_figaro2022(src_dir, year, "industry", quiet)
+  } else if (wiotype == "figaro2022p") {
+    io <- extract_figaro2022(src_dir, year, "product", quiet)
   } else if (wiotype == "wiodtest") {
     io <- generate_test_iot(is_icio = FALSE, quiet)
   }

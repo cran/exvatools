@@ -166,7 +166,6 @@ bkoffd <- function(df){
 #'   rows will now show the importing countries and the sectors they import
 #'   from, and the columns will show the the exporting countries and the
 #'   sectors they export from.
-#' @return A block transposed version of the original matrix.
 #' @seealso [bktt()].
 #' @export
 #' @examples

@@ -1,3 +1,11 @@
+# exvatools 0.4.0 (2023-06-12)
+
+* Added new database FIGARO EU Input-Output Tables (EU IC-SUIOTs), 2022 
+  edition (2010-2020), with data by industry (`"figaro2022i"`) and by product 
+  (`"figaro2022p"`).
+* Simplified code for extraction of matrices.
+* Corrected bugs.
+
 # exvatools 0.3.0 (2023-03-09)
 
 * Added `make_exvadec()` custom perspective (`sector`, `partner` or both) for

@@ -3,7 +3,7 @@ title: "Introduction to exvatools"
 author: 
   - name: Enrique Feás
     affiliation: University of Alcalá and Elcano Royal Institute
-date: March, 2023
+date: June, 2023
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to exvatools}
@@ -24,7 +24,7 @@ Trade flows should be expressed in terms of value added, taking advantage of
 modern international input-output tables, which show how different sectors in
 different countries interact with each other. The problem is that handling 
 big input-output tables is complicated and many indicators are not available.
-This is where **exvatools** comes to the rescue. Its purpose is double:
+This is where **exvatools** proves useful. Its purpose is double:
 
 * To facilitate the extraction and processing of the most relevant 
   international input tables available today, or the use of custom databases,
@@ -57,11 +57,12 @@ library(exvatools)
 1. Raw data of standard international input-output databases
 
 Raw data can be directly downloaded from the web pages of their respective
-institutions. Two sources are currently supported:
+institutions. Three sources are currently supported:
   
   * OECD Inter-Country Input-Output (ICIO) tables, on which the OECD's
     Trade in Value Added database (TiVA) is based.
-  * World Input Output Database (WIOD) tables
+  * World Input Output Database (WIOD) tables.
+  * FIGARO EU Input-Output Tables (EU IC-SUIOTs).
 
 The advantage of these databases is threefold: they are widely used in the 
 economic literature, they are quite rich in terms of countries and sectors, 
@@ -72,7 +73,7 @@ files (`.csv`), Excel files (`.xlsx`) or R data files (`.rData`).
 For instance, if we want to use **exvatools** with the latest edition of 
 the OECD ICIO tables (2021, with data up to 2018), we must first download to
 our computer the source file "ICIO_2015-2018.zip" (96 MB) from the
-[ICIO web page](https://www.oecd.org/sti/ind/inter-country-input-output-tables.htm).
+[ICIO web page](https://www.google.com/search?q=OECD+ICIO+tables).
 Then we will use the command `make_wio()`, specifying the edition, 
 the year and the folder where the source zip file is saved (just the directory).
 For instance, if we had downloaded it in `C:\Users\Username\Documents\R` and
@@ -205,10 +206,10 @@ added exports or `VAX`) that are not currently available in public databases.
 
 There are several methodologies in the economic literature, and **exvatools**
 includes the most complete ones: Koopman et al. (2014), Wang et al. (2013),
-Borin and Mancini (2019) and Miroudot and Ye (2021).
+Borin and Mancini (2023) and Miroudot and Ye (2021).
 
 For instance, to  create create a full decomposition of value added 
-in exports of Spain using the method of Borin and Mancini (2019), 
+in exports of Spain using the method of Borin and Mancini (2023), 
 using a source-based approach, we would type::
 
 ```{r make_exvadec ESP}
@@ -226,8 +227,8 @@ get_exvadec_bkdown(exvabm, exporter = "ESP",
                    sector = "SRVWC", importer = "USA")
 ```
 
-An alternative (although methodologically inferior) decomposition would be that
-of Wang et al. (2013). In this case, instead of the normal 
+An alternative (although with some methodologically limitations) decomposition
+would be that of Wang et al. (2013). In this case, instead of the normal
 decomposition, we will use the `"terms"` output. (that shows the 16 terms that
 compose the value added in exports):
 
@@ -388,7 +389,7 @@ To check the information about available countries, the command is `info_geo()`:
 info_geo("iciotest")
 ```
 
-This commands do not require to have a `wio` in the environment, so we can just
+These commands do not require to have a `wio` in the environment, so we can just
 check what sectors are available in the OECD's ICIO tables, 2021 edition.
 ```{r info_sec_2021}
 info_sec("icio2021")

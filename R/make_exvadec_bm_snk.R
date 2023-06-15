@@ -61,7 +61,8 @@ make_exvadec_bm_snk <- function(wio_object, exporter = "all",
   }
   class(exvadec) <- "exvadec"
 
-  if (!quiet) {cli::cli_alert_success("Done!")}
+  # Show conclusion only if is_all
+  if (is_all && !quiet) {cli::cli_alert_success("Done!")}
 
   # Print result summary
   if (!quiet) {

@@ -23,15 +23,18 @@ extract_lrwiod2022 <- function(src_dir, year = NULL, quiet = FALSE) {
   GFD <- G * FD
 
   # Extraction of data
-  csv_file <- paste0(src_dir, "lr_wiod_wiot_final_filled.csv")
+  csv_file <- "lr_wiod_wiot_final_filled.csv"
 
   # Check that file exists
   check_wio_source_file(src_dir, csv_file)
 
+  # If exists
+  filepath <- paste0(src_dir, csv_file)
+
   # Start extraction
   if (!quiet) {cli::cli_alert_info("Extracting data from {csv_file}...")}
   # data.table::fread is much much faster that utils::read.csv
-  df_total <- data.table::fread(csv_file, stringsAsFactors = FALSE)
+  df_total <- data.table::fread(filepath, stringsAsFactors = FALSE)
 
   if (is.null(year)) {
     year <- 2000
