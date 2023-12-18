@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
 library(exvatools)
 
 ## ----make_wio, eval=FALSE, echo=TRUE------------------------------------------
-#  wio <- make_wio("icio2021", year = 2018,
+#  wio <- make_wio("icio2023", year = 2020,
 #                  src_dir = "C:/Users/Username/Documents/R")
 
 ## ----make_wio_test, message=FALSE---------------------------------------------
@@ -108,12 +108,12 @@ info_sec("iciotest")
 ## ----info_geo-----------------------------------------------------------------
 info_geo("iciotest")
 
-## ----info_sec_2021------------------------------------------------------------
-info_sec("icio2021")
+## ----info_sec_2023------------------------------------------------------------
+info_sec("icio2023")
 
 ## ----get_geo_codes_wiod2016---------------------------------------------------
 get_geo_codes("EU27", wiotype = "wiod2016")
 
-## ----get_sec_codes_icio2021---------------------------------------------------
-get_sec_codes("BIZSV", wiotype = "icio2021")
+## ----get_sec_codes_icio2023---------------------------------------------------
+get_sec_codes("BIZSV", wiotype = "icio2023")
 

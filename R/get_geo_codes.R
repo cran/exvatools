@@ -9,16 +9,16 @@
 #'   [info_geo()].
 #' @param wiotype String, type of input-output table.
 #' @param icio_extend Boolean. If `TRUE` and the input-output table
-#'   is of type `icio`, codes will also include the extended elements for
-#'   China (`CN1`, `CN2`) and Mexico (`MX1`, `MX2`).
+#'   is of type `icio` extended, codes will also include the extended elements
+#'   for China (`CN1`, `CN2`) and Mexico (`MX1`, `MX2`).
 #' @return Codes of country/countries ready to grep, e.g. `AUS|ARG|BEL`
 #' @export
 #' @examples
 #' # Get the codes of EU27 countries
-#' get_geo_codes("EU27", "icio2021")
+#' get_geo_codes("EU27", "icio2023")
 #' # Gets the codes for NAFTA and extends MEX to MX1|MX2
-#' get_geo_codes("NAFTA", "icio2021", icio_extend = TRUE)
-get_geo_codes <- function(geo_id, wiotype="icio2021", icio_extend=FALSE){
+#' get_geo_codes("NAFTA", "icio2023", icio_extend = TRUE)
+get_geo_codes <- function(geo_id, wiotype="icio2023", icio_extend=FALSE){
 
   # Get string vector with grep-ready code of a country
   # or a group of countries included in dbgeo: EU27, NONEU27, NAFTA
@@ -122,7 +122,7 @@ get_geo_codes <- function(geo_id, wiotype="icio2021", icio_extend=FALSE){
 #' @keywords internal
 #' @noRd
 #' @return string with codes
-get_geo_code <- function(geo_id, wiotype = "icio2021") {
+get_geo_code <- function(geo_id, wiotype = "icio2023") {
 
   # If it is a custom wio
   if (wiotype == "custom") {

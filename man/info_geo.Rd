@@ -4,7 +4,7 @@
 \alias{info_geo}
 \title{Show available countries and country groups in a specific Input-Output table}
 \usage{
-info_geo(wiotype = "icio2021", lang = "en")
+info_geo(wiotype = "icio2023", lang = "en")
 }
 \arguments{
 \item{wiotype}{Character string specifying the world input-output database.}
@@ -19,5 +19,5 @@ Prints country codes and descriptive text in the console.
 Show available countries and country groups in a specific Input-Output table
 }
 \examples{
-info_geo("icio2021")
+info_geo("icio2023")
 }

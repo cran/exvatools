@@ -107,7 +107,7 @@ meld <- function(df, meld_rows=TRUE, meld_cols=TRUE){
 
     # If there exists one, df[-c(num, NULL)] will work, but if
     # both are null, df[-c(NULL)] will give error
-    # In this case, do not attemp to meld
+    # In this case, do not attempt to meld
     if (all(is.null(pcMXall), is.null(pcCNall))) {
       meld_cols <- FALSE
     }

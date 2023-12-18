@@ -4,7 +4,7 @@
 \alias{info_sec}
 \title{Show available sectors and sector groups included in a specific Input-Output table}
 \usage{
-info_sec(wiotype = "icio2021", lang = "en")
+info_sec(wiotype = "icio2023", lang = "en")
 }
 \arguments{
 \item{wiotype}{Character string specifying the world input-output database}
@@ -19,5 +19,5 @@ Prints ids, sector codes and descriptive text
 Show available sectors and sector groups included in a specific Input-Output table
 }
 \examples{
-info_sec("icio2021")
+info_sec("icio2023")
 }

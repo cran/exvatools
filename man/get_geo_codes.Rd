@@ -4,7 +4,7 @@
 \alias{get_geo_codes}
 \title{Get the ISO3 codes of standard country groups}
 \usage{
-get_geo_codes(geo_id, wiotype = "icio2021", icio_extend = FALSE)
+get_geo_codes(geo_id, wiotype = "icio2023", icio_extend = FALSE)
 }
 \arguments{
 \item{geo_id}{String, country group id. Available \code{geo_ids} for a
@@ -14,8 +14,8 @@ specific input-output table can be obtained with the command
 \item{wiotype}{String, type of input-output table.}
 
 \item{icio_extend}{Boolean. If \code{TRUE} and the input-output table
-is of type \code{icio}, codes will also include the extended elements for
-China (\code{CN1}, \code{CN2}) and Mexico (\code{MX1}, \code{MX2}).}
+is of type \code{icio} extended, codes will also include the extended elements
+for China (\code{CN1}, \code{CN2}) and Mexico (\code{MX1}, \code{MX2}).}
 }
 \value{
 Codes of country/countries ready to grep, e.g. \code{AUS|ARG|BEL}
@@ -27,7 +27,7 @@ extract elements of a matrix using \code{grep}.
 }
 \examples{
 # Get the codes of EU27 countries
-get_geo_codes("EU27", "icio2021")
+get_geo_codes("EU27", "icio2023")
 # Gets the codes for NAFTA and extends MEX to MX1|MX2
-get_geo_codes("NAFTA", "icio2021", icio_extend = TRUE)
+get_geo_codes("NAFTA", "icio2023", icio_extend = TRUE)
 }

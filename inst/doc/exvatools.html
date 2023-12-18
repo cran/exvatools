@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h4 class="author">Enrique Feás</h4>
 <address class="author_afil">
 University of Alcalá and Elcano Royal
-Institute<br><h4 class="date">June, 2023</h4>
+Institute<br><h4 class="date">December, 2023</h4>
 
 
 
@@ -392,15 +392,15 @@ their supporting institutions, normally as zipped files containing
 comma-delimited files (<code>.csv</code>), Excel files
 (<code>.xlsx</code>) or R data files (<code>.rData</code>).</p>
 <p>For instance, if we want to use <strong>exvatools</strong> with the
-latest edition of the OECD ICIO tables (2021, with data up to 2018), we
-must first download to our computer the source file “ICIO_2015-2018.zip”
-(96 MB) from the <a href="https://www.google.com/search?q=OECD+ICIO+tables">ICIO web
+latest edition of the OECD ICIO tables (2023, with data up to 2020), we
+must first download to our computer the source file
+“ICIO-2016-2020-extended.zip” (142 MB) from the <a href="https://www.google.com/search?q=OECD+ICIO+tables">ICIO web
 page</a>. Then we will use the command <code>make_wio()</code>,
 specifying the edition, the year and the folder where the source zip
 file is saved (just the directory). For instance, if we had downloaded
 it in <code>C:\Users\Username\Documents\R</code> and we wanted the year
-2018, we would just need to type:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>wio <span class="ot">&lt;-</span> <span class="fu">make_wio</span>(<span class="st">&quot;icio2021&quot;</span>, <span class="at">year =</span> <span class="dv">2018</span>, </span>
+2020, we would just need to type:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>wio <span class="ot">&lt;-</span> <span class="fu">make_wio</span>(<span class="st">&quot;icio2023&quot;</span>, <span class="at">year =</span> <span class="dv">2020</span>, </span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                <span class="at">src_dir =</span> <span class="st">&quot;C:/Users/Username/Documents/R&quot;</span>)</span></code></pre></div>
 <p>and <strong>exvatools</strong> will take care of the rest: it will
 extract the <code>.csv</code> files from the zip file and produce the
@@ -497,7 +497,7 @@ consolidate matrices and provide names, like <code>rsums()</code> to sum
 rows, <code>csums()</code> to sum columns, <code>sumnrow()</code> to sum
 every nth row of a matrix, <code>sumncol()</code> to sum every nth
 column, <code>sumgrows()</code> to sum groups of rows of a particular
-size, <code>sumncols()</code> to do the same with columns, etc.</p>
+size, <code>sumgcols()</code> to do the same with columns, etc.</p>
 <p>For instance, let us check that the production <code>X</code> is
 equivalent to the product of the global Leontief inverse matrix
 <code>B</code> and the final demand <code>Y</code>:</p>
@@ -905,7 +905,7 @@ database, we could just use <code>make_exvadec()</code> with the method
 <span id="cb26-30"><a href="#cb26-30" tabindex="-1"></a><span class="co">#&gt;    Value added (VA)                          1985.24  42.54 </span></span>
 <span id="cb26-31"><a href="#cb26-31" tabindex="-1"></a><span class="co">#&gt;    Production (PROD)                         5406.87 115.85 </span></span>
 <span id="cb26-32"><a href="#cb26-32" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
-<span id="cb26-33"><a href="#cb26-33" tabindex="-1"></a><span class="co">#&gt; Method: OECD (2021), TiVA output</span></span>
+<span id="cb26-33"><a href="#cb26-33" tabindex="-1"></a><span class="co">#&gt; Method: OECD (2022), TiVA output</span></span>
 <span id="cb26-34"><a href="#cb26-34" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
 </div>
 </div>
@@ -943,11 +943,11 @@ database, we could just use <code>make_exvadec()</code> with the method
 <span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a><span class="co">#&gt; (USMCA)</span></span></code></pre></div>
 <p>These commands do not require to have a <code>wio</code> in the
 environment, so we can just check what sectors are available in the
-OECD’s ICIO tables, 2021 edition.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">info_sec</span>(<span class="st">&quot;icio2021&quot;</span>)</span>
+OECD’s ICIO tables, 2023 edition.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">info_sec</span>(<span class="st">&quot;icio2023&quot;</span>)</span>
 <span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
-<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="co">#&gt;  OECD&#39;s Inter-Country Input-Output Table (ICIO), 2021 edition</span></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="co">#&gt;  OECD&#39;s Inter-Country Input-Output Table (ICIO), 2023 edition</span></span>
 <span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
 <span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt; Individual sectors:</span></span>
@@ -1009,9 +1009,9 @@ available input-output table. For instance, for <code>&quot;wiod2016&quot;</code
 we would have the following components of EU27:</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">get_geo_codes</span>(<span class="st">&quot;EU27&quot;</span>, <span class="at">wiotype =</span> <span class="st">&quot;wiod2016&quot;</span>)</span>
 <span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;AUT|BEL|CZE|DNK|EST|FIN|FRA|DEU|GRC|HUN|IRL|ITA|LVA|LTU|LUX|NLD|POL|PRT|SVK|SVN|ESP|SWE|BGR|HRV|CYP|MLT|ROU&quot;</span></span></code></pre></div>
-<p>And for <code>&quot;icio2021&quot;</code> we have the following components of
+<p>And for <code>&quot;icio2023&quot;</code> we have the following components of
 the business services sector:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="fu">get_sec_codes</span>(<span class="st">&quot;BIZSV&quot;</span>, <span class="at">wiotype =</span> <span class="st">&quot;icio2021&quot;</span>)</span>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="fu">get_sec_codes</span>(<span class="st">&quot;BIZSV&quot;</span>, <span class="at">wiotype =</span> <span class="st">&quot;icio2023&quot;</span>)</span>
 <span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;D45T47|D49|D50|D51|D52|D53|D55T56|D58T60|D61|D62T63|D64T66|D68|D69T75|D77T82&quot;</span></span></code></pre></div>
 </div>
 

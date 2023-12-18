@@ -6,15 +6,15 @@
 #' @param wio_object An object of class `wio` (standardized world
 #'   input-output table) obtained using [make_wio()].
 #' @param exporter String with a country or a country group code
-#'   (e.g., `"USA"`, code{"NAFTA"}, etc.). The default `"all"`
+#'   (e.g., `"USA"`, `"NAFTA"`, etc.). The default `"all"`
 #'   produces the decomposition of value added in exports for all
 #'   available individual countries.
 #' @param method A string specifying the export VA decomposition method:
 #'   * `"bm_src"`: Borin and Mancini, source-based (2023) (default).
-#'   * `"bm_snk"`: Borin and Mancini, sink-based (2019).
+#'   * `"bm_snk"`: Borin and Mancini, sink-based (2023).
 #'   * `"wwz"`: Wang et al. (2013).
 #'   * `"kww"`: Koopman et al. (2014).
-#'   * `"kww"`: Miroudot and Ye (2021)
+#'   * `"my"`: Miroudot and Ye (2021)
 #'   * `"oecd"`: OECD (not properly a decomposition).
 #' @param output Type of matrices in output:
 #'   * `"standard"` (default): Shows the domestic content (`DC`),

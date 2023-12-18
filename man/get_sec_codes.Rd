@@ -4,7 +4,7 @@
 \alias{get_sec_codes}
 \title{Get the ISO3 codes of standard sector groups}
 \usage{
-get_sec_codes(sector_id, wiotype = "icio2021", remove_letter = FALSE)
+get_sec_codes(sector_id, wiotype = "icio2023", remove_letter = FALSE)
 }
 \arguments{
 \item{sector_id}{String, sector or sector group code. Available
@@ -28,12 +28,12 @@ different input-output tables. The resulting format can be used to
 extract elements of a matrix using \code{grep}.
 }
 \examples{
-# Get sector codes for manufactures in the icio2021 database.
-get_sec_codes("MANUF", "icio2021")
+# Get sector codes for manufactures in the icio2023 database.
+get_sec_codes("MANUF", "icio2023")
 # Get sector codes for services (including construction)
-get_sec_codes("SRVWC", "icio2021")
+get_sec_codes("SRVWC", "icio2023")
 # Get sector codes for manufacturing, removing the first letter so
 # the result can be used with `grep` to select specific sectors from
 # a matrix
-get_sec_codes("MANUF", "icio2021", remove_letter = TRUE)
+get_sec_codes("MANUF", "icio2023", remove_letter = TRUE)
 }

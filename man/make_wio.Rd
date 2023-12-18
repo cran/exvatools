@@ -4,15 +4,16 @@
 \alias{make_wio}
 \title{Make standard world input-output matrices from source files}
 \usage{
-make_wio(wiotype = "icio2021", year = NULL, src_dir = NULL, quiet = FALSE)
+make_wio(wiotype = "icio2023", year = NULL, src_dir = NULL, quiet = FALSE)
 }
 \arguments{
 \item{wiotype}{String specifying the name and edition of the
 input-output tables to be used:
-* \code{"icio2021"} for the 2021 edition of the OECD ICIO tables
-(1995-2018). Deprecated editions \code{"icio2018"} (1995-2011)
-and \code{"icio2016"}(2005-2015) remain available for literature
-replication purposes.
+* \code{"icio2023"} for the 2023 edition of the OECD ICIO tables
+(1995-2020) and \code{"icio2023s"} for the small format of the same edition.
+The deprecated editions \code{"icio2021"} (1995-2018),
+\code{"icio2018"} (1995-2011) and \code{"icio2016"}(2005-2015) remain
+available for literature replication purposes.
 * \code{"wiod2016"} for the 2016 edition of the WIOD tables
 (2000-2014). The deprecated edition \code{"wiod2013"} (1995-2011)
 remains available for literature replication purposes.
@@ -72,6 +73,8 @@ If source files are used, they must be previously downloaded and
 placed in an accessible folder in disk, without renaming them. The
 following name pattern is expected:
 \itemize{
+\item \code{ICIO-XXXX-XXXX-extended.zip} for \code{"icio2023"} (\code{.csv} files)
+\item \code{ICIO-XXXX-XXXX-small.zip} for \code{"icio2023s"} (\code{.csv} files)
 \item \code{ICIO_XXXX-XXXX.zip} for \code{"icio2021"} (\code{.csv} files)
 \item \code{ICIO2018_XXXX.zip} for \code{"icio2018"} (\code{.csv} files)
 \item \code{ICIO2016_XXXX.zip} for \code{"icio2016"} (\code{.csv} files)
@@ -99,9 +102,9 @@ summary(wio)
 \dontrun{
 # The following examples require the previous download of the source
 # files in the working directory or in a directory specified by `src_dir`.
-wio <- make_wio("icio2021", 2018)
-wio <- make_wio("wiod2016", 2014)
-wio <- make_wio("wiod2021", 2018, src_dir = "C:/Users/John/R/")
+wio <- make_wio("icio2023", 2020)
+wio <- make_wio("wiod2021", 2018)
+wio <- make_wio("wiod2023", 2020, src_dir = "C:/Users/John/R/")
 }
 }
 \seealso{

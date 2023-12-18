@@ -8,10 +8,11 @@
 #'   data).
 #' @param wiotype String specifying the name and edition of the
 #'   input-output tables to be used:
-#'     * `"icio2021"` for the 2021 edition of the OECD ICIO tables
-#'       (1995-2018). Deprecated editions `"icio2018"` (1995-2011)
-#'       and `"icio2016"`(2005-2015) remain available for literature
-#'       replication purposes.
+#'     * `"icio2023"` for the 2023 edition of the OECD ICIO tables
+#'       (1995-2020) and `"icio2023s"` for the small format of the same edition.
+#'       The deprecated editions `"icio2021"` (1995-2018),
+#'       `"icio2018"` (1995-2011) and `"icio2016"`(2005-2015) remain
+#'       available for literature replication purposes.
 #'     * `"wiod2016"` for the 2016 edition of the WIOD tables
 #'       (2000-2014). The deprecated edition `"wiod2013"` (1995-2011)
 #'       remains available for literature replication purposes.
@@ -54,6 +55,8 @@
 #' If source files are used, they must be previously downloaded and
 #'   placed in an accessible folder in disk, without renaming them. The
 #'   following name pattern is expected:
+#'   * `ICIO-XXXX-XXXX-extended.zip` for `"icio2023"` (`.csv` files)
+#'   * `ICIO-XXXX-XXXX-small.zip` for `"icio2023s"` (`.csv` files)
 #'   * `ICIO_XXXX-XXXX.zip` for `"icio2021"` (`.csv` files)
 #'   * `ICIO2018_XXXX.zip` for `"icio2018"` (`.csv` files)
 #'   * `ICIO2016_XXXX.zip` for `"icio2016"` (`.csv` files)
@@ -84,11 +87,11 @@
 #' \dontrun{
 #' # The following examples require the previous download of the source
 #' # files in the working directory or in a directory specified by `src_dir`.
-#' wio <- make_wio("icio2021", 2018)
-#' wio <- make_wio("wiod2016", 2014)
-#' wio <- make_wio("wiod2021", 2018, src_dir = "C:/Users/John/R/")
+#' wio <- make_wio("icio2023", 2020)
+#' wio <- make_wio("wiod2021", 2018)
+#' wio <- make_wio("wiod2023", 2020, src_dir = "C:/Users/John/R/")
 #' }
-make_wio <- function(wiotype ="icio2021", year = NULL,
+make_wio <- function(wiotype ="icio2023", year = NULL,
                      src_dir = NULL, quiet = FALSE) {
 
   # Check arguments----
@@ -110,7 +113,11 @@ make_wio <- function(wiotype ="icio2021", year = NULL,
 
   # Extraction of Z, Yfd, Y, X, VA----
 
-  if (wiotype == "icio2021") {
+  if (wiotype == "icio2023") {
+    io <- extract_icio("icio2023", src_dir, year, quiet)
+  } else if (wiotype == "icio2023s") {
+    io <- extract_icio("icio2023s", src_dir, year, quiet)
+  } else if (wiotype == "icio2021") {
     io <- extract_icio("icio2021", src_dir, year, quiet)
   } else if (wiotype == "icio2018") {
     io <- extract_icio("icio2018", src_dir, year, quiet)

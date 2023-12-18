@@ -1,3 +1,12 @@
+# exvatools 0.5.0 (2023-12-18)
+
+* Added OECD ICIO tables 2023 edition, with normal extended data (`"icio2023"`) 
+  plus a reduced version ("small") with data for `CHN` and `MEX` consolidated 
+  and aggregated final demand (`"icio2023s"`).
+* Updated documentation.
+* Corrected bugs.
+
+
 # exvatools 0.4.0 (2023-06-12)
 
 * Added new database FIGARO EU Input-Output Tables (EU IC-SUIOTs), 2022 

@@ -7,8 +7,8 @@
 #' @return Prints country codes and descriptive text in the console.
 #' @export
 #' @examples
-#' info_geo("icio2021")
-info_geo <- function(wiotype = "icio2021", lang = "en"){
+#' info_geo("icio2023")
+info_geo <- function(wiotype = "icio2023", lang = "en"){
 
   if (wiotype == "custom") {
     stop("info_geo() only works with standard input-output tables.\n",
@@ -16,7 +16,7 @@ info_geo <- function(wiotype = "icio2021", lang = "en"){
   }
 
   # Select column with included elements
-  # (basic_icio2021, basic_wiod2016, etc)
+  # (basic_icio2023, basic_wiod2016, etc)
   # Elements will have 1 (individual) or 0 (group).
   basic <- paste0("basic", "_", wiotype)
 
@@ -75,8 +75,8 @@ info_geo <- function(wiotype = "icio2021", lang = "en"){
 #' @export
 #'
 #' @examples
-#' info_sec("icio2021")
-info_sec <- function(wiotype = "icio2021", lang = "en"){
+#' info_sec("icio2023")
+info_sec <- function(wiotype = "icio2023", lang = "en"){
 
   if (wiotype == "custom") {
     stop("info_sec() only works with standard input-output tables.\n",
@@ -85,7 +85,7 @@ info_sec <- function(wiotype = "icio2021", lang = "en"){
 
 
   # Select column with included elements
-  # (basic_icio2021, basic_wiod2016, etc)
+  # (basic_icio2023, basic_wiod2016, etc)
   # Elements will have 1 (individual) or 0 (group).
   basic <- paste0("basic", "_", wiotype)
 

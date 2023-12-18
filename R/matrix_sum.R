@@ -262,7 +262,7 @@ sumgcols <- function(df, n, col_names = NULL) {
 #' group_cols(df, "EU27", "replace")
 #' }
 group_cols <- function(df, group, mode="get",
-                       group_name = NULL, wiotype = "icio2021"){
+                       group_name = NULL, wiotype = "icio2023"){
 
   # Group can be id (geo_id), position (pgn_exp) (most typical)
   # or vector c("AUS", "ESP")

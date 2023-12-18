@@ -18,17 +18,17 @@ make_exvadec(
 input-output table) obtained using \code{\link[=make_wio]{make_wio()}}.}
 
 \item{exporter}{String with a country or a country group code
-(e.g., \code{"USA"}, code{"NAFTA"}, etc.). The default \code{"all"}
+(e.g., \code{"USA"}, \code{"NAFTA"}, etc.). The default \code{"all"}
 produces the decomposition of value added in exports for all
 available individual countries.}
 
 \item{method}{A string specifying the export VA decomposition method:
 \itemize{
 \item \code{"bm_src"}: Borin and Mancini, source-based (2023) (default).
-\item \code{"bm_snk"}: Borin and Mancini, sink-based (2019).
+\item \code{"bm_snk"}: Borin and Mancini, sink-based (2023).
 \item \code{"wwz"}: Wang et al. (2013).
 \item \code{"kww"}: Koopman et al. (2014).
-\item \code{"kww"}: Miroudot and Ye (2021)
+\item \code{"my"}: Miroudot and Ye (2021)
 \item \code{"oecd"}: OECD (not properly a decomposition).
 }}
 

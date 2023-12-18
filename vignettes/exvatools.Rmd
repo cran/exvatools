@@ -3,7 +3,7 @@ title: "Introduction to exvatools"
 author: 
   - name: Enrique Feás
     affiliation: University of Alcalá and Elcano Royal Institute
-date: June, 2023
+date: December, 2023
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to exvatools}
@@ -71,16 +71,16 @@ institutions, normally as zipped files containing comma-delimited
 files (`.csv`), Excel files (`.xlsx`) or R data files (`.rData`).
 
 For instance, if we want to use **exvatools** with the latest edition of 
-the OECD ICIO tables (2021, with data up to 2018), we must first download to
-our computer the source file "ICIO_2015-2018.zip" (96 MB) from the
+the OECD ICIO tables (2023, with data up to 2020), we must first download to
+our computer the source file "ICIO-2016-2020-extended.zip" (142 MB) from the
 [ICIO web page](https://www.google.com/search?q=OECD+ICIO+tables).
 Then we will use the command `make_wio()`, specifying the edition, 
 the year and the folder where the source zip file is saved (just the directory).
 For instance, if we had downloaded it in `C:\Users\Username\Documents\R` and
-we wanted the year 2018, we would just need to type:
+we wanted the year 2020, we would just need to type:
 
 ```{r make_wio, eval=FALSE, echo=TRUE}
-wio <- make_wio("icio2021", year = 2018, 
+wio <- make_wio("icio2023", year = 2020, 
                 src_dir = "C:/Users/Username/Documents/R")
 ```
 
@@ -136,7 +136,7 @@ names of countries and sectors, we have improved commands to consolidate
 matrices and provide names, like `rsums()` to sum rows, `csums()` to sum 
 columns, `sumnrow()` to sum every nth row of a matrix, `sumncol()` to sum every
 nth column, `sumgrows()` to sum groups of rows of a particular size,
-`sumncols()` to do the same with columns, etc.
+`sumgcols()` to do the same with columns, etc.
 
 For instance, let us check that the production `X` is equivalent to the product
 of the global Leontief inverse matrix `B` and the final demand `Y`:
@@ -390,9 +390,9 @@ info_geo("iciotest")
 ```
 
 These commands do not require to have a `wio` in the environment, so we can just
-check what sectors are available in the OECD's ICIO tables, 2021 edition.
-```{r info_sec_2021}
-info_sec("icio2021")
+check what sectors are available in the OECD's ICIO tables, 2023 edition.
+```{r info_sec_2023}
+info_sec("icio2023")
 ```
 
 Additionally, the commands `get_geo_codes()` and `get_sec_codes` provide details
@@ -404,9 +404,9 @@ we would have the following components of EU27:
 get_geo_codes("EU27", wiotype = "wiod2016")
 ```
 
-And for `"icio2021"` we have the following components of the business services
+And for `"icio2023"` we have the following components of the business services
 sector:
 
-```{r get_sec_codes_icio2021}
-get_sec_codes("BIZSV", wiotype = "icio2021")
+```{r get_sec_codes_icio2023}
+get_sec_codes("BIZSV", wiotype = "icio2023")
 ```
