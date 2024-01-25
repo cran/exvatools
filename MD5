@@ -1,9 +1,9 @@
-42feb1abebc3249abe31fede1a6f7d2c *DESCRIPTION
+a326dfb1b47e3c051062075fd48520e4 *DESCRIPTION
 c08073f31e2b6693fa8ad56e084d0811 *NAMESPACE
-1d69d28fbe372183926859efad0cc7d4 *NEWS.md
+d27ac4df26a7f73828f3f6a102bb556d *NEWS.md
 51b9c98e0bef047c3b1d1193d0706b72 *R/data.R
 8cf3a1463a0d58ddd9300a8a1b37006a *R/extract_figaro2022.R
-76adbe7faffaf6309f5f85795c8070c3 *R/extract_icio.R
+5bf90aa1926a38f8fc67e286832e7952 *R/extract_icio.R
 8b6c065eabb184ba29e4e189eb06a6f4 *R/extract_lrwiod2022.R
 93a35f393522fa7c23c4891ccee50751 *R/extract_wiod.R
 e8e1b801878232baf3c3a33425e2fba7 *R/generate_test_iot.R
@@ -42,8 +42,8 @@ cd6181b92efc074ec5fc04af709a5d47 *build/vignette.rds
 73327edd95abec76f7451c4a7695ca2a *data/wiodtest_data.rda
 4cca6f31b9b9a827d1ae9e4ded77054b *inst/WORDLIST
 75578f8ae8ef1053ec6c2c5e4f52ad58 *inst/doc/exvatools.R
-e335e6a87b82a8036b52f1be4ddc0be9 *inst/doc/exvatools.Rmd
-8011d4cf10ccc04d7df328fd642931ba *inst/doc/exvatools.html
+cfa42e01934d058d995d1c1ce21283e7 *inst/doc/exvatools.Rmd
+f4dc46f69565c4b66aee5e2498503c33 *inst/doc/exvatools.html
 317dbab8713d27579851f82acfec39bc *man/bkd.Rd
 5d38fc4508bc9270d9f0d46bb2d363b0 *man/bkdiag.Rd
 4dbfd51573f6e802d40c8516aff08654 *man/bkoffd.Rd
@@ -89,4 +89,4 @@ c36266ba372d5776c8f2130c47705295 *tests/testthat/test-make_exvadec_bm_snk.R
 2758702f3ffb571f0e319d610f559546 *tests/testthat/test-make_exvadec_my.R
 c568063b15e887dab9def3fd5ee2e6df *tests/testthat/test-make_exvadec_oecd.R
 6e04a8f49962b7fdc301d48f7942e570 *tests/testthat/test-make_exvadec_wwz.R
-e335e6a87b82a8036b52f1be4ddc0be9 *vignettes/exvatools.Rmd
+cfa42e01934d058d995d1c1ce21283e7 *vignettes/exvatools.Rmd

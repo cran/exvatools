@@ -1,8 +1,14 @@
+# exvatools 0.6.0 (2024-01-25)
+
+* Updated code to make it compatible with changes in the structure of
+  zip files containing raw data for the OECD ICIO tables 2023 edition 
+  (`"icio2023"` and `"icio2023s"`) after the January 2024 update.
+
 # exvatools 0.5.0 (2023-12-18)
 
 * Added OECD ICIO tables 2023 edition, with normal extended data (`"icio2023"`) 
   plus a reduced version ("small") with data for `CHN` and `MEX` consolidated 
-  and aggregated final demand (`"icio2023s"`).
+  (`"icio2023s"`).
 * Updated documentation.
 * Corrected bugs.
 

@@ -53,9 +53,9 @@ extract_icio <- function(edition = "icio2023", src_dir,
     } else {
       stop(paste0("Year ", year, " is not available"))
     }
-    # Zip contains a zip file
-    zip2_file <- paste0(year, ".zip")
-    csv_file <- paste0(year, ".csv")
+    # Zip contains a zip file (not anymore since jan 2024)
+    # zip2_file <- paste0(year, ".zip")
+    csv_file <- paste0(year, ".CSV")
     g_names <- c("ARG", "AUS", "AUT", "BEL", "BGD", "BGR", "BLR", "BRA",
                  "BRN", "CAN", "CHE", "CHL", "CHN", "CIV", "CMR", "COL",
                  "CRI", "CYP", "CZE", "DEU", "DNK", "EGY", "ESP", "EST",
@@ -82,7 +82,7 @@ extract_icio <- function(edition = "icio2023", src_dir,
     G <- 77
     GX <- 77
     N <- 45
-    FD <- 1
+    FD <- 6
     # Name of zip file
     if (year %in% c(1995:2000)) {
       zip_file <- "ICIO-1995-2000-small.zip"
@@ -98,9 +98,9 @@ extract_icio <- function(edition = "icio2023", src_dir,
       stop(paste0("Year ", year, " is not available"))
     }
     # Zip contains a zip file
-    zip2_file <- paste0(year, ".SML", ".zip")
+    # zip2_file <- paste0(year, ".SML", ".zip")
     # csv_file
-    csv_file <- paste0(year, ".SML", ".csv")
+    csv_file <- paste0(year, "_SML", ".csv")
     g_names <- c("ARG", "AUS", "AUT", "BEL", "BGD", "BGR", "BLR", "BRA",
                  "BRN", "CAN", "CHE", "CHL", "CHN", "CIV", "CMR", "COL",
                  "CRI", "CYP", "CZE", "DEU", "DNK", "EGY", "ESP", "EST",
@@ -119,7 +119,7 @@ extract_icio <- function(edition = "icio2023", src_dir,
                  "D50", "D51", "D52", "D53", "D55T56", "D58T60",
                  "D61", "D62T63", "D64T66", "D68", "D69T75", "D77T82",
                  "D84", "D85", "D86T88", "D90T93", "D94T96", "D97T98")
-    fd_names <- c("FD")
+    fd_names <- c("HFCE", "NPISH", "GGFC", "GFCF", "INVNT", "DIRPA")
   # ************
   # ICIO 2021
   # ************
@@ -237,17 +237,19 @@ extract_icio <- function(edition = "icio2023", src_dir,
 
   if (!quiet) {cli::cli_alert_info(c("Unzipping {.file {csv_file}}..."))}
 
-  # In case zip contained another zip
-  if (edition %in% c("icio2023", "icio2023s")) {
-    utils::unzip(paste0(src_dir, zip_file), file = zip2_file, exdir = td)
-    zip2path <- paste0(td, "\\", zip2_file)
-    # For OS compatibility
-    zip2path <- gsub("\\\\", "/", zip2path)
-    utils::unzip(zip2path, file = csv_file, exdir = td)
-    unlink(zip2path)
-  } else {
-    utils::unzip(paste0(src_dir, zip_file), file = csv_file, exdir = td)
-  }
+  # # In case zip contained another zip
+  # if (edition %in% c("icio2023", "icio2023s")) {
+  #   utils::unzip(paste0(src_dir, zip_file), file = zip2_file, exdir = td)
+  #   zip2path <- paste0(td, "\\", zip2_file)
+  #   # For OS compatibility
+  #   zip2path <- gsub("\\\\", "/", zip2path)
+  #   utils::unzip(zip2path, file = csv_file, exdir = td)
+  #   unlink(zip2path)
+  # } else {
+  #   utils::unzip(paste0(src_dir, zip_file), file = csv_file, exdir = td)
+  # }
+
+  utils::unzip(paste0(src_dir, zip_file), file = csv_file, exdir = td)
 
   # Path to csv file
   filepath <- paste0(td, "\\", csv_file)
@@ -359,7 +361,7 @@ extract_icio <- function(edition = "icio2023", src_dir,
     for(r in 1:G) {
       p <- (r - 1)*FD + 1
       q <- (r - 1)*FD + FD
-      # Check case FD=1
+      # Check case FD = 1
       if (p == q) {
         Y[, r] <- Yfd[, p]
       } else {
