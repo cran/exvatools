@@ -3,7 +3,7 @@ title: "Introduction to exvatools"
 author: 
   - name: Enrique Feás
     affiliation: University of Alcalá and Elcano Royal Institute
-date: January, 2024
+date: March, 2024
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to exvatools}
@@ -72,7 +72,7 @@ files (`.csv`), Excel files (`.xlsx`) or R data files (`.rData`).
 
 For instance, if we want to use **exvatools** with the latest edition of 
 the OECD ICIO tables (2023, with data up to 2020), we must first download to
-our computer the source file "ICIO-2016-2020-extended.zip" (142 MB) from the
+our computer the source file "2016-2020.zip" (95 MB) from the
 [ICIO web page](https://www.google.com/search?q=OECD+ICIO+tables).
 Then we will use the command `make_wio()`, specifying the edition, 
 the year and the folder where the source zip file is saved (just the directory).

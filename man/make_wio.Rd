@@ -19,10 +19,11 @@ available for literature replication purposes.
 remains available for literature replication purposes.
 * \code{"lrwiod2022"} for the 2022 edition of the long-run WIOD
 (1965-2000), useful for historical analysis.
-* \verb{"figaro2022i} for the 2022 edition of the FIGARO EU Input-Output
-Tables (EU IC-SUIOTs), industry-by-industry (2010-2020), and
-\verb{"figaro2022p} for the product-by-product version of the same
-database.
+* \verb{"figaro2023i} for the 2023 edition of the FIGARO EU Input-Output
+Tables (EU IC-SUIOTs), industry-by-industry (2010-2021), and
+\verb{"figaro2023p} for the product-by-product version of the same
+database.The deprecated edition of 2022 (2010-2020)
+remains available for literature replication purposes.
 * \code{"iciotest"} for an example of an ICIO-type international
 input-output table (disaggregated for \code{MEX} into \code{MX1} and \code{MX2} and
 for \code{CHN} into \code{CN1} and \code{CN2}) and \code{"wiodtest"} for an example of a
@@ -73,8 +74,8 @@ If source files are used, they must be previously downloaded and
 placed in an accessible folder in disk, without renaming them. The
 following name pattern is expected:
 \itemize{
-\item \code{ICIO-XXXX-XXXX-extended.zip} for \code{"icio2023"} (\code{.csv} files)
-\item \code{ICIO-XXXX-XXXX-small.zip} for \code{"icio2023s"} (\code{.csv} files)
+\item \code{XXXX-XXXX.zip} for \code{"icio2023"} (\code{.csv} files)
+\item \code{XXXX-XXXX_SML.zip} for \code{"icio2023s"} (\code{.csv} files)
 \item \code{ICIO_XXXX-XXXX.zip} for \code{"icio2021"} (\code{.csv} files)
 \item \code{ICIO2018_XXXX.zip} for \code{"icio2018"} (\code{.csv} files)
 \item \code{ICIO2016_XXXX.zip} for \code{"icio2016"} (\code{.csv} files)
@@ -83,8 +84,8 @@ following name pattern is expected:
 package \code{openxlsx}..
 \item \code{lr_wiod_wiot_final_filled.csv} for \code{"lrwiod2022"}. Requires
 packages \code{data.table} and \code{reshape2}.
-\item \code{matrix_eu-ic-io_ind-by-ind_XXXX.csv} for \verb{"figaro2022i} and
-\code{matrix_eu-ic-io_prod-by-prod_XXXX.csv} for \verb{"figaro2022p}
+\item \code{matrix_eu-ic-io_ind-by-ind_23ed_XXXX.csv} for \verb{"figaro2023i} and
+\code{matrix_eu-ic-io_prod-by-prod_23ed_XXXX.csv} for \verb{"figaro2023p}
 (\code{.csv} files)
 The input-output framework follows the traditional demand model of
 Leontief (1936), which makes assumptions about the stability of inputs

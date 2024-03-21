@@ -40,22 +40,26 @@ extract_icio <- function(edition = "icio2023", src_dir,
     N <- 45
     FD <- 6
     # Name of zip file
+    # In Nov and Dec 2023 ICIO-XXXX-XXXX-extended.zip
+    # Later in February 2024 XXXX-XXXX.zip
     if (year %in% c(1995:2000)) {
-      zip_file <- "ICIO-1995-2000-extended.zip"
+      zip_file <- "1995-2000.zip"
     } else if (year %in% c(2001:2005)) {
-      zip_file <- "ICIO-2001-2005-extended.zip"
+      zip_file <- "2001-2005.zip"
     } else if (year %in% c(2006:2010)) {
-      zip_file <- "ICIO-2006-2010-extended.zip"
+      zip_file <- "2006-2010.zip"
     } else if (year %in% c(2011:2015)) {
-      zip_file <- "ICIO-2011-2015-extended.zip"
+      zip_file <- "2011-2015.zip"
     } else if (year %in% c(2016:2020)) {
-      zip_file <- "ICIO-2016-2020-extended.zip"
+      zip_file <- "2016-2020.zip"
     } else {
       stop(paste0("Year ", year, " is not available"))
     }
-    # Zip contains a zip file (not anymore since jan 2024)
-    # zip2_file <- paste0(year, ".zip")
-    csv_file <- paste0(year, ".CSV")
+    # In Nov 2023 zip contained zip files (XXXX.zip)
+    # In Dec 2023 just XXXX.CSV files (extension in uppercase)
+    # In Feb 2024 XXXX.csv files (extension in lowercase)
+    csv_file <- paste0(year, ".csv")
+    # Names of rows and columns
     g_names <- c("ARG", "AUS", "AUT", "BEL", "BGD", "BGR", "BLR", "BRA",
                  "BRN", "CAN", "CHE", "CHL", "CHN", "CIV", "CMR", "COL",
                  "CRI", "CYP", "CZE", "DEU", "DNK", "EGY", "ESP", "EST",
@@ -84,23 +88,25 @@ extract_icio <- function(edition = "icio2023", src_dir,
     N <- 45
     FD <- 6
     # Name of zip file
+    # In Nov and Dec 2023 ICIO-XXXX-XXXX-small.zip
+    # In Feb 2024 XXXX-XXXX_SML.zip
     if (year %in% c(1995:2000)) {
-      zip_file <- "ICIO-1995-2000-small.zip"
+      zip_file <- "1995-2000_SML.zip"
     } else if (year %in% c(2001:2005)) {
-      zip_file <- "ICIO-2001-2005-small.zip"
+      zip_file <- "2001-2005_SML.zip"
     } else if (year %in% c(2006:2010)) {
-      zip_file <- "ICIO-2006-2010-small.zip"
+      zip_file <- "2006-2010_SML.zip"
     } else if (year %in% c(2011:2015)) {
-      zip_file <- "ICIO-2011-2015-small.zip"
+      zip_file <- "2011-2015_SML.zip"
     } else if (year %in% c(2016:2020)) {
-      zip_file <- "ICIO-2016-2020-small.zip"
+      zip_file <- "2016-2020_SML.zip"
     } else {
       stop(paste0("Year ", year, " is not available"))
     }
-    # Zip contains a zip file
-    # zip2_file <- paste0(year, ".SML", ".zip")
-    # csv_file
+    # In Nov 2023 zip contained zip files (XXXX_SML.zip)
+    # In Dec 2023 and Feb 2024 XXXX_SML.csv files (extension in lowercase)
     csv_file <- paste0(year, "_SML", ".csv")
+    # Names of rows and columns
     g_names <- c("ARG", "AUS", "AUT", "BEL", "BGD", "BGR", "BLR", "BRA",
                  "BRN", "CAN", "CHE", "CHL", "CHN", "CIV", "CMR", "COL",
                  "CRI", "CYP", "CZE", "DEU", "DNK", "EGY", "ESP", "EST",

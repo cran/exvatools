@@ -1,8 +1,16 @@
+# exvatools 0.7.0 (2022-03-21)
+
+* Updated code to make it compatible with changes in the structure of
+  zip files containing raw data for the OECD ICIO tables 2023 edition 
+  (`"icio2023"` and `"icio2023s"`) after the February 2024 update.
+* Added new edition of FIGARO EU Input-Output Tables 
+  (2023 edition, 2010-2021) 
+
 # exvatools 0.6.0 (2024-01-25)
 
 * Updated code to make it compatible with changes in the structure of
   zip files containing raw data for the OECD ICIO tables 2023 edition 
-  (`"icio2023"` and `"icio2023s"`) after the January 2024 update.
+  (`"icio2023"` and `"icio2023s"`) after the December 2023 update.
 
 # exvatools 0.5.0 (2023-12-18)
 
