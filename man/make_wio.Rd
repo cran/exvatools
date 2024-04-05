@@ -19,11 +19,14 @@ available for literature replication purposes.
 remains available for literature replication purposes.
 * \code{"lrwiod2022"} for the 2022 edition of the long-run WIOD
 (1965-2000), useful for historical analysis.
-* \verb{"figaro2023i} for the 2023 edition of the FIGARO EU Input-Output
+* \code{"figaro2023i"} for the 2023 edition of the FIGARO EU Input-Output
 Tables (EU IC-SUIOTs), industry-by-industry (2010-2021), and
-\verb{"figaro2023p} for the product-by-product version of the same
+\code{"figaro2023p"} for the product-by-product version of the same
 database.The deprecated edition of 2022 (2010-2020)
 remains available for literature replication purposes.
+* \code{"mrio2023"} for the 2023 edition of the 62-country ADB MRIO tables,
+\code{"mrio2023k"} for the same edition in constant prices, and
+\code{"mrio2023x"} for the 72-country edition (years up to 2022).
 * \code{"iciotest"} for an example of an ICIO-type international
 input-output table (disaggregated for \code{MEX} into \code{MX1} and \code{MX2} and
 for \code{CHN} into \code{CN1} and \code{CN2}) and \code{"wiodtest"} for an example of a
@@ -64,11 +67,12 @@ with the traditional matrices, including the coefficient matrix \code{A}, the
 Leontief global inverse matrix \code{B}, the Leontief matrix of local inverse
 matrices \code{Ld} and others.
 
-Original source files can be obtained in the OECD's
-\href{https://www.google.com/search?q=OECD+ICIO+tables}{ICIO web page}
-or in the University of Groningen's
-\href{https://www.rug.nl/ggdc/valuechain/wiod/}{WIOD web page} or in the
+Original source files can be obtained from the OECD's
+\href{https://www.google.com/search?q=OECD+ICIO+tables}{ICIO web page},
+the University of Groningen's
+\href{https://www.rug.nl/ggdc/valuechain/wiod/}{WIOD web page}, the
 \href{https://ec.europa.eu/eurostat/web/esa-supply-use-input-tables/database}{Eurostat web page}
+or the \href{https://kidb.adb.org/mrio}{Asian Development Bank MRIO web page}
 
 If source files are used, they must be previously downloaded and
 placed in an accessible folder in disk, without renaming them. The
@@ -87,6 +91,9 @@ packages \code{data.table} and \code{reshape2}.
 \item \code{matrix_eu-ic-io_ind-by-ind_23ed_XXXX.csv} for \verb{"figaro2023i} and
 \code{matrix_eu-ic-io_prod-by-prod_23ed_XXXX.csv} for \verb{"figaro2023p}
 (\code{.csv} files)
+\item \code{ADB-MRIO[XX]-XXXX_xxx2023.xlsx} for the \code{"mrio62-2023"}, \code{"mrio72-2023"}
+and \verb{ADB MRIO XXXX, at constant 2010 prices.xlsx} for the
+\code{"mrio62-2023k"} tables (with some exceptions).
 The input-output framework follows the traditional demand model of
 Leontief (1936), which makes assumptions about the stability of inputs
 (and therefore value-added) as a proportion of production. This allows

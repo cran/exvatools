@@ -18,7 +18,12 @@ info_geo <- function(wiotype = "icio2023", lang = "en"){
   # Select column with included elements
   # (basic_icio2023, basic_wiod2016, etc)
   # Elements will have 1 (individual) or 0 (group).
-  basic <- paste0("basic", "_", wiotype)
+
+  # Get equivalent wiotype
+  wiotypeq <- dbqv[dbqv$id == wiotype, ][["eqv_id_geo"]]
+
+  # Get column of basic elements
+  basic <- paste0("basic", "_", wiotypeq)
 
   # Get included elements
   db <- dbgeo[dbgeo[basic] >= 0, ]
@@ -87,7 +92,12 @@ info_sec <- function(wiotype = "icio2023", lang = "en"){
   # Select column with included elements
   # (basic_icio2023, basic_wiod2016, etc)
   # Elements will have 1 (individual) or 0 (group).
-  basic <- paste0("basic", "_", wiotype)
+
+  # Get equivalent wiotype
+  wiotypeq <- dbqv[dbqv$id == wiotype, ][["eqv_id_sec"]]
+
+  # Get basic elements
+  basic <- paste0("basic", "_", wiotypeq)
 
   # Get included elements
   db <- dbsec[dbsec[basic] >= 0, ]
@@ -102,12 +112,12 @@ info_sec <- function(wiotype = "icio2023", lang = "en"){
 
 
   # Select column of codes
-  codes <- paste0("codes_", wiotype)
+  codes <- paste0("codes_", wiotypeq)
   # Reorder (importanto for older codes)
   db_indiv <- db_indiv[order(db_indiv[[codes]]), ]
 
   # Select column of notes
-  notes <- paste0("notes_", wiotype)
+  notes <- paste0("notes_", wiotypeq)
 
   # Select column of description (short, for the moment)
   # with language

@@ -130,9 +130,11 @@ get_geo_code <- function(geo_id, wiotype = "icio2023") {
     geo_codes <- geo_id
     # If it is a standard wiotype
   } else {
-    # Get column in database
-    code_column <- paste0("codes", "_", wiotype)
-    basic_column <- paste0("basic", "_", wiotype)
+    # Get equivalent wiotype
+    wiotypeq <- dbqv[dbqv$id == wiotype, ][["eqv_id_geo"]]
+    # Get column in database0
+    code_column <- paste0("codes", "_", wiotypeq)
+    basic_column <- paste0("basic", "_", wiotypeq)
     # and find code
     db <- dbgeo[dbgeo[[basic_column]] >= 0, ]
     geo_codes <- db[db$id == geo_id, ][[code_column]]

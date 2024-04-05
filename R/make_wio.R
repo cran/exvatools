@@ -18,11 +18,14 @@
 #'       remains available for literature replication purposes.
 #'     * `"lrwiod2022"` for the 2022 edition of the long-run WIOD
 #'       (1965-2000), useful for historical analysis.
-#'     * `"figaro2023i` for the 2023 edition of the FIGARO EU Input-Output
+#'     * `"figaro2023i"` for the 2023 edition of the FIGARO EU Input-Output
 #'       Tables (EU IC-SUIOTs), industry-by-industry (2010-2021), and
-#'       `"figaro2023p` for the product-by-product version of the same
+#'       `"figaro2023p"` for the product-by-product version of the same
 #'       database.The deprecated edition of 2022 (2010-2020)
 #'       remains available for literature replication purposes.
+#'     * `"mrio2023"` for the 2023 edition of the 62-country ADB MRIO tables,
+#'       `"mrio2023k"` for the same edition in constant prices, and
+#'       `"mrio2023x"` for the 72-country edition (years up to 2022).
 #'     * `"iciotest"` for an example of an ICIO-type international
 #'       input-output table (disaggregated for `MEX` into `MX1` and `MX2` and
 #'       for `CHN` into `CN1` and `CN2`) and `"wiodtest"` for an example of a
@@ -47,11 +50,12 @@
 #'   Leontief global inverse matrix `B`, the Leontief matrix of local inverse
 #'   matrices `Ld` and others.
 #'
-#' Original source files can be obtained in the OECD's
-#' [ICIO web page](https://www.google.com/search?q=OECD+ICIO+tables)
-#' or in the University of Groningen's
-#' [WIOD web page](https://www.rug.nl/ggdc/valuechain/wiod/) or in the
+#' Original source files can be obtained from the OECD's
+#' [ICIO web page](https://www.google.com/search?q=OECD+ICIO+tables),
+#' the University of Groningen's
+#' [WIOD web page](https://www.rug.nl/ggdc/valuechain/wiod/), the
 #' [Eurostat web page](https://ec.europa.eu/eurostat/web/esa-supply-use-input-tables/database)
+#' or the [Asian Development Bank MRIO web page](https://kidb.adb.org/mrio)
 #'
 #' If source files are used, they must be previously downloaded and
 #'   placed in an accessible folder in disk, without renaming them. The
@@ -69,6 +73,9 @@
 #'   * `matrix_eu-ic-io_ind-by-ind_23ed_XXXX.csv` for `"figaro2023i` and
 #'     `matrix_eu-ic-io_prod-by-prod_23ed_XXXX.csv` for `"figaro2023p`
 #'     (`.csv` files)
+#'   * `ADB-MRIO[XX]-XXXX_xxx2023.xlsx` for the `"mrio62-2023"`, `"mrio72-2023"`
+#'     and `ADB MRIO XXXX, at constant 2010 prices.xlsx` for the
+#'     `"mrio62-2023k"` tables (with some exceptions).
 #' The input-output framework follows the traditional demand model of
 #'   Leontief (1936), which makes assumptions about the stability of inputs
 #'   (and therefore value-added) as a proportion of production. This allows
@@ -140,6 +147,12 @@ make_wio <- function(wiotype ="icio2023", year = NULL,
     io <- extract_figaro("figaro2022i", src_dir, year, quiet)
   } else if (wiotype == "figaro2022p") {
     io <- extract_figaro("figaro2022p", src_dir, year, quiet)
+  } else if (wiotype == "mrio2023") {
+    io <- extract_mrio("mrio2023", src_dir, year, quiet)
+  } else if (wiotype == "mrio2023k") {
+    io <- extract_mrio("mrio2023k", src_dir, year, quiet)
+  } else if (wiotype == "mrio2023x") {
+    io <- extract_mrio("mrio2023x", src_dir, year, quiet)
   } else if (wiotype == "wiodtest") {
     io <- generate_test_iot(is_icio = FALSE, quiet)
   }

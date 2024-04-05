@@ -113,9 +113,11 @@ get_sec_code <- function(sector_id, wiotype = "icio2023") {
     sec_codes <- sector_id
     # If it is a standard wiotype
   } else {
+    # Get equivalent wiotype
+    wiotypeq <- dbqv[dbqv$id == wiotype, ][["eqv_id_sec"]]
     # Get column in database
-    code_column <- paste0("codes", "_", wiotype)
-    basic_column <- paste0("basic", "_", wiotype)
+    code_column <- paste0("codes", "_", wiotypeq)
+    basic_column <- paste0("basic", "_", wiotypeq)
     # and find code
     db <- dbsec[dbsec[[basic_column]] >= 0, ]
     sec_codes <- db[db$id == sector_id,][[code_column]]

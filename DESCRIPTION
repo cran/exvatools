@@ -2,7 +2,7 @@ Type: Package
 Package: exvatools
 Title: Value Added in Exports and Other Input-Output Table Analysis
         Tools
-Version: 0.7.0
+Version: 0.8.0
 Authors@R: 
     person("Enrique", "Feas", , "efeas@runbox.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9431-6051"))
@@ -26,8 +26,8 @@ Language: en-US
 LazyData: true
 RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2024-03-21 15:16:46 UTC; Enrique
+Packaged: 2024-04-04 22:21:36 UTC; Enrique
 Author: Enrique Feas [aut, cre] (<https://orcid.org/0000-0002-9431-6051>)
 Maintainer: Enrique Feas <efeas@runbox.com>
 Repository: CRAN
-Date/Publication: 2024-03-21 17:00:02 UTC
+Date/Publication: 2024-04-05 07:33:00 UTC

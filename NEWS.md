@@ -1,4 +1,13 @@
-# exvatools 0.7.0 (2022-03-21)
+# exvatools 0.8.0 (2024-04-05)
+
+* Added support for ADB Multi-Regional Input-Output Tables (ADB-MRIO), with 
+  data up to 2022, for the 62-country version in current prices 
+  (`"mrio2023"`) and in constant 2010 prices (`"mrio2023k"`), and for the
+  72-country version (`"mrio2023x"`).
+* Corrected bugs in 2023 edition of FIGARO EU Input-Output Tables and other
+  minor errors in sector classification.
+
+# exvatools 0.7.0 (2024-03-21)
 
 * Updated code to make it compatible with changes in the structure of
   zip files containing raw data for the OECD ICIO tables 2023 edition 

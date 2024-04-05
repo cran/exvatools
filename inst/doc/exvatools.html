@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h4 class="author">Enrique Feás</h4>
 <address class="author_afil">
 University of Alcalá and Elcano Royal
-Institute<br><h4 class="date">March, 2024</h4>
+Institute<br><h4 class="date">April, 2024</h4>
 
 
 
@@ -378,12 +378,13 @@ three types of data:</p>
 <li>Raw data of standard international input-output databases</li>
 </ol>
 <p>Raw data can be directly downloaded from the web pages of their
-respective institutions. Three sources are currently supported:</p>
+respective institutions. Four sources are currently supported:</p>
 <ul>
 <li>OECD Inter-Country Input-Output (ICIO) tables, on which the OECD’s
 Trade in Value Added database (TiVA) is based.</li>
 <li>World Input Output Database (WIOD) tables.</li>
 <li>FIGARO EU Input-Output Tables (EU IC-SUIOTs).</li>
+<li>ADB Multi-Regional Input-Output Tables (ADB MRIO)</li>
 </ul>
 <p>The advantage of these databases is threefold: they are widely used
 in the economic literature, they are quite rich in terms of countries
@@ -925,7 +926,8 @@ database, we could just use <code>make_exvadec()</code> with the method
 <span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a><span class="co">#&gt; Sector groups:</span></span>
 <span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a><span class="co">#&gt; TOTAL: D01T98 (Total goods and services), GOODSWU: D01T39 (Goods,</span></span>
-<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a><span class="co">#&gt; total, incl. utilities)</span></span></code></pre></div>
+<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a><span class="co">#&gt; total, incl. utilities), TTAITC: n.a. (Trade, transport, accomodation</span></span>
+<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a><span class="co">#&gt; and ITC)</span></span></code></pre></div>
 <p>To check the information about available countries, the command is
 <code>info_geo()</code>:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">info_geo</span>(<span class="st">&quot;iciotest&quot;</span>)</span>
@@ -939,8 +941,12 @@ database, we could just use <code>make_exvadec()</code> with the method
 <span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt; (China), ROW (Rest of the world)</span></span>
 <span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="co">#&gt; Groups of countries:</span></span>
-<span id="cb28-12"><a href="#cb28-12" tabindex="-1"></a><span class="co">#&gt; WLD (World), EU27 (EU-27), NONEU27 (Non-EU27), NAFTA (NAFTA), USMCA</span></span>
-<span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a><span class="co">#&gt; (USMCA)</span></span></code></pre></div>
+<span id="cb28-12"><a href="#cb28-12" tabindex="-1"></a><span class="co">#&gt; WLD (World), EUROPE (Europa), EU27 (EU-27), AMERICA (Americas),</span></span>
+<span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a><span class="co">#&gt; NAMERICA (North America), LATAM (Latin America and Caribbean), ASIA</span></span>
+<span id="cb28-14"><a href="#cb28-14" tabindex="-1"></a><span class="co">#&gt; (Asia), EASIA (East Asia), ASIAOC (Asia and Oceania), G7 (G7), G20</span></span>
+<span id="cb28-15"><a href="#cb28-15" tabindex="-1"></a><span class="co">#&gt; (G20), NAFTA (NAFTA), USMCA (USMCA), APEC (APEC), RCEP (RCEP), EU28</span></span>
+<span id="cb28-16"><a href="#cb28-16" tabindex="-1"></a><span class="co">#&gt; (EU-28), OECD (OECD), EMU (EMU), EMU19 (EMU-19), NONEU28 (Non-EU28),</span></span>
+<span id="cb28-17"><a href="#cb28-17" tabindex="-1"></a><span class="co">#&gt; NONEU27 (Non-EU27), NONOECD (Non-OECD)</span></span></code></pre></div>
 <p>These commands do not require to have a <code>wio</code> in the
 environment, so we can just check what sectors are available in the
 OECD’s ICIO tables, 2023 edition.</p>
@@ -991,17 +997,19 @@ OECD’s ICIO tables, 2023 edition.</p>
 <span id="cb29-45"><a href="#cb29-45" tabindex="-1"></a><span class="co">#&gt; (Computer, electronic, optical and electrical equipment), TREQ:</span></span>
 <span id="cb29-46"><a href="#cb29-46" tabindex="-1"></a><span class="co">#&gt; D29T30 (Transport equipment), EGWT: D35T39 (Electricity, gas, water</span></span>
 <span id="cb29-47"><a href="#cb29-47" tabindex="-1"></a><span class="co">#&gt; supply), SRVWC: D41T98 (Services, including construction), SERVS:</span></span>
-<span id="cb29-48"><a href="#cb29-48" tabindex="-1"></a><span class="co">#&gt; D45T98 (Services), BIZSV: D45T82 (Business services), TPST: D49T53</span></span>
-<span id="cb29-49"><a href="#cb29-49" tabindex="-1"></a><span class="co">#&gt; (Transportation and storage), PTL: D53T61 (Post and</span></span>
-<span id="cb29-50"><a href="#cb29-50" tabindex="-1"></a><span class="co">#&gt; telecommunications), INFO: D58T63 (Information industries), ITCS:</span></span>
-<span id="cb29-51"><a href="#cb29-51" tabindex="-1"></a><span class="co">#&gt; D61T63 (ITC Services), OBZS: D69T82 (Other business services),</span></span>
-<span id="cb29-52"><a href="#cb29-52" tabindex="-1"></a><span class="co">#&gt; NONBIZSV: D84T98 (Non-business services), OSPS: D90T98 (Other social</span></span>
-<span id="cb29-53"><a href="#cb29-53" tabindex="-1"></a><span class="co">#&gt; and personal services), AEO: D90T96 (Arts, entertainment and other),</span></span>
-<span id="cb29-54"><a href="#cb29-54" tabindex="-1"></a><span class="co">#&gt; RDIHI: D21, D28 (R&amp;D Intensity High), RDIMH: D20, D27T30, D62T65 (R&amp;D</span></span>
-<span id="cb29-55"><a href="#cb29-55" tabindex="-1"></a><span class="co">#&gt; Intensity Medium-High), RDIME: D22T24, D31T33, D69T77 (R&amp;D Intensity</span></span>
-<span id="cb29-56"><a href="#cb29-56" tabindex="-1"></a><span class="co">#&gt; Medium), RDIML: D05T09, D10T19, D25, D58T63 (R&amp;D Intensity</span></span>
-<span id="cb29-57"><a href="#cb29-57" tabindex="-1"></a><span class="co">#&gt; Medium-Low), RDILO: D01T03, D35T56, D64T68, D77T82, D90T100 (R&amp;D</span></span>
-<span id="cb29-58"><a href="#cb29-58" tabindex="-1"></a><span class="co">#&gt; Intensity Low), RDINM: D84T90 (Non-Market Activities)</span></span></code></pre></div>
+<span id="cb29-48"><a href="#cb29-48" tabindex="-1"></a><span class="co">#&gt; D45T98 (Services), BIZSV: D45T82 (Business services), TTAITC: D45T63</span></span>
+<span id="cb29-49"><a href="#cb29-49" tabindex="-1"></a><span class="co">#&gt; (Trade, transport, accomodation and ITC), TPST: D49T53</span></span>
+<span id="cb29-50"><a href="#cb29-50" tabindex="-1"></a><span class="co">#&gt; (Transportation and storage), PITC: D58T63 (Publishing, audiovisual</span></span>
+<span id="cb29-51"><a href="#cb29-51" tabindex="-1"></a><span class="co">#&gt; and ITC), ITCS: D61T63 (ITC Services), FINRE: D64T68 (Financial,</span></span>
+<span id="cb29-52"><a href="#cb29-52" tabindex="-1"></a><span class="co">#&gt; insurance and real estate), OBZS: D69T82 (Other business services),</span></span>
+<span id="cb29-53"><a href="#cb29-53" tabindex="-1"></a><span class="co">#&gt; NONBIZSV: D84T98 (Non-business services), OSPS: D90T98 (Other social</span></span>
+<span id="cb29-54"><a href="#cb29-54" tabindex="-1"></a><span class="co">#&gt; and personal services), OCS: D90T96 (Other community services), INFO:</span></span>
+<span id="cb29-55"><a href="#cb29-55" tabindex="-1"></a><span class="co">#&gt; D26pD58T63 (Information industries), RDIHI: D21, D28 (R&amp;D Intensity</span></span>
+<span id="cb29-56"><a href="#cb29-56" tabindex="-1"></a><span class="co">#&gt; High), RDIMH: D20, D27T30, D62T65 (R&amp;D Intensity Medium-High), RDIME:</span></span>
+<span id="cb29-57"><a href="#cb29-57" tabindex="-1"></a><span class="co">#&gt; D22T24, D31T33, D69T77 (R&amp;D Intensity Medium), RDIML: D05T09, D10T19,</span></span>
+<span id="cb29-58"><a href="#cb29-58" tabindex="-1"></a><span class="co">#&gt; D25, D58T63 (R&amp;D Intensity Medium-Low), RDILO: D01T03, D35T56,</span></span>
+<span id="cb29-59"><a href="#cb29-59" tabindex="-1"></a><span class="co">#&gt; D64T68, D77T82, D90T100 (R&amp;D Intensity Low), RDINM: D84T90</span></span>
+<span id="cb29-60"><a href="#cb29-60" tabindex="-1"></a><span class="co">#&gt; (Non-Market Activities)</span></span></code></pre></div>
 <p>Additionally, the commands <code>get_geo_codes()</code> and
 <code>get_sec_codes</code> provide details about the components of the
 different groups. These commands are also directly applicable for any

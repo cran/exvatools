@@ -2,9 +2,9 @@
 #'
 #' Extract basic matrices from source data and prepares it for
 #' processing with `make_wio`
+#' @param edition Character string with edition
 #' @param src_dir Character string for source folder
 #' @param year Integer
-#' @param version Character string with version (`"industry"` or `"product"`)
 #' @param quiet Boolean, if `TRUE`, suppress all status messages. Default
 #'   is `FALSE`, i.e., messages are shown.
 #' @keywords internal
