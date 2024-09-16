@@ -1,3 +1,14 @@
+# exvatools 0.9.0 (2024-09-16)
+
+* Added partial 2024 edition of ADB Multi-Regional Input-Output Tables
+  (ADB-MRIO), with data up to 2023, for the 62-country version in current  
+  prices (`"mrio2024"`) and for the 72-country version (`"mrio2024x"`) only.
+* Added new edition of FIGARO EU Input-Output Tables (2024 edition, 2010-2022) 
+* Added parameter `bkdown` for the sector breakdown of the Borin and Mancini
+  decomposition, with default `"exporting"` sector and possibility of
+  showing sector of `"origin"`.
+* Solved issues with `set_zero()` command when using country or sector codes. 
+
 # exvatools 0.8.0 (2024-04-05)
 
 * Added support for ADB Multi-Regional Input-Output Tables (ADB-MRIO), with 

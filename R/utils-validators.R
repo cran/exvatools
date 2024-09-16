@@ -132,7 +132,7 @@ check_wio_args <- function(list_args){
 check_exvadec_args <- function(list_args, my_args = NULL) {
 
   # Standard arguments are in list_args
-  # Miroudot-Ye arguments are in my_args
+  # Perimeter arguments and bkdown are in my_args
   # (NULL if unspecified)
   method <- list_args$method
   output <- list_args$output
@@ -151,15 +151,16 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
   }
 
   # Perspective world, bilateral or sector are only
-  # compatible with Miroudot and Ye. If perim, partner or
+  # compatible with Miroudot and Ye and BM. If perim, partner or
   # sector have been specified as arguments with other
   # method, my_args will have length > 0 and an error will appear
   if (length(my_args) > 0) {
     # Method different from BMsrc/MY
     if (!method %in% c("bm_src", "my")) {
       cli::cli_abort(paste0("Perpectives other than country ",
-                            "only available for the ",
-                            "decomposition methods 'bm_src' and 'my'."))
+                            "and are only available for the ",
+                            "decomposition methods 'bm_src' and 'my', and ",
+                            "sector breakdown is only available for 'bm_src'."))
     # Method BM source
     } else if (method == "bm_src") {
       # Check that BM arguments are valid
@@ -167,10 +168,11 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
         # As arguments in R admit partial matching
         # e.g. "sec" is valid for "sector", we use grepl
         # If the is not at least a similar coincidence
-        if (!any(grepl(arg, c("partner", "sector")))) {
+        if (!any(grepl(arg, c("partner", "sector", "bkdown")))) {
           cli::cli_abort(paste0("Argument {arg} not valid.",
                                 "Method 'bm_src' is only compatible with ",
-                                "'partner' and 'sector' perimeters."))
+                                "'partner' and 'sector' perimeters and ",
+                                "with the 'bkdown' argument."))
         }
       }
     # Method MY
@@ -201,8 +203,6 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
                             "of world perspective (perim = 'WLD')"))
     }
   }
-
-
 
   return(TRUE)
 

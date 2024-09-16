@@ -18,13 +18,15 @@
 #'       remains available for literature replication purposes.
 #'     * `"lrwiod2022"` for the 2022 edition of the long-run WIOD
 #'       (1965-2000), useful for historical analysis.
-#'     * `"figaro2023i"` for the 2023 edition of the FIGARO EU Input-Output
+#'     * `"figaro2024i"` for the 2024 edition of the FIGARO EU Input-Output
 #'       Tables (EU IC-SUIOTs), industry-by-industry (2010-2021), and
-#'       `"figaro2023p"` for the product-by-product version of the same
-#'       database.The deprecated edition of 2022 (2010-2020)
-#'       remains available for literature replication purposes.
-#'     * `"mrio2023"` for the 2023 edition of the 62-country ADB MRIO tables,
-#'       `"mrio2023k"` for the same edition in constant prices, and
+#'       `"figaro2024p"` for the product-by-product version of the same
+#'       database.The deprecated editions of 2023 and 2022
+#'       remain available for literature replication purposes.
+#'     * `"mrio2024"` for the 2024 edition of the 62-country ADB MRIO tables.
+#'       `"mrio2023"` for the 2023 edition of the 62-country ADB MRIO tables,
+#'       `"mrio2023k"` for the 2023 edition in constant prices
+#'       `"mrio2024x"` for the 72-country edition (years up to 2023).
 #'       `"mrio2023x"` for the 72-country edition (years up to 2022).
 #'     * `"iciotest"` for an example of an ICIO-type international
 #'       input-output table (disaggregated for `MEX` into `MX1` and `MX2` and
@@ -55,7 +57,7 @@
 #' the University of Groningen's
 #' [WIOD web page](https://www.rug.nl/ggdc/valuechain/wiod/), the
 #' [Eurostat web page](https://ec.europa.eu/eurostat/web/esa-supply-use-input-tables/database)
-#' or the [Asian Development Bank MRIO web page](https://kidb.adb.org/mrio)
+#' or the [Asian Development Bank MRIO web page](https://kidb.adb.org/globalization)
 #'
 #' If source files are used, they must be previously downloaded and
 #'   placed in an accessible folder in disk, without renaming them. The
@@ -67,20 +69,22 @@
 #'   * `ICIO2016_XXXX.zip` for `"icio2016"` (`.csv` files)
 #'   * `WIOTS_in_R.zip` for `"wiod2016"` (`.RData` files)
 #'   * `WIOTS_in_EXCEL.zip` for `"wiod2013"` (`.xlsx` files). Requires
-#'     package `openxlsx`..
+#'     package `openxlsx`.
 #'   * `lr_wiod_wiot_final_filled.csv` for `"lrwiod2022"`. Requires
 #'     packages `data.table` and `reshape2`.
-#'   * `matrix_eu-ic-io_ind-by-ind_23ed_XXXX.csv` for `"figaro2023i` and
-#'     `matrix_eu-ic-io_prod-by-prod_23ed_XXXX.csv` for `"figaro2023p`
-#'     (`.csv` files)
-#'   * `ADB-MRIO[XX]-XXXX_xxx2023.xlsx` for the `"mrio62-2023"`, `"mrio72-2023"`
+#'   * `matrix_eu-ic-io_ind-by-ind_2Xed_XXXX.csv` for `"figaro202Xi` and
+#'     `matrix_eu-ic-io_prod-by-prod_2Xed_XXXX.csv` for `"figaro202Xp`
+#'     (`.csv` files).
+#'   * `ADB-MRIO[XX]-XXXX_xxx2023.xlsx` for the `"mrio62-202X"`, `"mrio72-202X"`
 #'     and `ADB MRIO XXXX, at constant 2010 prices.xlsx` for the
-#'     `"mrio62-2023k"` tables (with some exceptions).
+#'     `"mrio62-202Xk"` tables (with some exceptions).
+#'
 #' The input-output framework follows the traditional demand model of
 #'   Leontief (1936), which makes assumptions about the stability of inputs
 #'   (and therefore value-added) as a proportion of production. This allows
 #'   production and value-added to be expressed as the result of variations
-#'   in final demand.\
+#'   in final demand.
+#'
 #' Details about the content of the world input-output object (`wio`)
 #'   produced by `make_wio()` can be obtained with the command
 #'   `summary(wio_object)`.
@@ -139,6 +143,10 @@ make_wio <- function(wiotype ="icio2023", year = NULL,
     io <- extract_wiod("wiod2013", src_dir, year, quiet)
   } else if (wiotype == "lrwiod2022") {
     io <- extract_lrwiod2022(src_dir, year, quiet)
+  } else if (wiotype == "figaro2024i") {
+    io <- extract_figaro("figaro2024i", src_dir, year, quiet)
+  } else if (wiotype == "figaro2024p") {
+    io <- extract_figaro("figaro2024p", src_dir, year, quiet)
   } else if (wiotype == "figaro2023i") {
     io <- extract_figaro("figaro2023i", src_dir, year, quiet)
   } else if (wiotype == "figaro2023p") {
@@ -147,10 +155,14 @@ make_wio <- function(wiotype ="icio2023", year = NULL,
     io <- extract_figaro("figaro2022i", src_dir, year, quiet)
   } else if (wiotype == "figaro2022p") {
     io <- extract_figaro("figaro2022p", src_dir, year, quiet)
+  } else if (wiotype == "mrio2024") {
+    io <- extract_mrio("mrio2024", src_dir, year, quiet)
   } else if (wiotype == "mrio2023") {
     io <- extract_mrio("mrio2023", src_dir, year, quiet)
   } else if (wiotype == "mrio2023k") {
     io <- extract_mrio("mrio2023k", src_dir, year, quiet)
+  } else if (wiotype == "mrio2024x") {
+    io <- extract_mrio("mrio2024x", src_dir, year, quiet)
   } else if (wiotype == "mrio2023x") {
     io <- extract_mrio("mrio2023x", src_dir, year, quiet)
   } else if (wiotype == "wiodtest") {

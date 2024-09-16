@@ -11,6 +11,7 @@
 make_exvadec_bm_src <- function(wio_object, exporter = "all",
                                 output = "standard", perim = "country",
                                 partner = "WLD", sector = "TOTAL",
+                                bkdown = "exporting",
                                 quiet = FALSE) {
 
   # Check class----
@@ -44,8 +45,9 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
                                            perim = "country",
                                            partner = partner,
                                            sector = sector,
+                                           bkdown = bkdown,
                                            quiet = exp_quiet)
-     # Get exvadec names
+    # Get exvadec names
     exvadec_names <- names(exvadec_exp)
     # Add to exvadec list
     for (var in exvadec_names) {
@@ -70,6 +72,10 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
   }
   if (!sector == "TOTAL") {
     exvadec$sector <- sector
+  }
+  # Include sector perspective only if is origin
+  if (!bkdown == "exporting") {
+    exvadec$bkdown <- "origin"
   }
 
   class(exvadec) <- "exvadec"
@@ -103,6 +109,7 @@ make_exvadec_bm_src <- function(wio_object, exporter = "all",
 make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
                                     output = "standard", perim = "country",
                                     partner = "WLD", sector = "TOTAL",
+                                    bkdown = "exporting",
                                     quiet = FALSE) {
 
   # Requires functions: bkd, bkoffd, bkt, bktt, hmult,
@@ -112,10 +119,11 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
   # wio <- make_wio("iciotest")
   # exporter <- "ESP"
   # output <- "standard"
-  # quiet <- FALSE
   # perim <- "country"
   # partner <- "WLD"
   # sector <- "TOTAL"
+  # bkdown <- "exporting"
+  # quiet <- FALSE
 
 
   # Check class----
@@ -162,6 +170,12 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
   country_persp <- TRUE
   if (any(!partner=="WLD", !sector == "TOTAL")) {
     country_persp <- FALSE
+  }
+
+  # Check sector breakdown
+  is_secx <- TRUE
+  if (bkdown == "origin") {
+    is_secx <- FALSE
   }
 
   # Auxiliary functions to improve code readability
@@ -262,13 +276,29 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
 
 
   # Basic value added matrices
-  Vs_Bxss <- diagcs(dmult(Vs, Bxss))
+  if (is_secx) {
+    Vs_Bxss <- diagcs(dmult(Vs, Bxss))
+  } else {
+    Vs_Bxss <- dmult(Vs, Bxss)
+  }
   Asr_Lrr <- Asr %*% Lrr
-  Vs_Bxss_Asr_Lrr <- dmult(Vs_Bxss, Asr_Lrr)
+  if (is_secx) {
+    Vs_Bxss_Asr_Lrr <- dmult(Vs_Bxss, Asr_Lrr)
+  } else {
+    Vs_Bxss_Asr_Lrr <- Vs_Bxss %*% Asr_Lrr
+  }
   Vs_Bss_minus_Bxss <- dmult(Vs, Bss - Bxss)
-  sum_Vt_Bxts <- diagcs(sumnrow(dmult(wio$W, Bxts), N))
-  sum_Vt_Bts_minus_Bxts <- diagcs(sumnrow(dmult(wio$W, Brs - Bxts), N))
-  sum_Vt_Bxts_Asr_Lrr <- dmult(sum_Vt_Bxts, Asr_Lrr)
+  if (is_secx) {
+    sum_Vt_Bxts <- diagcs(sumnrow(dmult(wio$W, Bxts), N))
+  } else {
+    sum_Vt_Bxts <- sumnrow(dmult(wio$W, Bxts), N, expn_names)
+  }
+  if (is_secx) {
+    sum_Vt_Bts_minus_Bxts <- diagcs(sumnrow(dmult(wio$W, Brs - Bxts), N))
+  } else {
+    sum_Vt_Bts_minus_Bxts <- sumnrow(dmult(wio$W, Brs - Bxts), N, expn_names)
+  }
+  sum_Vt_Bxts_Asr_Lrr <- sum_Vt_Bxts %*% Asr_Lrr
 
   # Exports
   EXGR <- get_rows_exp(set_zero_exp(wio$EXGR))
@@ -308,18 +338,30 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
 
   if (output == "basic") {
 
-    DVA <- sumnrow_meld(dmult(Vs_Bxss, EXGR))
+    if (is_secx) {
+      DVA <- sumnrow_meld(dmult(Vs_Bxss, EXGR))
+    } else {
+      DVA <- sumnrow_meld(Vs_Bxss %*% EXGR)
+    }
     Vs_Bxss_Asr_Lrr <- sumnrow_meld(Vs_Bxss_Asr_Lrr, meld_cols = FALSE)
     REF1 <- meld(hmult(Vs_Bxss_Asr_Lrr, Yrs))
     REF2 <- meld(hmult(Vs_Bxss_Asr_Lrr, sum_Arj_sum_Bjk_Yks))
     REF <- REF1 + REF2
     VAX <- DVA - REF
-    DDC <- sumnrow_meld(dmult(Vs_Bss_minus_Bxss, EXGR))
-    DC <- DVA + DDC
+    if (is_secx) {
+      DDC <- sumnrow_meld(dmult(Vs_Bss_minus_Bxss, EXGR))
+    } else {
+      DDC <- sumnrow_meld(Vs_Bss_minus_Bxss %*% EXGR)
+      DC <- DVA + DDC
+    }
 
   } else if (output %in% c("standard", "terms")) {
 
-    VAX1 <- sumnrow_meld(dmult(Vs_Bxss, Ysr))
+    if (is_secx) {
+      VAX1 <- sumnrow_meld(dmult(Vs_Bxss, Ysr))
+    } else {
+      VAX1 <- sumnrow_meld(Vs_Bxss %*% Ysr)
+    }
     VAX2 <- sumnrow_meld(Vs_Bxss_Asr_Lrr %*% Yrr)
     # Terms in VAX3, VAX4, REF1 and REF2 and DDC all have dimension
     # GN x GXN or N x GXN, so Vs_Lss_Asr_Lrr must be first melded in rows and,
@@ -330,16 +372,31 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
     VAX4 <- meld(hmult(Vs_Bxss_Asr_Lrr, sum_Arj_sum_Bjk_Yklxs))
     REF1 <- meld(hmult(Vs_Bxss_Asr_Lrr, Yrs))
     REF2 <- meld(hmult(Vs_Bxss_Asr_Lrr, sum_Arj_sum_Bjk_Yks))
-    DDC <- sumnrow_meld(dmult(Vs_Bss_minus_Bxss, EXGR))
+
+    if (is_secx) {
+      DDC <- sumnrow_meld(dmult(Vs_Bss_minus_Bxss, EXGR))
+    } else {
+      DDC <- sumnrow_meld(Vs_Bss_minus_Bxss %*% EXGR)
+    }
+
+    # Just if we want to break down DDC
+    # Vs_Bss_minus_Bxss_Asr_Lrr <- Vs_Bss_minus_Bxss %*% Asr_Lrr
+    # DDC1 <- sumnrow_meld(Vs_Bss_minus_Bxss %*% Ysr)
+    # DDC2 <- sumnrow_meld(Vs_Bss_minus_Bxss_Asr_Lrr %*% Yrr)
+    # DDC3 <- meld(hmult(Vs_Bss_minus_Bxss_Asr_Lrr, sum_Yrj))
+    # DDC4 <- meld(hmult(Vs_Bss_minus_Bxss_Asr_Lrr, sum_Arj_sum_Bjk_Ykl))
+    # DDC <- DDC1 + DDC2 + DDC3 + DDC4
+
     if (output == "standard") {
       DAVAX <- VAX1 + VAX2
       VAX <- DAVAX + VAX3 + VAX4
       REF <- REF1 + REF2
       DVA <- VAX + REF
       DC <- DVA + DDC
-      GVC <- sumnrow_meld(EXGR) - DAVAX
-      GVCF <- DVA - DAVAX
-      GVCB <- GVC - GVCF
+      # This is not true in sector perspective origin
+      # GVC <- sumnrow_meld(EXGR) - DAVAX
+      # GVCF <- DVA - DAVAX
+      # GVCB <- GVC - GVCF
     }
 
   }
@@ -349,13 +406,27 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
 
   if (output %in% c("basic", "standard")) {
 
-    FVA <- sumnrow_meld(dmult(sum_Vt_Bxts, EXGR))
-    FDC <- sumnrow_meld(dmult(sum_Vt_Bts_minus_Bxts, EXGR))
+    if (is_secx) {
+      FVA <- sumnrow_meld(dmult(sum_Vt_Bxts, EXGR))
+    } else {
+      FVA <- sumnrow_meld(sum_Vt_Bxts %*% EXGR)
+    }
+
+    if (is_secx) {
+      FDC <- sumnrow_meld(dmult(sum_Vt_Bts_minus_Bxts, EXGR))
+    } else {
+      FDC <- sumnrow_meld(sum_Vt_Bts_minus_Bxts %*% EXGR)
+    }
+
     FC <- FVA + FDC
 
   } else if (output == "terms") {
 
-    FVA1 <- sumnrow_meld(dmult(sum_Vt_Bxts, Ysr))
+    if (is_secx) {
+      FVA1 <- sumnrow_meld(dmult(sum_Vt_Bxts, Ysr))
+    } else {
+      FVA1 <- sumnrow_meld(sum_Vt_Bxts %*% Ysr)
+    }
     FVA2 <- sumnrow_meld(sum_Vt_Bxts_Asr_Lrr %*% Yrr)
     # FVA3 and FVA4 terms have dimension GN x GXN or KN x GXN
     # so sum_Vt_Btsnots_Asr_Lrr must be previously melded by rows
@@ -363,8 +434,27 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
                                         meld_cols = FALSE)
     FVA3 <- meld(hmult(sum_Vt_Bxts_Asr_Lrr, sum_Yrj))
     FVA4 <- meld(hmult(sum_Vt_Bxts_Asr_Lrr, sum_Arj_sum_Bjk_Ykl))
-    FDC <- sumnrow_meld(dmult(sum_Vt_Bts_minus_Bxts, EXGR))
 
+    if (is_secx) {
+      FDC <- sumnrow_meld(dmult(sum_Vt_Bts_minus_Bxts, EXGR))
+    } else {
+      FDC <- sumnrow_meld(sum_Vt_Bts_minus_Bxts %*% EXGR)
+    }
+
+    # Only if we want FDC breakdown
+    # sum_Vt_Bts_minus_Bxts_Asr_Lrr <- sum_Vt_Bts_minus_Bxts %*% Asr_Lrr
+    # FDC1 <- sumnrow_meld(sum_Vt_Bts_minus_Bxts %*% Ysr)
+    # FDC2 <- sumnrow_meld(sum_Vt_Bts_minus_Bxts_Asr_Lrr %*% Yrr)
+    # FDC3 <- meld(hmult(sum_Vt_Bts_minus_Bxts_Asr_Lrr, sum_Yrj))
+    # FDC4 <- meld(hmult(sum_Vt_Bts_minus_Bxts_Asr_Lrr, sum_Arj_sum_Bjk_Ykl))
+    # FDC <- FDC1 + FDC2 + FDC3 + FDC4
+
+  }
+
+  if (output == "standard") {
+    GVCB <- FVA + FDC + DDC
+    GVCF <- VAX3 + VAX4 + REF
+    GVC <- GVCB + GVCF
   }
 
   EXGR <- sumnrow_meld(EXGR)

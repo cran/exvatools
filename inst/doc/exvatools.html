@@ -49,7 +49,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h4 class="author">Enrique Feás</h4>
 <address class="author_afil">
 University of Alcalá and Elcano Royal
-Institute<br><h4 class="date">April, 2024</h4>
+Institute<br><h4 class="date">September, 2024</h4>
 
 
 
@@ -663,7 +663,7 @@ source-based approach, we would type::</p>
 <span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, forward (GVCF)          1247.89  26.74 </span></span>
 <span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
 <span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="co">#&gt; Method: Borin and Mancini (2023), source-based, standard output</span></span>
-<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co">#&gt; Exporting country perspective, source approach</span></span></code></pre></div>
 <p>The advantage is that, once we have obtained a decomposition, we can
 play with the results in terms of sectors and countries of destination
 just using the command <code>get_exvadec_bkdown()</code>. For instance,
@@ -679,7 +679,7 @@ construction) to the United States, we just have to type:</p>
 <span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt;  VA_components                              USD_MM Percent</span></span>
 <span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt;  Gross exports of goods and services (EXGR) 276.71 100.00 </span></span>
 <span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt;    Domestic Content in VA (DC)              159.63  57.69 </span></span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;      Domestic Value Added (DVA)             145.95  52.74 </span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;      Domestic Value Added (DVA)             145.95  52.75 </span></span>
 <span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt;        Value Added Exported (VAX)           127.28  46.00 </span></span>
 <span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt;        Reflection (REF)                      18.67   6.75 </span></span>
 <span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt;      Domestic Double Counting (DDC)          13.68   4.94 </span></span>
@@ -687,11 +687,11 @@ construction) to the United States, we just have to type:</p>
 <span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt;      Foreign Value Added (FVA)              101.53  36.69 </span></span>
 <span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt;      Foreign Double Counting (FDC)           15.55   5.62 </span></span>
 <span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt;  Global Value Chain-related trade (GVC)     221.62  80.09 </span></span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, backward (GVCB)         130.76  47.26 </span></span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, backward (GVCB)         130.76  47.25 </span></span>
 <span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt;  GVC-related trade, forward (GVCF)           90.86  32.84 </span></span>
 <span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; ======================================================================</span></span>
 <span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="co">#&gt; Method: Borin and Mancini (2023), source-based, standard output</span></span>
-<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; Country perspective, source approach</span></span></code></pre></div>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; Exporting country perspective, source approach</span></span></code></pre></div>
 <p>An alternative (although with some methodologically limitations)
 decomposition would be that of Wang et al. (2013). In this case, instead
 of the normal decomposition, we will use the <code>&quot;terms&quot;</code>
@@ -926,8 +926,7 @@ database, we could just use <code>make_exvadec()</code> with the method
 <span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a><span class="co">#&gt; Sector groups:</span></span>
 <span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a><span class="co">#&gt; TOTAL: D01T98 (Total goods and services), GOODSWU: D01T39 (Goods,</span></span>
-<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a><span class="co">#&gt; total, incl. utilities), TTAITC: n.a. (Trade, transport, accomodation</span></span>
-<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a><span class="co">#&gt; and ITC)</span></span></code></pre></div>
+<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a><span class="co">#&gt; total, incl. utilities)</span></span></code></pre></div>
 <p>To check the information about available countries, the command is
 <code>info_geo()</code>:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">info_geo</span>(<span class="st">&quot;iciotest&quot;</span>)</span>

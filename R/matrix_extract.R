@@ -241,8 +241,11 @@ set_zero <- function(df, orig = NULL, dest = NULL, wiotype = NULL,
     stop("Matrices without dimension names cannot be set to zero")
   }
 
-
-  # Vector de posiciones
+  # ************************
+  # Vectors with positions
+  # *************************
+  # If orig or dest are numeric (and the other null)
+  # Then is a vector of positions
   if (all(any(is.numeric(orig), is.null(orig)),
           any(is.numeric(dest), is.null(dest)))) {
 
@@ -256,36 +259,45 @@ set_zero <- function(df, orig = NULL, dest = NULL, wiotype = NULL,
       df[orig, dest] <- 0
     }
 
-    # Lista con origen y destino
+  # **********************************
+  # Lists with origin and destination
+  # **********************************
+  # If orig or dest are lists (and the other null)
   } else if (all(any(is.list(orig), is.null(orig)),
                  any(is.list(dest), is.null(dest)))) {
 
+    # If there is no wiotype, no way to know position of countries/sectors
     if (is.null(wiotype)) {
       stop(paste0("The use of geographical or sector codes require the\n",
                   "specification of the argument 'wiotype'"))
     }
-    # Check origin (rows)
 
+
+    # *********************
+    # Check origin (rows)
+    # *********************
+
+    # There should always be geo as orig
     ogeo <- orig[[1]]
     if (length(orig) > 1) {
       osec <- orig[[2]]
     } else{
-      osec <- NULL
+      osec <- "TOTAL"
     }
 
-    if (all(ogeo == "all", osec == "all")) {
-      ogeo_codes <- NULL
-      osec_codes <- NULL
-      pgr <- NULL
-    } else if (all(!ogeo == "all", osec == "all")) {
+    if (all(ogeo == "WLD", osec == "TOTAL")) {
+      # ogeo_codes <- NULL
+      # osec_codes <- NULL
+      pgr <- c(1:length(row_names))
+    } else if (all(!ogeo == "WLD", osec == "TOTAL")) {
       ogeo_codes <- get_geo_codes(ogeo, wiotype, icio_extend = TRUE)
-      osec_codes <-NULL
+      # osec_codes <-NULL
       pgr <- grep(ogeo_codes, row_names, invert = invert)
-    } else if (all(ogeo == "all", !osec == "all")) {
-      ogeo_codes <- NULL
-      osec_codes <- get_sec_codes(ogeo, wiotype, remove_letter = TRUE)
+    } else if (all(ogeo == "WLD", !osec == "TOTAL")) {
+      # ogeo_codes <- NULL
+      osec_codes <- get_sec_codes(osec, wiotype, remove_letter = TRUE)
       pgr <- grep(osec_codes, row_names, invert = invert)
-    } else if (all(!ogeo == "all", !osec == "all")) {
+    } else if (all(!ogeo == "WLD", !osec == "TOTAL")) {
       ogeo_codes <- get_geo_codes(ogeo, wiotype, icio_extend = TRUE)
       ogeo_codes <- strsplit(ogeo_codes, "[|]")[[1]]
       num_geo <- length(ogeo_codes)
@@ -298,29 +310,29 @@ set_zero <- function(df, orig = NULL, dest = NULL, wiotype = NULL,
       pgr <- grep(srch, row_names, invert = invert)
     }
 
-    # Check colunmns
+    # ****************************
+    # Check destination (columns)
+    # ****************************
 
+    # There should always be geo as dest
     dgeo <- dest[[1]]
     if (length(dest) > 1) {
       dsec <- dest[[2]]
     } else{
-      dsec <- NULL
+      dsec <- "TOTAL"
     }
 
 
-    if (all(dgeo == "all", dsec == "all")) {
-      dgeo_codes <- NULL
-      dsec_codes <- NULL
-      pgc <- NULL
-    } else if (all(!dgeo == "all", dsec == "all")) {
+    if (all(dgeo == "WLD", dsec == "TOTAL")) {
+
+      pgc <- c(1:length(col_names))
+    } else if (all(!dgeo == "WLD", dsec == "TOTAL")) {
       dgeo_codes <- get_geo_codes(dgeo, wiotype, icio_extend = TRUE)
-      dsec_codes <-NULL
       pgc <- grep(dgeo_codes, col_names, invert = invert)
-    } else if (all(dgeo == "all", !dsec == "all")) {
-      dgeo_codes <- NULL
-      dsec_codes <- get_sec_codes(dgeo, wiotype, remove_letter = TRUE)
+    } else if (all(dgeo == "WLD", !dsec == "TOTAL")) {
+      dsec_codes <- get_sec_codes(dsec, wiotype, remove_letter = TRUE)
       pgc <- grep(dsec_codes, col_names, invert = invert)
-    } else if (all(!dgeo == "all", !dsec == "all")) {
+    } else if (all(!dgeo == "WLD", !dsec == "TOTAL")) {
       dgeo_codes <- get_geo_codes(dgeo, wiotype, icio_extend = TRUE)
       dgeo_codes <- strsplit(dgeo_codes, "[|]")[[1]]
       num_geo <- length(dgeo_codes)
@@ -332,17 +344,18 @@ set_zero <- function(df, orig = NULL, dest = NULL, wiotype = NULL,
       pgc <- grep(srch, col_names, invert = invert)
     }
 
-    # print(paste(pgr, pgc))
+    # print(pgr)
+    # print(pgc)
 
-    if (all(is.null(orig), is.null(dest))) {
-      df <- df
-    } else if (all(!is.null(orig), is.null(dest))) {
-      df[pgr, ] <- 0
-    } else if (all(is.null(orig), !is.null(dest))) {
-      df[, pgc] <- 0
-    } else if (all(!is.null(orig), !is.null(dest))) {
-      df[pgr, pgc] <- 0
+    # Check in case sectors (other than TOTAL) are included in rows or columns
+    # with no sectors (e.g., matrix Y)
+    if (length(pgr) == 0) {
+      stop(paste0(dsec, " is not available in row names"))
+    } else if (length(pgc) == 0) {
+      stop(paste0(dsec, " is not available in column names"))
     }
+
+    df[pgr, pgc] <- 0
 
   }
 

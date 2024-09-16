@@ -64,10 +64,14 @@ output with several indicators of the OECD TiVA database.
 \item{quiet}{Boolean, if \code{TRUE}, suppresses all status messages. Default
 is \code{FALSE}, i.e., messages are shown.}
 
-\item{...}{Additional parameters for targeted value added perspectives.
-These are only available for the \code{"bm_src"} (Borin and Mancini, 2023,
-source-based) and the \code{"my"} (Miroudot and Ye, 2021) decomposition.
-methods. Specific perimeters can be:
+\item{...}{Additional parameters for targeted value-added perspectives
+and for sector breakdown. Targeted value-added perspectives are only
+available for the \code{"bm_src"} (Borin and Mancini, 2023, source-based) and
+the \code{"my"} (Miroudot and Ye, 2021) decomposition methods. Specific
+perimeters can be partner, sector and general perimeter. Sector breakdown
+is only available for the \code{"bm_src"} (Borin and Mancini, 2023,
+source-based) method, and can be exporting sector and sector of origin
+of value added.
 \itemize{
 \item \code{partner} String, for bilateral perspective. Default is \code{"WLD"}, but
 any country or country group code (e.g. \code{"USA"} or \code{"EU27"}) can be
@@ -79,7 +83,7 @@ that case, all flows that cross the sector perimeter more than
 once will be considered as double counting. \
 The bilateral and sector perspectives can be combined in a
 bilateral-sector perspective.
-\item \code{perim} Boolean (only for \code{"my"}, and incompatible with sector or partner
+\item \code{perim} (only for \code{"my"}, and incompatible with sector or partner
 specifications). String, for general perimeter of value added.
 If \code{perim = "WLD"} (world) is specified (default is exporting country),
 then all flows that cross the border of \emph{any} country
@@ -90,6 +94,14 @@ more than once). Please note that, when using the world perspective
 (\code{perim = "WLD"}) and the terms output (\code{output = "terms"}, the foreign
 double counting will be automatically divided into two
 elements (\code{"terms2"}).
+\item \code{bkdown} Sector breakdown (only for \code{"bm_src"}). The default value
+\code{"exporting"} will present a breakdown of value added by exporting
+sector. The matrix product \code{VB} is diagonalized, and the total content
+of value added (domestic and foreign) will coincide with total gross
+exports. The alternative value \code{"origin"} will show a breakdown by
+sector of origin of value added. In this case, only matrix \code{V} will be
+diagonalized and the total content of value added will not coincide
+with total gross exports.
 }}
 }
 \value{

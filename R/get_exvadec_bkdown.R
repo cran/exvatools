@@ -70,9 +70,14 @@ get_exvadec_bkdown <- function(exvadec_object, exporter = "WLD",
 
     # print(paste0("Extracting data from ", var_code))
 
-    value <- round(get_data(exvadec, var_code, exporter = exporter,
-                            sector = sector, importer = importer), 2)
-    valuesh <- round(100 * value/EXGR, 2)
+    # value <- round(get_data(exvadec, var_code, exporter = exporter,
+    #                         sector = sector, importer = importer), 2)
+    # valuesh <- round(100 * value/EXGR, 2)
+
+    # Let us keep full decimals
+    value <- get_data(exvadec, var_code, exporter = exporter,
+                      sector = sector, importer = importer)
+    valuesh <- 100 * value/EXGR
 
     # Text will depend on the type of output
     # basic/Standard show   XXXXXXXXXXXXXXXXX (XXX)  XXX.XX  XX.XX
@@ -98,11 +103,15 @@ get_exvadec_bkdown <- function(exvadec_object, exporter = "WLD",
 
   }
 
-  # Capture data
+  # Create table
   tbl <- data.frame("VA_components" = row_labels,
                     "USD_MM" = tbl_values[,1],
                     "Percent"= tbl_values[,2])
-  tbl_txt <- utils::capture.output(print(tbl, row.names = FALSE,
+  # Now we round to 2 decimals
+  tbl_rnd <- tbl
+  tbl_rnd[, 2:3] <- round(tbl_rnd[, 2:3], 2)
+  # Capture table
+  tbl_txt <- utils::capture.output(print(tbl_rnd, row.names = FALSE,
                                          quote = FALSE, right = FALSE))
   tbl_txt <- paste0(tbl_txt, collapse = cr)
 
@@ -194,7 +203,7 @@ get_exvadec_bkdown <- function(exvadec_object, exporter = "WLD",
 
   if (exvadec$method %in% c("bm_src", "my")) {
     # Default
-    persp_txt <- "Country perspective"
+    persp_txt <- "Exporting country perspective"
     if (all(exvadec$method == "my", exvadec$perim == "WLD")) {
       persp_txt <- "World perspective"
     }
@@ -262,6 +271,7 @@ get_exvadec_bkdown <- function(exvadec_object, exporter = "WLD",
   cat(txt)
 
   # Return tbl (without double printing to console)
+  # and with full decimals
   return(invisible(tbl))
 
 }

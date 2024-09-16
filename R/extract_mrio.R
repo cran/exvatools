@@ -1,4 +1,4 @@
-#'
+##'
 #' Extract basic matrices from source data and prepares it for
 #' processing with `make_wio`
 #' @param edition Character string with edition
@@ -9,10 +9,10 @@
 #' @keywords internal
 #' @noRd
 #' @return List with basic input-output matrices and metadata
-extract_mrio <- function(edition = "mrio2023", src_dir,
-                           year = NULL, quiet = FALSE) {
+extract_mrio <- function(edition = "mrio2024", src_dir,
+                         year = NULL, quiet = FALSE) {
 
-  if (edition %in% c("mrio2023", "mrio2023k")) {
+  if (edition %in% c("mrio2024", "mrio2023", "mrio2023k")) {
 
     # Dimensions
     G <- 63
@@ -23,14 +23,42 @@ extract_mrio <- function(edition = "mrio2023", src_dir,
     FD <- 5
     GFD <- G * FD
 
-    # Use last year if year not specified
-    if (is.null(year)) {
-      year <- 2022
-      cli::cli_alert_info(c("Year not specified. Using year {year}"))
-    }
 
     # xlsx_names
-    if (edition == "mrio2023") {
+    # ************
+    # MRIO 2024
+    # ************
+    if (edition == "mrio2024") {
+      # Use last year if year not specified
+      if (is.null(year)) {
+        year <- 2023
+        cli::cli_alert_info(c("Year not specified. Using year {year}"))
+      }
+      if (year == 2000) {
+        xlsx_file <- "ADB-MRIO-2000_Mar2022-3.xlsx"
+      } else if (year == 2007) {
+        xlsx_file <- "ADB-MRIO-2007.xlsx"
+      } else if (year %in% c(2008:2016)) {
+        xlsx_file <- paste0("ADB-MRIO-", year, "_Mar2022", ".xlsx")
+      } else if (year %in% c(2017:2019)) {
+        xlsx_file <- paste0("ADB-MRIO62-", year, "_Dec2022", ".xlsx")
+      } else if (year %in% c(2020)) {
+        xlsx_file <- paste0("ADB-MRIO62-", year, "_June2023", ".xlsx")
+      } else if (year %in% c(2021:2023)) {
+        xlsx_file <- paste0("ADB-MRIO62-", year, "_August 2024", ".xlsx")
+      }
+      else {
+        stop(paste0("Year ", year, " is not available"))
+      }
+    # ************
+    # MRIO 2023
+    # ************
+    } else if (edition == "mrio2023") {
+      # Use last year if year not specified
+      if (is.null(year)) {
+        year <- 2022
+        cli::cli_alert_info(c("Year not specified. Using year {year}"))
+      }
       if (year == 2000) {
         xlsx_file <- "ADB-MRIO-2000_Mar2022-3.xlsx"
       } else if (year == 2007) {
@@ -44,12 +72,20 @@ extract_mrio <- function(edition = "mrio2023", src_dir,
       } else {
         stop(paste0("Year ", year, " is not available"))
       }
+    # ************
+    # MRIO 2023k
+    # ************
     } else if (edition== "mrio2023k") {
+      # Use last year if year not specified
+      if (is.null(year)) {
+        year <- 2022
+        cli::cli_alert_info(c("Year not specified. Using year {year}"))
+      }
       if (year == 2000) {
-         xlsx_file <- "ADB-MRIO-2000-at-constant-2010-prices.xlsx"
+        xlsx_file <- "ADB-MRIO-2000-at-constant-2010-prices.xlsx"
       } else if (year %in% c(2007:2009, 2011:2022))
-         xlsx_file <- paste0("ADB MRIO ", year,
-                             ", at constant 2010 prices", ".xlsx")
+        xlsx_file <- paste0("ADB MRIO ", year,
+                            ", at constant 2010 prices", ".xlsx")
       else {
         stop(paste0("Year ", year, " is not available"))
       }
@@ -72,13 +108,6 @@ extract_mrio <- function(edition = "mrio2023", src_dir,
                  "C70", "C71T74", "C75", "C80", "C85",
                  "C90T93", "C95T97")
 
-    # n_names <- c("D01T03", "D05T09", "D10T12", "D13T14", "D15", "D16",
-    #              "D17T18P58", "D19", "D20T21", "D22", "D23", "D24T25",
-    #              "D26T27", "D28", "D29T30", "D31T33", "D35T39", "D41T43",
-    #              "D45", "D46", "D47", "D55T56", "D49", "D50", "D51", "D52",
-    #              "D53P61", "D64T66", "D68", "D58T60P62T63P69T82",
-    #              "D84", "D85", "D86T88", "D90T96", "D97T98")
-
     fd_names <- c("GGFC", "HFCE", "NPISH", "GFCF", "INVNT")
 
     gn_names <- paste0(rep(g_names, each = N), gsub("^C", "_", n_names))
@@ -100,7 +129,7 @@ extract_mrio <- function(edition = "mrio2023", src_dir,
                               colNames = FALSE,
                               na.strings = " ")
 
-  } else if (edition %in% c("mrio2023x")) {
+  } else if (edition %in% c("mrio2024x", "mrio2023x")) {
 
     # Dimensions
     G <- 73
@@ -111,22 +140,48 @@ extract_mrio <- function(edition = "mrio2023", src_dir,
     FD <- 5
     GFD <- G * FD
 
-    # Use last year if year not specified
-    if (is.null(year)) {
-      year <- 2022
-      cli::cli_alert_info(c("Year not specified. Using year {year}"))
+    # ************
+    # MRIO 2024x
+    # ************
+    if (edition == "mrio2024x") {
+      # Use last year if year not specified
+      if (is.null(year)) {
+        year <- 2023
+        cli::cli_alert_info(c("Year not specified. Using year {year}"))
+      }
+      # xlsx_names
+      if (year == 2017) {
+        xlsx_file <- "ADB-MRIO-2017_Dec2022-2.xlsx"
+      } else if (year %in% c(2018:2019)) {
+        xlsx_file <- paste0("ADB-MRIO-", year, "_Dec2022", ".xlsx")
+      } else if (year %in% c(2020)) {
+        xlsx_file <- paste0("ADB-MRIO-", year, "_June2023", ".xlsx")
+      } else if (year %in% c(2021:2023)) {
+        xlsx_file <- paste0("ADB-MRIO-", year, "_August 2024", ".xlsx")
+      } else {
+        stop(paste0("Year ", year, " is not available"))
+      }
+    # ************
+    # MRIO 2023x
+    # ************
+    } else if (edition == "mrio2023x") {
+      # Use last year if year not specified
+      if (is.null(year)) {
+        year <- 2022
+        cli::cli_alert_info(c("Year not specified. Using year {year}"))
+      }
+      # xlsx_names
+      if (year == 2017) {
+        xlsx_file <- "ADB-MRIO-2017_Dec2022-2.xlsx"
+      } else if (year %in% c(2018:2019)) {
+        xlsx_file <- paste0("ADB-MRIO-", year, "_Dec2022", ".xlsx")
+      } else if (year %in% c(2020:2022)) {
+        xlsx_file <- paste0("ADB-MRIO-", year, "_June2023", ".xlsx")
+      } else {
+        stop(paste0("Year ", year, " is not available"))
+      }
     }
 
-    # xlsx_names
-    if (year == 2017) {
-      xlsx_file <- "ADB-MRIO-2017_Dec2022-2.xlsx"
-    } else if (year %in% c(2018:2019)) {
-      xlsx_file <- paste0("ADB-MRIO-", year, "_Dec2022", ".xlsx")
-    } else if (year %in% c(2020:2022)) {
-      xlsx_file <- paste0("ADB-MRIO-", year, "_June2023", ".xlsx")
-    } else {
-      stop(paste0("Year ", year, " is not available"))
-    }
 
     # Names
     g_names <- c("AUS", "AUT", "BEL", "BGR", "BRA", "CAN", "CHE", "CHN", "CYP",

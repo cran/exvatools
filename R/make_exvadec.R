@@ -44,10 +44,14 @@
 #'     output with several indicators of the OECD TiVA database.
 #' @param quiet Boolean, if `TRUE`, suppresses all status messages. Default
 #'   is `FALSE`, i.e., messages are shown.
-#' @param ... Additional parameters for targeted value added perspectives.
-#'   These are only available for the `"bm_src"` (Borin and Mancini, 2023,
-#'   source-based) and the `"my"` (Miroudot and Ye, 2021) decomposition.
-#'   methods. Specific perimeters can be:
+#' @param ... Additional parameters for targeted value-added perspectives
+#'   and for sector breakdown. Targeted value-added perspectives are only
+#'   available for the `"bm_src"` (Borin and Mancini, 2023, source-based) and
+#'   the `"my"` (Miroudot and Ye, 2021) decomposition methods. Specific
+#'   perimeters can be partner, sector and general perimeter. Sector breakdown
+#'   is only available for the `"bm_src"` (Borin and Mancini, 2023,
+#'   source-based) method, and can be exporting sector and sector of origin
+#'   of value added.
 #'   * `partner` String, for bilateral perspective. Default is `"WLD"`, but
 #'     any country or country group code (e.g. `"USA"` or `"EU27"`) can be
 #'     specified. In that case, all flows that cross the bilateral geographic
@@ -58,7 +62,7 @@
 #'     once will be considered as double counting. \
 #'     The bilateral and sector perspectives can be combined in a
 #'     bilateral-sector perspective.
-#'   * `perim` Boolean (only for `"my"`, and incompatible with sector or partner
+#'   * `perim` (only for `"my"`, and incompatible with sector or partner
 #'     specifications). String, for general perimeter of value added.
 #'     If `perim = "WLD"` (world) is specified (default is exporting country),
 #'     then all flows that cross the border of *any* country
@@ -69,6 +73,14 @@
 #'     (`perim = "WLD"`) and the terms output (`output = "terms"`, the foreign
 #'     double counting will be automatically divided into two
 #'     elements (`"terms2"`).
+#'   * `bkdown` Sector breakdown (only for `"bm_src"`). The default value
+#'     `"exporting"` will present a breakdown of value added by exporting
+#'     sector. The matrix product `VB` is diagonalized, and the total content
+#'     of value added (domestic and foreign) will coincide with total gross
+#'     exports. The alternative value `"origin"` will show a breakdown by
+#'     sector of origin of value added. In this case, only matrix `V` will be
+#'     diagonalized and the total content of value added will not coincide
+#'     with total gross exports.
 #' @return A list object of class `exvadec` with several matrices
 #'   plus metadata.
 #' @references
@@ -106,8 +118,11 @@ make_exvadec <- function(wio_object, exporter = "all",
   checked_args <- check_exvadec_args(list_args, my_args)
   # If output = "standard", change to "basic", as DAVAX and GVC indicators
   # are not compatible with sector or partner
+  # Exception: bkdown = "origin"
   if (all(length(my_args) > 0, method == "bm_src", output == "standard")) {
-    output <- "basic"
+    if (my_args$bkdown == "exporting") {
+      output <- "basic"
+    }
   }
 
   # Select method, exporter and output----
