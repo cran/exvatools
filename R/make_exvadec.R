@@ -119,9 +119,10 @@ make_exvadec <- function(wio_object, exporter = "all",
   # If output = "standard", change to "basic", as DAVAX and GVC indicators
   # are not compatible with sector or partner
   # Exception: bkdown = "origin"
+
   if (all(length(my_args) > 0, method == "bm_src", output == "standard")) {
-    if (my_args$bkdown == "exporting") {
-      output <- "basic"
+    if (any("partner" %in% my_args, "sector" %in% my_args)) {
+        output <- "basic"
     }
   }
 

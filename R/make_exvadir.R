@@ -10,12 +10,14 @@
 #' @param via Code of intermediate importing country (default: `"any"`)
 #' @param flow_type Gross exports (`"EXGR"`) or in terms of final demand:
 #'   `"EXGRY"`, `"EXGRY_FIN"`, `"EXGRY_INT"`.
-#' @param va_type VA total content (`"TC"`), domestic (`"DC"`) or foreign
-#'   content (`"FC"`) or VA content excluding double counting
-#'   (`"TVA"`, `"DVA"`, `"FVA"`)
+#' @param va_type Value-added total content (`"TC"`), domestic content (`"DC"`)
+#'   or foreign content (`"FC"`) or these indicators excluding double counting
+#'   (`"TVA"`, `"DVA"` and `"FVA"`, plus `"GVCB"`).
 #' @param intra Boolean for inclusion of intra-regional exports
 #'   (default: `FALSE`)
-#' @param perspective Sector perspective, `"origin"` or `"exporter"`.
+#' @param perspective Sector breakdown perspective, `"exporting"` (exporting
+#' sector, default) or `"origin"` (sector of origin). In the former the matrix
+#' `VB` will be diagonalized.
 #' @return Matrix with source and destination of value added in exports
 #' @export
 #' @examples
@@ -29,7 +31,7 @@
 make_exvadir <- function(wio_object, exporter,
                          va_type="TC", flow_type="EXGR",
                          orig_geo = "all", sec_orig = "all",
-                         via="any", perspective="exporter",
+                         via="any", perspective="exporting",
                          intra=FALSE){
 
   # Uses: bkd, bkoffd, get_geo_codes, get_sec_codes, meld
@@ -81,10 +83,10 @@ make_exvadir <- function(wio_object, exporter,
   }
 
   # Type of VA (VA o content) and matrix Bts----
-  va_type = toupper(va_type)
+  va_type <- toupper(va_type)
   if (va_type %in% c("TCX", "DCX", "FCX", "TC", "DC", "FC")){
     Bts <- wio$B
-  } else if(va_type %in% c("TVA", "DVA", "FVA")) {
+  } else if(va_type %in% c("TVA", "DVA", "FVA", "GVCB")) {
     # Matrix Bo for exporter
     cli::cli_alert_info("Calculating inverse matrix...")
     Ao <- wio$A
@@ -95,13 +97,17 @@ make_exvadir <- function(wio_object, exporter,
 
   # Domestic or foreign VA----
   # bkd and bkoffd correct icio, if needed
-  if (va_type %in% c("DCX", "DC", "DVA")) {
+  if (va_type %in% c("DCX", "DC", "DVA", "GVCB")) {
     Bm <- bkoffd(Bts)
     if (intra == FALSE) {
       Bm[pgn_exp, pgn_exp] <- 0
     }
     Bd <- Bts - Bm
     Bts <- Bd
+    # If GVCB we calculate TC minus DVA
+    if (va_type == "GVCB") {
+      Bts <- wio$B - Bts
+    }
   } else if (va_type %in% c("FCX", "FC", "FVA")) {
     Bm <- bkoffd(Bts)
     if (intra == FALSE) {
@@ -126,12 +132,12 @@ make_exvadir <- function(wio_object, exporter,
   }
 
 
-  # Perspective (origin or exporter)----
-  # If perspective is "exporter" (default) we diagonalize the matrix
+  # Sector perspective (exporting sector or sector of origin of VA)----
+  # If perspective is "exporting" (default) we diagonalize the matrix
   # Be careful: we are diagonalizing every submatrix ij of Vt_Bts
   # The result is not a block-diagonal matrix, but a full matrix with
   # every block diagonalized
-  if (perspective == "exporter") {
+  if (perspective %in% c("exporting", "exporter")) {
     Vt_Bts <- bkdiag(Vt_Bts)
   }
 

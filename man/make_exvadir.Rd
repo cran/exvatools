@@ -12,7 +12,7 @@ make_exvadir(
   orig_geo = "all",
   sec_orig = "all",
   via = "any",
-  perspective = "exporter",
+  perspective = "exporting",
   intra = FALSE
 )
 }
@@ -21,9 +21,9 @@ make_exvadir(
 
 \item{exporter}{Country code (or country group code) of exporting country}
 
-\item{va_type}{VA total content (\code{"TC"}), domestic (\code{"DC"}) or foreign
-content (\code{"FC"}) or VA content excluding double counting
-(\code{"TVA"}, \code{"DVA"}, \code{"FVA"})}
+\item{va_type}{Value-added total content (\code{"TC"}), domestic content (\code{"DC"})
+or foreign content (\code{"FC"}) or these indicators excluding double counting
+(\code{"TVA"}, \code{"DVA"} and \code{"FVA"}, plus \code{"GVCB"}).}
 
 \item{flow_type}{Gross exports (\code{"EXGR"}) or in terms of final demand:
 \code{"EXGRY"}, \code{"EXGRY_FIN"}, \code{"EXGRY_INT"}.}
@@ -34,7 +34,9 @@ content (\code{"FC"}) or VA content excluding double counting
 
 \item{via}{Code of intermediate importing country (default: \code{"any"})}
 
-\item{perspective}{Sector perspective, \code{"origin"} or \code{"exporter"}.}
+\item{perspective}{Sector breakdown perspective, \code{"exporting"} (exporting
+sector, default) or \code{"origin"} (sector of origin). In the former the matrix
+\code{VB} will be diagonalized.}
 
 \item{intra}{Boolean for inclusion of intra-regional exports
 (default: \code{FALSE})}

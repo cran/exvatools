@@ -28,6 +28,36 @@ diagcs <- function(df) {
 }
 
 
+#' Diagonalize the sums of each row of a matrix
+#'
+#' @description
+#' Diagonalizes the sums of each row of a matrix.
+#' @param df A matrix with named rows and columns.
+#' @return A diagonal matrix with the sums of rows in the diagonal.
+#' @export
+#' @examples
+#' wio <- make_wio("wiodtest")
+#' diagrs(wio$Y)
+diagrs <- function(df) {
+
+  # The dimension of the final matrix is defined by the
+  # number of rows of the matrix, i.e., a matrix of 10x3
+  # will become 10x10, whereas a 3x10 will become 3x3
+  if (nrow(df) > 1) {
+    row_names <- col_names <- rownames(df)
+    arr <- diag(rowSums(df))
+    dimnames(arr) <- list(row_names, col_names)
+  } else {
+    row_names <- col_names <- rownames(df)
+    arr <- as.matrix(sum(df))
+    dimnames(arr) <- list(row_names, col_names)
+  }
+
+  return(arr)
+
+}
+
+
 #' Sum matrix rows and assign name to resulting column
 #'
 #' Improved version of `rowSums()` for matrix output. The sum of rows is kept
@@ -262,7 +292,7 @@ sumgcols <- function(df, n, col_names = NULL) {
 #' group_cols(df, "EU27", "replace")
 #' }
 group_cols <- function(df, group, mode="get",
-                       group_name = NULL, wiotype = "icio2023"){
+                       group_name = NULL, wiotype = "icio2025"){
 
   # Group can be id (geo_id), position (pgn_exp) (most typical)
   # or vector c("AUS", "ESP")

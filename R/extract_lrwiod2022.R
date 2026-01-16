@@ -1,4 +1,4 @@
-#' Extract Long-run WIOD 2012 table
+#' Extract Long-run WIOD table
 #'
 #' Extract basic matrices from source data and prepares it for
 #' processing with `make_wio`
@@ -9,7 +9,8 @@
 #' @keywords internal
 #' @noRd
 #' @return List with basic input-output matrices and metadata
-extract_lrwiod2022 <- function(src_dir, year = NULL, quiet = FALSE) {
+extract_lrwiod <- function(edition = "lrwiod2022", src_dir,
+                           year = NULL, quiet = FALSE) {
 
   # Uses reshape2 and data.table
 
@@ -172,7 +173,7 @@ extract_lrwiod2022 <- function(src_dir, year = NULL, quiet = FALSE) {
                        "gx_names", "gn_names", "gxn_names",
                        "gfd_names")
 
-  io$type <- "lrwiod2022"
+  io$type <- edition
 
   io$year <- year
 

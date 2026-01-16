@@ -44,7 +44,7 @@ Matrix with source and destination of value added.
 }
 \description{
 Details of both geographical and sector origin of the
-VA incorporated in exports induced by final demand. Equivalent to the
+VA induced by final demand. Equivalent to the
 OECD's Origin of Value added in Final Demand (\code{FDVA_BSCI}), but with much
 more flexible geographical and sector options.
 }

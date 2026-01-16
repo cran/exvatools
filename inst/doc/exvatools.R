@@ -5,20 +5,20 @@ knitr::opts_chunk$set(
 )
 
 ## ----install, eval=FALSE, echo=TRUE-------------------------------------------
-#  install.packages("exvatools")
+# install.packages("exvatools")
 
 ## ----library------------------------------------------------------------------
 library(exvatools)
 
 ## ----make_wio, eval=FALSE, echo=TRUE------------------------------------------
-#  wio <- make_wio("icio2023", year = 2020,
-#                  src_dir = "C:/Users/Username/Documents/R")
+# wio <- make_wio("icio2025", year = 2025,
+#                 src_dir = "C:/Users/Username/Documents/R")
 
 ## ----make_wio_test, message=FALSE---------------------------------------------
 wio <- make_wio("iciotest")
 
 ## ----make_custom_wio, eval=FALSE----------------------------------------------
-#  wio <- make_custom_wio(df, g_names = c("C01", "C02", "C03"))
+# wio <- make_custom_wio(df, g_names = c("C01", "C02", "C03"))
 
 ## ----summary_wio--------------------------------------------------------------
 summary(wio)
@@ -70,18 +70,18 @@ get_data(exvadir, exporter = c("WLD", "EU27", "FRA",
          sector = c("TOTAL", "GOODSWU", "SRVWC"),
          importer = c("WLD", "EU27", "NONEU27"))
 
-## ----define_aukus-------------------------------------------------------------
-LATAM <- c("ESP", "MEX")
+## ----define_latam-------------------------------------------------------------
+latam <- c(LATAM = "ESP|MEX")
 
 ## ----get_data_vax_latam-------------------------------------------------------
-get_data(exvawwz, "DVA_INT", exporter = "LATAM", 
+get_data(exvawwz, "DVA_INT", exporter = latam, 
          sector = c("TOTAL", "MANUF", "SRVWC"), 
-         importer = "USA", custom = TRUE)
+         importer = "USA")
 
 ## ----get_data_vax_latam_intrarreg---------------------------------------------
 get_data(exvawwz, "EXGR", exporter = "NAFTA", 
          sector = c("TOTAL", "TOTALxSRVWC", "SRVWC"), 
-         importer = c("WLD", "NAFTA", "WLDxNAFTA"), custom = TRUE)
+         importer = c("WLD", "NAFTA", "WLDxNAFTA"))
 
 ## ----get_va_exgr--------------------------------------------------------------
 get_va_exgr(wio,geo_orig = "USA", sec_orig = "SRVWC",

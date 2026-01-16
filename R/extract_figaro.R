@@ -10,10 +10,66 @@
 #' @keywords internal
 #' @noRd
 #' @return List with basic input-output matrices and metadata
-extract_figaro <- function(edition = "figaro2024i", src_dir,
+extract_figaro <- function(edition = "figaro2025i", src_dir,
                            year = NULL, quiet = FALSE) {
 
-  if (edition %in% c("figaro2024i", "figaro2024p")) {
+  if (edition %in% c("figaro2025i", "figaro2025p")) {
+
+    # Dimensions
+    G <- 50
+    GX <- 50
+    N <- 64
+    GN <- G * N
+    GXN <- GX * N
+    FD <- 5
+    GFD <- G * FD
+
+    # Use last year if year not specified
+    if (is.null(year)) {
+      year <- 2023
+      cli::cli_alert_info(c("Year not specified. Using year {year}"))
+    }
+
+    # csv_names
+    if (edition == "figaro2025i") {
+      csv_file <- paste0("matrix_eu-ic-io_ind-by-ind_25ed_", year, ".csv")
+    } else if (edition== "figaro2025p") {
+      csv_file <- paste0("matrix_eu-ic-io_prod-by-prod_25ed_", year, ".csv")
+    }
+
+    # Names
+    # ROW appears as FIGW1 after FI
+    # Version 2025 adds ALB Albania, MKD North Macedonia,
+    # MNE Montenegro and SRB Serbia
+    g_names <- c("ALB", "ARG", "AUT", "AUS", "BEL", "BGR", "BRA", "CAN",
+                 "CHE", "CHN", "CYP", "CZE", "DEU", "DNK", "EST", "ESP",
+                 "FIN", "ROW", "FRA", "GBR", "GRC", "HRV", "HUN", "IDN",
+                 "IRL", "IND", "ITA", "JPN", "KOR", "LTU", "LUX", "LVA",
+                 "MNE", "MKD", "MLT", "MEX", "NLD", "NOR", "POL", "PRT",
+                 "ROU", "SRB", "RUS", "SAU", "SWE", "SVN", "SVK", "TUR",
+                 "USA", "ZAF")
+
+    # No changes in sectors
+    n_names <- c("D01", "D02", "D03", "D05T09", "D10T12", "D13T15",
+                 "D16", "D17", "D18", "D19", "D20", "D21", "D22", "D23",
+                 "D24", "D25", "D26", "D27", "D28", "D29", "D30", "D31T32",
+                 "D33", "D35", "D36", "D37T39", "D41T43", "D45", "D46",
+                 "D47", "D49", "D50", "D51", "D52", "D53", "D55T56",
+                 "D58", "D59T60", "D61", "D62T63", "D64", "D65", "D66",
+                 "D68", "D69T70", "D71", "D72", "D73", "D74T75", "D77",
+                 "D78", "D79", "D80T82", "D84", "D85", "D86", "D87T88",
+                 "D90T92", "D93", "D94", "D95", "D96", "D97T98", "D99")
+
+    # No changes
+    # P3_S13, P3_S14, P3_S15, P51G, P5M
+    fd_names <- c("GGFC", "HFCE", "NPISH", "GFCF", "INVNT")
+
+    gn_names <- paste0(rep(g_names, each = N), gsub("D", "_", n_names))
+    gfd_names <- paste0(rep(g_names, each = FD), "_", fd_names)
+    gxn_names <- gn_names
+    gx_names <- g_names
+
+  } else if (edition %in% c("figaro2024i", "figaro2024p")) {
 
     # Dimensions
     G <- 46
@@ -190,6 +246,7 @@ extract_figaro <- function(edition = "figaro2024i", src_dir,
   # Y with FD components
   Yfd <- as.matrix(df[1:GXN, (GXN+1):(GXN+GFD)])
   rownames(Yfd) <- gxn_names
+  colnames(Yfd) <- gfd_names
 
   # Aggregation of Yfd
   Y <- matrix(0, GXN, G)

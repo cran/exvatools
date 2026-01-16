@@ -1,7 +1,7 @@
 #' Value added induced by final demand
 #'
 #' @description Details of both geographical and sector origin of the
-#'   VA incorporated in exports induced by final demand. Equivalent to the
+#'   VA induced by final demand. Equivalent to the
 #'   OECD's Origin of Value added in Final Demand (`FDVA_BSCI`), but with much
 #'   more flexible geographical and sector options.
 #' @param wio_object A `wio` object
@@ -67,7 +67,7 @@ get_va_fd <- function(wio_object, va_type ="TOTAL",
   # Position of geo_orig (exporter)
   # Remember: in VBY, the exporter is the origin of VA
   intra <- FALSE
-  # We consider "WLD" not as a group, but as the sum of all indiviudal
+  # We consider "WLD" not as a group, but as the sum of all individual
   # countries (so we can obtain world's VAX or VAD). IN that case, we need
   # to include intra-trade (otherwise all content would be domestic)
   if (geo_orig == "WLD") {

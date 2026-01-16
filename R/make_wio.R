@@ -8,26 +8,30 @@
 #'   data).
 #' @param wiotype String specifying the name and edition of the
 #'   input-output tables to be used:
-#'     * `"icio2023"` for the 2023 edition of the OECD ICIO tables
-#'       (1995-2020) and `"icio2023s"` for the small format of the same edition.
-#'       The deprecated editions `"icio2021"` (1995-2018),
-#'       `"icio2018"` (1995-2011) and `"icio2016"`(2005-2015) remain
-#'       available for literature replication purposes.
+#'     * `"icio2025"` for the 2025 edition of the OECD ICIO tables
+#'       (1995-2022) and `"icio2025s"` for the small format of the same edition.
+#'       The deprecated editions `"icio2023"` and `"icio2023s"` (1995-2020),
+#'       `"icio2021"` (1995-2018), `"icio2018"` (1995-2011) and `"icio2016"`
+#'       (2005-2015) remain available for literature replication purposes.
 #'     * `"wiod2016"` for the 2016 edition of the WIOD tables
 #'       (2000-2014). The deprecated edition `"wiod2013"` (1995-2011)
 #'       remains available for literature replication purposes.
 #'     * `"lrwiod2022"` for the 2022 edition of the long-run WIOD
 #'       (1965-2000), useful for historical analysis.
-#'     * `"figaro2024i"` for the 2024 edition of the FIGARO EU Input-Output
-#'       Tables (EU IC-SUIOTs), industry-by-industry (2010-2021), and
-#'       `"figaro2024p"` for the product-by-product version of the same
-#'       database.The deprecated editions of 2023 and 2022
+#'     * `"figaro2025i"` for the 2025 edition of the FIGARO EU Input-Output
+#'       Tables, industry-by-industry (2010-2023), and
+#'       `"figaro2025p"` for the product-by-product version of the same
+#'       database.The deprecated editions of 2022, 2023 and 2024
 #'       remain available for literature replication purposes.
-#'     * `"mrio2024"` for the 2024 edition of the 62-country ADB MRIO tables.
-#'       `"mrio2023"` for the 2023 edition of the 62-country ADB MRIO tables,
-#'       `"mrio2023k"` for the 2023 edition in constant prices
-#'       `"mrio2024x"` for the 72-country edition (years up to 2023).
-#'       `"mrio2023x"` for the 72-country edition (years up to 2022).
+#'     * `"mrio2025"` for the 2025 edition of the 62-country ADB MRIO tables
+#'       in current prices (2000, 2007-2023). The deprecated editions
+#'       of 2024 and 2023 remain available for replication purposes.
+#'     * `"mrio2025k"` for the 2024 edition of the 62-country tables in 2010
+#'       constant prices (2000, 2007-2009, 2011-2023). The deprecated
+#'       versions fr 2024 and 2023 remain available.
+#'     * `"mrio2025x"` for the 72-country edition, current prices (2017-2023).
+#'       The deprecated versions for 2024 and 2023 remain available.
+#'     * `"mrio2025xx"` for the 74-country edition, current prices (2022-2023).
 #'     * `"iciotest"` for an example of an ICIO-type international
 #'       input-output table (disaggregated for `MEX` into `MX1` and `MX2` and
 #'       for `CHN` into `CN1` and `CN2`) and `"wiodtest"` for an example of a
@@ -62,8 +66,8 @@
 #' If source files are used, they must be previously downloaded and
 #'   placed in an accessible folder in disk, without renaming them. The
 #'   following name pattern is expected:
-#'   * `XXXX-XXXX.zip` for `"icio2023"` (`.csv` files)
-#'   * `XXXX-XXXX_SML.zip` for `"icio2023s"` (`.csv` files)
+#'   * `XXXX-XXXX.zip` for `"icio2025"` and `"icio2023"` (`.csv` files)
+#'   * `XXXX-XXXX_SML.zip` for `"icio2025s"` and `"icio2023s"` (`.csv` files)
 #'   * `ICIO_XXXX-XXXX.zip` for `"icio2021"` (`.csv` files)
 #'   * `ICIO2018_XXXX.zip` for `"icio2018"` (`.csv` files)
 #'   * `ICIO2016_XXXX.zip` for `"icio2016"` (`.csv` files)
@@ -75,9 +79,9 @@
 #'   * `matrix_eu-ic-io_ind-by-ind_2Xed_XXXX.csv` for `"figaro202Xi` and
 #'     `matrix_eu-ic-io_prod-by-prod_2Xed_XXXX.csv` for `"figaro202Xp`
 #'     (`.csv` files).
-#'   * `ADB-MRIO[XX]-XXXX_xxx2023.xlsx` for the `"mrio62-202X"`, `"mrio72-202X"`
+#'   * `ADB-MRIO[XX]-XXXX_xxx202X.xlsx` for the `"mrio202X"`, `"mrio202Xx"`
 #'     and `ADB MRIO XXXX, at constant 2010 prices.xlsx` for the
-#'     `"mrio62-202Xk"` tables (with some exceptions).
+#'     `"mrio62-202Xk"` tables (with some exceptions and updates).
 #'
 #' The input-output framework follows the traditional demand model of
 #'   Leontief (1936), which makes assumptions about the stability of inputs
@@ -99,11 +103,11 @@
 #' \dontrun{
 #' # The following examples require the previous download of the source
 #' # files in the working directory or in a directory specified by `src_dir`.
-#' wio <- make_wio("icio2023", 2020)
-#' wio <- make_wio("wiod2021", 2018)
+#' wio <- make_wio("icio2025", 2022)
+#' wio <- make_wio("wiod2023", 2020)
 #' wio <- make_wio("wiod2023", 2020, src_dir = "C:/Users/John/R/")
 #' }
-make_wio <- function(wiotype ="icio2023", year = NULL,
+make_wio <- function(wiotype ="icio2025", year = NULL,
                      src_dir = NULL, quiet = FALSE) {
 
   # Check arguments----
@@ -125,47 +129,22 @@ make_wio <- function(wiotype ="icio2023", year = NULL,
 
   # Extraction of Z, Yfd, Y, X, VA----
 
-  if (wiotype == "icio2023") {
-    io <- extract_icio("icio2023", src_dir, year, quiet)
-  } else if (wiotype == "icio2023s") {
-    io <- extract_icio("icio2023s", src_dir, year, quiet)
-  } else if (wiotype == "icio2021") {
-    io <- extract_icio("icio2021", src_dir, year, quiet)
-  } else if (wiotype == "icio2018") {
-    io <- extract_icio("icio2018", src_dir, year, quiet)
-  } else if (wiotype == "icio2016") {
-    io <- extract_icio("icio2016", src_dir, year, quiet)
-  } else if (wiotype == "iciotest") {
+  # Get wiotype base (i.e., without the year: figaro, icio, etc)
+  wio_base_type  <- sub("\\d.*", "", wiotype)
+
+  if (wio_base_type == "icio") {
+    io <- extract_icio(wiotype, src_dir, year, quiet)
+  } else if (wio_base_type == "wiod") {
+    io <- extract_wiod(wiotype, src_dir, year, quiet)
+  } else if (wio_base_type == "lrwiod") {
+    io <- extract_lrwiod(wiotype, src_dir, year, quiet)
+  } else if (wio_base_type == "figaro") {
+    io <- extract_figaro(wiotype, src_dir, year, quiet)
+  } else if (wio_base_type == "mrio") {
+    io <- extract_mrio(wiotype, src_dir, year, quiet)
+  } else if (wio_base_type == "iciotest") {
     io <- generate_test_iot(is_icio = TRUE, quiet)
-  } else if (wiotype == "wiod2016") {
-    io <- extract_wiod("wiod2016", src_dir, year, quiet)
-  } else if (wiotype == "wiod2013") {
-    io <- extract_wiod("wiod2013", src_dir, year, quiet)
-  } else if (wiotype == "lrwiod2022") {
-    io <- extract_lrwiod2022(src_dir, year, quiet)
-  } else if (wiotype == "figaro2024i") {
-    io <- extract_figaro("figaro2024i", src_dir, year, quiet)
-  } else if (wiotype == "figaro2024p") {
-    io <- extract_figaro("figaro2024p", src_dir, year, quiet)
-  } else if (wiotype == "figaro2023i") {
-    io <- extract_figaro("figaro2023i", src_dir, year, quiet)
-  } else if (wiotype == "figaro2023p") {
-    io <- extract_figaro("figaro2023p", src_dir, year, quiet)
-  } else if (wiotype == "figaro2022i") {
-    io <- extract_figaro("figaro2022i", src_dir, year, quiet)
-  } else if (wiotype == "figaro2022p") {
-    io <- extract_figaro("figaro2022p", src_dir, year, quiet)
-  } else if (wiotype == "mrio2024") {
-    io <- extract_mrio("mrio2024", src_dir, year, quiet)
-  } else if (wiotype == "mrio2023") {
-    io <- extract_mrio("mrio2023", src_dir, year, quiet)
-  } else if (wiotype == "mrio2023k") {
-    io <- extract_mrio("mrio2023k", src_dir, year, quiet)
-  } else if (wiotype == "mrio2024x") {
-    io <- extract_mrio("mrio2024x", src_dir, year, quiet)
-  } else if (wiotype == "mrio2023x") {
-    io <- extract_mrio("mrio2023x", src_dir, year, quiet)
-  } else if (wiotype == "wiodtest") {
+  } else if (wio_base_type == "wiodtest") {
     io <- generate_test_iot(is_icio = FALSE, quiet)
   }
 

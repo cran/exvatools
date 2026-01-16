@@ -10,8 +10,9 @@ get_data(
   exporter,
   sector = "TOTAL",
   importer = "WLD",
+  imp_sector = "TOTAL",
   demand_comp = "TOTAL",
-  custom = FALSE
+  as_num = FALSE
 )
 }
 \arguments{
@@ -52,16 +53,18 @@ Of course, variables that do not require to exclude double-counting,
 like \code{"EXGR"}, \code{"DC"} or\code{"FC"} will be the same in
 both cases, so no specific \code{exvadec} object will be required.}
 
+\item{imp_sector}{A character vector with sector codes, e.g. \code{TOTAL},
+\code{AGF}, \code{MANUF}, \code{c("TOTAL", "AGF", "MANUF", "SERVS")}.
+Available codes can be checked with \code{\link[=info_sec]{info_sec()}}.}
+
 \item{demand_comp}{A character vector of demand components, e.g.,
 \code{"HFCE"}, \code{c("HFCE", "GCFC")}. Only valid for \code{wio}
 objects.}
 
-\item{custom}{Boolean specifying whether custom-made groups of countries
-or sectors are present in the environment to be used. For instance, a
-custom \code{HITECH} custom variable including high-tech sectors or
-a \code{LDC} variable with list of least-developed countries. Note that
-custom variables should be referred to as strings in \code{get_data()},
-i.e. as \code{"HITECH"} and \code{"LDC"}.}
+\item{as_num}{Boolean specifying whether to present the data with
+names of rows and columns or just as a numeric vector or matrix.
+This option is useful when creating data frames composed of several
+\code{get_data()} commands, as in that case dimensions need to be controlled.}
 }
 \value{
 A two-dimensional matrix with sector and geographical data of a
@@ -73,7 +76,7 @@ variable in an \code{exvatools} object.
 }
 \examples{
 wio <- make_wio("wiodtest")
-get_data(wio, "EXGR", exp = "ESP", sec = "MANUF")
-get_data(wio, "EXGR", exp = "ESP", sec = c("TOTAL", "MANUF", "SRVWC"),
-         imp = c("USA", "FRA"))
+get_data(wio, "EXGR", exporter = "ESP", sector = "MANUF")
+get_data(wio, "EXGR", exporter = "ESP", sector = c("TOTAL", "MANUF", "SRVWC"),
+         importer = c("USA", "FRA"))
 }

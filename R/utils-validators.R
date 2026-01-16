@@ -174,6 +174,15 @@ check_exvadec_args <- function(list_args, my_args = NULL) {
                                 "'partner' and 'sector' perimeters and ",
                                 "with the 'bkdown' argument."))
         }
+        if (arg == "bkdown") {
+          if (!my_args$bkdown %in% c("exporting", "origin")) {
+            cli::cli_abort(paste0("Breakdown '{my_args$bkdown}' not valid. ",
+                                  "Method 'bm_src' is only compatible with ",
+                                  "'exporting' and 'origin' ",
+                                  "'bkdown' argument."))
+          }
+        }
+
       }
     # Method MY
     } else if (method == "my") {

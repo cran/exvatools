@@ -10,11 +10,13 @@
 #' @keywords internal
 #' @noRd
 #' @return List with basic input-output matrices and metadata
-extract_icio <- function(edition = "icio2023", src_dir,
+extract_icio <- function(edition = "icio2025", src_dir,
                          year = NULL, quiet = FALSE) {
 
   # Default year
-  if (edition %in% c("icio2023", "icio2023s")) {
+  if (edition %in% c("icio2025", "icio2025s")) {
+    last_year <- 2022
+  } else if (edition %in% c("icio2023", "icio2023s")) {
     last_year <- 2020
   } else if (edition == "icio2021") {
     last_year <- 2018
@@ -31,10 +33,108 @@ extract_icio <- function(edition = "icio2023", src_dir,
   }
 
   # Dimensions and file names
+
+  # ************
+  # ICIO 2025
+  # ************
+  if (edition == "icio2025") {
+    G <- 81
+    GX <- 85
+    N <- 50
+    FD <- 6
+    # Name of zip file
+    if (year %in% c(1995:2000)) {
+      zip_file <- "1995-2000_EXT.zip"
+    } else if (year %in% c(2001:2005)) {
+      zip_file <- "2001-2005_EXT.zip"
+    } else if (year %in% c(2006:2010)) {
+      zip_file <- "2006-2010_EXT.zip"
+    } else if (year %in% c(2011:2015)) {
+      zip_file <- "2011-2015_EXT.zip"
+    } else if (year %in% c(2016:2022)) {
+      zip_file <- "2016-2022_EXT.zip"
+    } else {
+      stop(paste0("Year ", year, " is not available"))
+    }
+    # In Nov 2023 zip contained zip files (XXXX.zip)
+    # In Dec 2023 just XXXX.CSV files (extension in uppercase)
+    # In Feb 2024 XXXX.csv files (extension in lowercase)
+    csv_file <- paste0(year, ".csv")
+    # Names of rows and columns
+    g_names <- c("AGO", "ARE", "ARG", "AUS", "AUT", "BEL", "BGD", "BGR",
+                 "BLR", "BRA", "BRN", "CAN", "CHE", "CHL", "CHN", "CIV",
+                 "CMR", "COD", "COL", "CRI", "CYP", "CZE", "DEU", "DNK",
+                 "EGY", "ESP", "EST", "FIN", "FRA", "GBR", "GRC", "HKG",
+                 "HRV", "HUN", "IDN", "IND", "IRL", "ISL", "ISR", "ITA",
+                 "JOR", "JPN", "KAZ", "KHM", "KOR", "LAO", "LTU", "LUX",
+                 "LVA", "MAR", "MEX", "MLT", "MMR", "MYS", "NGA", "NLD",
+                 "NOR", "NZL", "PAK", "PER", "PHL", "POL", "PRT", "ROU",
+                 "RUS", "SAU", "SEN", "SGP", "STP", "SVK", "SVN", "SWE",
+                 "THA", "TUN", "TUR", "TWN", "UKR", "USA", "VNM", "ZAF",
+                 "ROW")
+    gx_names <- c(g_names, "MX1", "MX2", "CN1", "CN2")
+    n_names <- c("D01", "D02", "D03", "D05", "D06", "D07", "D08", "D09",
+                 "D10T12", "D13T15", "D16", "D17T18", "D19", "D20", "D21",
+                 "D22", "D23", "D241", "D242", "D25", "D26", "D27", "D28",
+                 "D29", "D301", "D302", "D31T33", "D35", "D36T39", "D41T43",
+                 "D45T47", "D49", "D50", "D51", "D52", "D53", "D55T56",
+                 "D58T60", "D61", "D62T63", "D64T66", "D68", "D69T75",
+                 "D77T82", "D84", "D85", "D86T89", "D90T93", "D94T96",
+                 "D97T98")
+    fd_names <- c("HFCE", "NPISH", "GGFC", "GFCF", "INVNT", "DIRPA")
+
+    # ************
+    # ICIO 2025s
+    # ************
+  } else if (edition == "icio2025s") {
+    G <- 81
+    GX <- 81
+    N <- 50
+    FD <- 6
+    # Name of zip file
+    # In Nov and Dec 2023 ICIO-XXXX-XXXX-small.zip
+    # In Feb 2024 XXXX-XXXX_SML.zip
+    if (year %in% c(1995:2000)) {
+      zip_file <- "1995-2000_SML.zip"
+    } else if (year %in% c(2001:2005)) {
+      zip_file <- "2001-2005_SML.zip"
+    } else if (year %in% c(2006:2010)) {
+      zip_file <- "2006-2010_SML.zip"
+    } else if (year %in% c(2011:2016)) {
+      zip_file <- "2011-2016_SML.zip"
+    } else if (year %in% c(2017:2022)) {
+      zip_file <- "2017-2022_SML.zip"
+    } else {
+      stop(paste0("Year ", year, " is not available"))
+    }
+    csv_file <- paste0(year, "_SML", ".csv")
+    # Names of rows and columns
+    g_names <- c("AGO", "ARE", "ARG", "AUS", "AUT", "BEL", "BGD", "BGR",
+                 "BLR", "BRA", "BRN", "CAN", "CHE", "CHL", "CHN", "CIV",
+                 "CMR", "COD", "COL", "CRI", "CYP", "CZE", "DEU", "DNK",
+                 "EGY", "ESP", "EST", "FIN", "FRA", "GBR", "GRC", "HKG",
+                 "HRV", "HUN", "IDN", "IND", "IRL", "ISL", "ISR", "ITA",
+                 "JOR", "JPN", "KAZ", "KHM", "KOR", "LAO", "LTU", "LUX",
+                 "LVA", "MAR", "MEX", "MLT", "MMR", "MYS", "NGA", "NLD",
+                 "NOR", "NZL", "PAK", "PER", "PHL", "POL", "PRT", "ROU",
+                 "RUS", "SAU", "SEN", "SGP", "STP", "SVK", "SVN", "SWE",
+                 "THA", "TUN", "TUR", "TWN", "UKR", "USA", "VNM", "ZAF",
+                 "ROW")
+    gx_names <- g_names
+    n_names <- c("D01", "D02", "D03", "D05", "D06", "D07", "D08", "D09",
+                 "D10T12", "D13T15", "D16", "D17T18", "D19", "D20", "D21",
+                 "D22", "D23", "D241", "D242", "D25", "D26", "D27", "D28",
+                 "D29", "D301", "D302", "D31T33", "D35", "D36T39", "D41T43",
+                 "D45T47", "D49", "D50", "D51", "D52", "D53", "D55T56",
+                 "D58T60", "D61", "D62T63", "D64T66", "D68", "D69T75",
+                 "D77T82", "D84", "D85", "D86T89", "D90T93", "D94T96",
+                 "D97T98")
+    fd_names <- c("HFCE", "NPISH", "GGFC", "GFCF", "INVNT", "DIRPA")
+
   # ************
   # ICIO 2023
   # ************
-  if (edition == "icio2023") {
+  } else if (edition == "icio2023") {
     G <- 77
     GX <- 81
     N <- 45
@@ -42,16 +142,17 @@ extract_icio <- function(edition = "icio2023", src_dir,
     # Name of zip file
     # In Nov and Dec 2023 ICIO-XXXX-XXXX-extended.zip
     # Later in February 2024 XXXX-XXXX.zip
+    # Later XXXX-XXXX_EXT.zip
     if (year %in% c(1995:2000)) {
-      zip_file <- "1995-2000.zip"
+      zip_file <- "1995-2000_EXT.zip"
     } else if (year %in% c(2001:2005)) {
-      zip_file <- "2001-2005.zip"
+      zip_file <- "2001-2005_EXT.zip"
     } else if (year %in% c(2006:2010)) {
-      zip_file <- "2006-2010.zip"
+      zip_file <- "2006-2010_EXT.zip"
     } else if (year %in% c(2011:2015)) {
-      zip_file <- "2011-2015.zip"
+      zip_file <- "2011-2015_EXT.zip"
     } else if (year %in% c(2016:2020)) {
-      zip_file <- "2016-2020.zip"
+      zip_file <- "2016-2020_EXT.zip"
     } else {
       stop(paste0("Year ", year, " is not available"))
     }
@@ -153,12 +254,11 @@ extract_icio <- function(edition = "icio2023", src_dir,
                  "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL",
                  "IRL", "ISR", "ITA", "JPN", "KOR", "LVA", "LTU", "LUX",
                  "MEX", "NLD", "NZL", "NOR", "POL", "PRT", "SVK", "SVN",
-                 "ESP", "SWE", "CHE", "TUR", "GBR", "USA", "ARG", "BGD",
-                 "BLR", "BRA", "BRN", "BGR", "KHM", "CMR", "CHN", "CIV",
-                 "HRV", "CYP", "EGY", "HKG", "IND", "IDN", "JOR", "KAZ",
-                 "LAO", "MYS", "MLT", "MAR", "MMR", "NGA", "PAK", "PER",
-                 "PHL", "ROU", "RUS", "SAU", "SEN", "SGP", "ZAF", "TWN",
-                 "THA", "TUN", "UKR", "VNM", "ROW")
+                 "ESP", "SWE", "CHE", "TUR", "GBR", "USA", "ARG", "BRA",
+                 "BRN", "BGR", "KHM", "CHN", "HRV", "CYP", "IND", "IDN",
+                 "HKG", "KAZ", "LAO", "MYS", "MLT", "MAR", "MMR", "PER",
+                 "PHL", "ROU", "RUS", "SAU", "SGP", "ZAF", "TWN", "THA",
+                 "TUN", "VNM", "ROW")
     gx_names <- c(g_names, "MX1", "MX2", "CN1", "CN2")
     n_names <- c("D01T02", "D03", "D05T06", "D07T08", "D09", "D10T12",
                  "D13T15", "D16", "D17T18", "D19", "D20", "D21", "D22",

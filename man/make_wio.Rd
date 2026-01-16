@@ -4,31 +4,35 @@
 \alias{make_wio}
 \title{Make standard world input-output matrices from source files}
 \usage{
-make_wio(wiotype = "icio2023", year = NULL, src_dir = NULL, quiet = FALSE)
+make_wio(wiotype = "icio2025", year = NULL, src_dir = NULL, quiet = FALSE)
 }
 \arguments{
 \item{wiotype}{String specifying the name and edition of the
 input-output tables to be used:
-* \code{"icio2023"} for the 2023 edition of the OECD ICIO tables
-(1995-2020) and \code{"icio2023s"} for the small format of the same edition.
-The deprecated editions \code{"icio2021"} (1995-2018),
-\code{"icio2018"} (1995-2011) and \code{"icio2016"}(2005-2015) remain
-available for literature replication purposes.
+* \code{"icio2025"} for the 2025 edition of the OECD ICIO tables
+(1995-2022) and \code{"icio2025s"} for the small format of the same edition.
+The deprecated editions \code{"icio2023"} and \code{"icio2023s"} (1995-2020),
+\code{"icio2021"} (1995-2018), \code{"icio2018"} (1995-2011) and \code{"icio2016"}
+(2005-2015) remain available for literature replication purposes.
 * \code{"wiod2016"} for the 2016 edition of the WIOD tables
 (2000-2014). The deprecated edition \code{"wiod2013"} (1995-2011)
 remains available for literature replication purposes.
 * \code{"lrwiod2022"} for the 2022 edition of the long-run WIOD
 (1965-2000), useful for historical analysis.
-* \code{"figaro2024i"} for the 2024 edition of the FIGARO EU Input-Output
-Tables (EU IC-SUIOTs), industry-by-industry (2010-2021), and
-\code{"figaro2024p"} for the product-by-product version of the same
-database.The deprecated editions of 2023 and 2022
+* \code{"figaro2025i"} for the 2025 edition of the FIGARO EU Input-Output
+Tables, industry-by-industry (2010-2023), and
+\code{"figaro2025p"} for the product-by-product version of the same
+database.The deprecated editions of 2022, 2023 and 2024
 remain available for literature replication purposes.
-* \code{"mrio2024"} for the 2024 edition of the 62-country ADB MRIO tables.
-\code{"mrio2023"} for the 2023 edition of the 62-country ADB MRIO tables,
-\code{"mrio2023k"} for the 2023 edition in constant prices
-\code{"mrio2024x"} for the 72-country edition (years up to 2023).
-\code{"mrio2023x"} for the 72-country edition (years up to 2022).
+* \code{"mrio2025"} for the 2025 edition of the 62-country ADB MRIO tables
+in current prices (2000, 2007-2023). The deprecated editions
+of 2024 and 2023 remain available for replication purposes.
+* \code{"mrio2025k"} for the 2024 edition of the 62-country tables in 2010
+constant prices (2000, 2007-2009, 2011-2023). The deprecated
+versions fr 2024 and 2023 remain available.
+* \code{"mrio2025x"} for the 72-country edition, current prices (2017-2023).
+The deprecated versions for 2024 and 2023 remain available.
+* \code{"mrio2025xx"} for the 74-country edition, current prices (2022-2023).
 * \code{"iciotest"} for an example of an ICIO-type international
 input-output table (disaggregated for \code{MEX} into \code{MX1} and \code{MX2} and
 for \code{CHN} into \code{CN1} and \code{CN2}) and \code{"wiodtest"} for an example of a
@@ -80,8 +84,8 @@ If source files are used, they must be previously downloaded and
 placed in an accessible folder in disk, without renaming them. The
 following name pattern is expected:
 \itemize{
-\item \code{XXXX-XXXX.zip} for \code{"icio2023"} (\code{.csv} files)
-\item \code{XXXX-XXXX_SML.zip} for \code{"icio2023s"} (\code{.csv} files)
+\item \code{XXXX-XXXX.zip} for \code{"icio2025"} and \code{"icio2023"} (\code{.csv} files)
+\item \code{XXXX-XXXX_SML.zip} for \code{"icio2025s"} and \code{"icio2023s"} (\code{.csv} files)
 \item \code{ICIO_XXXX-XXXX.zip} for \code{"icio2021"} (\code{.csv} files)
 \item \code{ICIO2018_XXXX.zip} for \code{"icio2018"} (\code{.csv} files)
 \item \code{ICIO2016_XXXX.zip} for \code{"icio2016"} (\code{.csv} files)
@@ -93,9 +97,9 @@ packages \code{data.table} and \code{reshape2}.
 \item \code{matrix_eu-ic-io_ind-by-ind_2Xed_XXXX.csv} for \verb{"figaro202Xi} and
 \code{matrix_eu-ic-io_prod-by-prod_2Xed_XXXX.csv} for \verb{"figaro202Xp}
 (\code{.csv} files).
-\item \code{ADB-MRIO[XX]-XXXX_xxx2023.xlsx} for the \code{"mrio62-202X"}, \code{"mrio72-202X"}
+\item \code{ADB-MRIO[XX]-XXXX_xxx202X.xlsx} for the \code{"mrio202X"}, \code{"mrio202Xx"}
 and \verb{ADB MRIO XXXX, at constant 2010 prices.xlsx} for the
-\code{"mrio62-202Xk"} tables (with some exceptions).
+\code{"mrio62-202Xk"} tables (with some exceptions and updates).
 }
 
 The input-output framework follows the traditional demand model of
@@ -114,8 +118,8 @@ summary(wio)
 \dontrun{
 # The following examples require the previous download of the source
 # files in the working directory or in a directory specified by `src_dir`.
-wio <- make_wio("icio2023", 2020)
-wio <- make_wio("wiod2021", 2018)
+wio <- make_wio("icio2025", 2022)
+wio <- make_wio("wiod2023", 2020)
 wio <- make_wio("wiod2023", 2020, src_dir = "C:/Users/John/R/")
 }
 }

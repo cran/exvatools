@@ -16,15 +16,15 @@
 #' @return Codes of sector ready to grep, e.g. `_01|_02|_03`.
 #' @export
 #' @examples
-#' # Get sector codes for manufactures in the icio2023 database.
-#' get_sec_codes("MANUF", "icio2023")
+#' # Get sector codes for manufactures in the icio2025 database.
+#' get_sec_codes("MANUF", "icio2025")
 #' # Get sector codes for services (including construction)
-#' get_sec_codes("SRVWC", "icio2023")
+#' get_sec_codes("SRVWC", "icio2025")
 #' # Get sector codes for manufacturing, removing the first letter so
 #' # the result can be used with `grep` to select specific sectors from
 #' # a matrix
-#' get_sec_codes("MANUF", "icio2023", remove_letter = TRUE)
-get_sec_codes <- function(sector_id, wiotype = "icio2023",
+#' get_sec_codes("MANUF", "icio2025", remove_letter = TRUE)
+get_sec_codes <- function(sector_id, wiotype = "icio2025",
                           remove_letter = FALSE){
 
   # Requires: dbsec
@@ -105,7 +105,7 @@ get_sec_codes <- function(sector_id, wiotype = "icio2023",
 #' @keywords internal
 #' @noRd
 #' @return string with codes
-get_sec_code <- function(sector_id, wiotype = "icio2023") {
+get_sec_code <- function(sector_id, wiotype = "icio2025") {
 
   # If it is a custom wio
   if (wiotype == "custom") {

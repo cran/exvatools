@@ -1,3 +1,19 @@
+# exvatools 1.0.0 (2026-01-15)
+
+* Added 2025 edition of OECD ICIO Input-Output Tables (1995-2022), in  versions
+  extended (`"icio2025"`) and simplified (`"icio2025s"`)
+* Added 2025 edition of ADB Multi-Regional Input-Output Tables
+  (ADB-MRIO), with data up to 2023 or 2024, for the 62-country version in   
+  current prices (`"mrio2025"`), and constant prices, (`"mrio2025k"`) the 
+  72-country version (`"mrio2025x"`) and the 74-country 
+  version (`"mrio2025xx"`).
+* Added 2025 edition of FIGARO EU Input-Output Tables (2010-2023) 
+* Improved version of `get_data()`command so it takes names from named string
+  vectors (both for countries and sectors). Removed the `custom` option in
+  the same command, as it becomes redundant.
+* Added the option of decomposing the Global Value Chain Backward (`GVCB`) 
+  indicator by origin in `make_exvadir()`.
+
 # exvatools 0.9.0 (2024-09-16)
 
 * Added partial 2024 edition of ADB Multi-Regional Input-Output Tables

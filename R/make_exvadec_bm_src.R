@@ -350,6 +350,7 @@ make_exvadec_bm_src_exp <- function(wio_object, exporter = "all",
     VAX <- DVA - REF
     if (is_secx) {
       DDC <- sumnrow_meld(dmult(Vs_Bss_minus_Bxss, EXGR))
+      DC <- DVA + DDC
     } else {
       DDC <- sumnrow_meld(Vs_Bss_minus_Bxss %*% EXGR)
       DC <- DVA + DDC
